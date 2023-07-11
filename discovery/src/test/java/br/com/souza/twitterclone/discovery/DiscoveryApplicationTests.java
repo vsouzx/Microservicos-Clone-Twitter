@@ -1,10 +1,10 @@
-/*package br.com.souza.twitterclone.configserver;
+/*package br.com.souza.twitterclone.discovery;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ConfigserverApplicationTests {
+class DiscoveryApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="twitterclone" />
+        <module name="discovery" />
         <module name="configserver" />
       </profile>
     </annotationProcessing>
@@ -21,6 +22,7 @@
       <module name="configserver" options="-parameters" />
       <module name="configserver (1)" options="-parameters" />
       <module name="configserver (2)" options="-parameters" />
+      <module name="discovery" options="-parameters" />
       <module name="twitterclone" options="-parameters" />
     </option>
   </component>
