@@ -21,6 +21,7 @@
 		<spring-boot.version>3.0.8</spring-boot.version>
 		<spring-cloud.version>4.0.1</spring-cloud.version>
 		<mssql.version>11.2.3.jre17</mssql.version>
+		<redis-client.version>4.4.3</redis-client.version>
 	</properties>
 
 	<dependencies>
@@ -44,6 +45,18 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 			<version>${spring-boot.version}</version>
+		</dependency>
+		<!-- Spring boot Redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+		<!-- Redis Client -->
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>${redis-client.version}</version>
 		</dependency>
 
 		<!-- Spring Cloud -->
@@ -75,6 +88,25 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
+		</dependency>
+
+		<!--JWT-->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.9.1</version>
+		</dependency>
+		<!-- jjwt -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>9.31</version>
+		</dependency>
+		<!-- JAXB -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.1</version>
 		</dependency>
 	</dependencies>
 

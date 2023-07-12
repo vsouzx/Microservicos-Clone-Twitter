@@ -1,0 +1,9 @@
+version: '2'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    hostname: redis
+    command: [ "--requirepass 6#3MxH432%eS9ngj" ]
+    restart: always
