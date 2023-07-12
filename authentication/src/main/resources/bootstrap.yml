@@ -1,7 +1,7 @@
 ## Configuração Default da Aplicação ##
 spring:
   application:
-    name: discovery
+    name: authentication
   jpa:
     fail-fast: true
 

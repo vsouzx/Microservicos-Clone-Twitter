@@ -19,3 +19,30 @@ CREATE USER twitterclone_admin FOR LOGIN twitterclone_admin WITH DEFAULT_SCHEMA 
 GRANT CONTROL 
 ON SCHEMA::dbo
 TO twitterclone_admin;
+
+ALTER LOGIN [twitterclone_admin] DISABLE
+GO
+
+ALTER SERVER ROLE [sysadmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [securityadmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [serveradmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [setupadmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [processadmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [diskadmin] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [dbcreator] ADD MEMBER [twitterclone_admin]
+GO
+
+ALTER SERVER ROLE [bulkadmin] ADD MEMBER [twitterclone_admin]
+GO
