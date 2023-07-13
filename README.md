@@ -3,7 +3,7 @@ Backend do meu futuro "clone" do twitter, usando arquitetura de microservicos co
 
 O que será implementado:
 <p><b>ConfigServer</b> ✔️</p> 
-<p><b>ConfigServer Repository ✔️</b></p>
+<p><b>ConfigServer Repository</b>✔️ <a href="https://github.com/vsouzx/Microservicos-Clone-Twitter-Repository"> Link do repositorio</a></p>
 <p><b>Discovery</b> ✔️</p>
 <p><b>Gateway</b> (com Spring WebFlux) 🔜</p>
 <p>Serviço de <b>autenticação</b> (com Redis) ✔️</p>
