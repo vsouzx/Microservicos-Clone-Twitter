@@ -79,16 +79,10 @@
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
 		</dependency>
-
-		<!-- Banco SqlServer -->
-		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
-			<version>${mssql.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>gateway</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
