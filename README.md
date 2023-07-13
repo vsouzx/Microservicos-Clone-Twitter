@@ -5,7 +5,7 @@ O que será implementado:
 <p><b>ConfigServer</b> ✔️</p> 
 <p><b>ConfigServer Repository</b>✔️ <a href="https://github.com/vsouzx/Microservicos-Clone-Twitter-Repository"> Link do repositorio</a></p>
 <p><b>Discovery</b> ✔️</p>
-<p><b>Gateway</b> (com Spring WebFlux) 🔜</p>
+<p><b>Gateway</b> (com Spring WebFlux) ✔️</p>
 <p>Serviço de <b>autenticação</b> (com Redis) ✔️</p>
 <p>Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka) 🔜</p>
 <p>Serviço de <b>email </b>(sendo um Consumer Kafka) 🔜</p>
