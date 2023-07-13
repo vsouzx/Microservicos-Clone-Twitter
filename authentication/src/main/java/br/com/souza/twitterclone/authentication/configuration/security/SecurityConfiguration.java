@@ -21,11 +21,21 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     private final TokenProvider tokenProvider;
-    private final UserService userService;
 
     private static final String[] AUTH_WHITELIST = {
             // URLs com acesso liberado
+            "/authentication/v1/connect",
             "/v1/connect",
+            // Swagger
+            // -- Swagger UI v3 (OpenAPI)
+            "/authentication/v3/api-docs",
+            "/authentication/v3/api-docs/swagger-config",
+            "/authentication/swagger-ui.html",
+            "/authentication/swagger-ui/*",
+            "/v3/api-docs",
+            "/v3/api-docs/swagger-config",
+            "/swagger-ui.html",
+            "/swagger-ui/*"
     };
 
     @Bean
@@ -63,7 +73,7 @@ public class SecurityConfiguration {
     }
 
     private JWTConfigurer securityConfigurerAdapter() {
-        return new JWTConfigurer(tokenProvider, userService);
+        return new JWTConfigurer(tokenProvider);
     }
 
 }

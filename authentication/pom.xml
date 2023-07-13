@@ -22,6 +22,7 @@
 		<spring-cloud.version>4.0.1</spring-cloud.version>
 		<mssql.version>11.2.3.jre17</mssql.version>
 		<redis-client.version>4.4.3</redis-client.version>
+		<springdoc.openapi.starter.webmvc.ui.version>2.0.4</springdoc.openapi.starter.webmvc.ui.version>
 	</properties>
 
 	<dependencies>
@@ -107,6 +108,12 @@
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<version>2.3.1</version>
+		</dependency>
+		<!-- Swagger (OpenAPI v3) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>${springdoc.openapi.starter.webmvc.ui.version}</version>
 		</dependency>
 	</dependencies>
 
