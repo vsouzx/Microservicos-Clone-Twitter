@@ -27,5 +27,4 @@ public class AuthenticationController {
     public ResponseEntity<TokenResponse> authenticate(@Valid @RequestBody LoginRequest request) throws Exception{
         return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
     }
-
 }
