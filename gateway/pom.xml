@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>br.com.souza.twitterclone</groupId>
-	<artifactId>authentication</artifactId>
+	<artifactId>gateway</artifactId>
 	<version>1.0.0</version>
-	<name>authentication</name>
-	<description>Authentication for Twitter Clone Microservices</description>
+	<name>gateway</name>
+	<description>Gateway with Spring Webflux for Twitter Clone Microservices</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -23,59 +23,61 @@
 		<spring-cloud-netflix.version>4.0.0</spring-cloud-netflix.version>
 		<mssql.version>11.2.3.jre17</mssql.version>
 		<redis-client.version>4.4.3</redis-client.version>
-		<springdoc.openapi.starter.webmvc.ui.version>2.0.4</springdoc.openapi.starter.webmvc.ui.version>
+		<springdoc.openapi.starter.webflux.ui.version>2.0.4</springdoc.openapi.starter.webflux.ui.version>
+		<lombok.version>1.18.26</lombok.version>
+		<mssql.version>12.2.0.jre11</mssql.version>
 	</properties>
 
 	<dependencies>
-		<!-- Spring Boot -->
+		<!-- Spring boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+			<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
 			<version>${spring-boot.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<!-- Spring boot Redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<!-- Redis Client -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${redis-client.version}</version>
 		</dependency>
 
-		<!-- Spring Cloud -->
+		<!-- Spring cloud -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 			<version>${spring-cloud-netflix.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+			<version>${spring-cloud.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-config</artifactId>
 			<version>${spring-cloud.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
 			<version>${spring-cloud.version}</version>
+		</dependency>
+
+		<!-- Swagger (OpenAPI v3) -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+			<version>${springdoc.openapi.starter.webflux.ui.version}</version>
+		</dependency>
+
+		<!-- Lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
 		</dependency>
 
 		<!-- Banco SqlServer -->
@@ -84,42 +86,9 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<version>${mssql.version}</version>
 		</dependency>
-
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!--JWT-->
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.9.1</version>
-		</dependency>
-		<!-- jjwt -->
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>9.31</version>
-		</dependency>
-		<!-- JAXB -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		<!-- Swagger (OpenAPI v3) -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>${springdoc.openapi.starter.webmvc.ui.version}</version>
-		</dependency>
 	</dependencies>
 
 	<build>
-		<finalName>authentication</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

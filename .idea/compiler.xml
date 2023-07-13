@@ -10,6 +10,7 @@
         <module name="twitterclone" />
         <module name="configserver" />
         <module name="discovery" />
+        <module name="gateway" />
         <module name="authentication" />
       </profile>
     </annotationProcessing>
@@ -26,6 +27,7 @@
       <module name="configserver (1)" options="-parameters" />
       <module name="configserver (2)" options="-parameters" />
       <module name="discovery" options="-parameters" />
+      <module name="gateway" options="-parameters" />
       <module name="twitterclone" options="-parameters" />
     </option>
   </component>
