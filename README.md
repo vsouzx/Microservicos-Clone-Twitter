@@ -2,13 +2,13 @@
 Backend do meu futuro "clone" do twitter, usando arquitetura de microservicos com Spring.
 
 O que será implementado:
-<b>-ConfigServer</b>
-</b>-ConfigServer Repository</b>
-</b>-Discovery</b>
-</b>-Gateway (com Spring WebFlux)</b>
-</b>-Serviço de autenticação (com Redis)</b>
-</b>-Serviço de gerenciamento de contas (sendo um Producer Kafka)</b>
-</b>-Serviço de email (sendo um Consumer Kafka)</b>
-</b>-Serviço de feed (posts, retweets, follows, likes, comentarios, etc)</b>
-</b>-Serviço de notificações</b>
-</b>-Serviço de DM</b>
+<p><b>ConfigServer</b></p>
+<p><b>ConfigServer Repository</b></p>
+<p><b>Discovery</b></p>
+<p><b>Gateway</b> (com Spring WebFlux)</p>
+<p>Serviço de <b>autenticação</b> (com Redis)</p>
+<p>Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka)</p>
+<p>Serviço de <b>email </b>(sendo um Consumer Kafka)</p>
+<p>Serviço de <b>feed </b>(posts, retweets, follows, likes, comentarios, etc)</p>
+<p>Serviço de <b>notificações</b></p>
+<p>Serviço de <b>DM</b></p>
