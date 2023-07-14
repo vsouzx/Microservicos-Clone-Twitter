@@ -1,0 +1,40 @@
+## Configuração Default da Aplicação ##
+spring:
+  application:
+    name: accounts
+  jpa:
+    fail-fast: true
+
+  ## Spring Config Server Cloud
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+    config:
+      fail-fast: true
+      retry:
+        initial-interval: 10000
+        max-attempts: 10
+        max-interval: 20000
+        multiplier: 1.1
+
+---
+## Ambiente Default do Config Server (Ambientes com Docker Compose)
+spring:
+  cloud:
+    config:
+      uri: http://configserver:8889
+      ## Habilitar ou Não o Spring Cloud Config Client (False = desabilita)
+      enabled: true
+
+---
+## Ambiente Local do Config Server
+spring:
+  config:
+    activate:
+      on-profile: "local"
+  cloud:
+    config:
+      uri: http://127.0.0.1:8889
+      ## Habilitar ou Não o Spring Cloud Config Client (False = desabilita)
+      enabled: true

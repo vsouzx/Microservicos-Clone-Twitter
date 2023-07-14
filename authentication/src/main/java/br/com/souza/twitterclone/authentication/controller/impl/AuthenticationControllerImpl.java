@@ -5,6 +5,7 @@ import br.com.souza.twitterclone.authentication.dto.auth.LoginRequest;
 import br.com.souza.twitterclone.authentication.dto.auth.TokenResponse;
 import br.com.souza.twitterclone.authentication.service.auth.AuthenticationService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class AuthenticationControllerImpl implements IAuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TokenResponse> authenticate(@RequestBody LoginRequest request) throws Exception{
         return new ResponseEntity<>(authenticationService.authenticate(request), HttpStatus.OK);
     }

@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="twitterclone" />
         <module name="configserver" />
+        <module name="accounts" />
         <module name="discovery" />
         <module name="gateway" />
         <module name="authentication" />
@@ -22,6 +23,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="accounts" options="-parameters" />
       <module name="authentication" options="-parameters" />
       <module name="configserver" options="-parameters" />
       <module name="configserver (1)" options="-parameters" />
