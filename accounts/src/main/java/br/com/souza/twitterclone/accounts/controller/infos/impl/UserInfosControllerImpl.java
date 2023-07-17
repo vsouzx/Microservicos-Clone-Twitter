@@ -28,31 +28,31 @@ public class UserInfosControllerImpl implements IUserInfosController {
         this.iUsersInfosService = iUsersInfosService;
     }
 
-    @PutMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserInfos(@RequestBody UserInfosUpdateRequest request) throws Exception {
         iUsersInfosService.updateUserInfos(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/email", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/email", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserEmail(@RequestBody UserEmailUpdateRequest request, @RequestHeader("Authorization") String authorization) throws Exception {
         iUsersInfosService.updateUserEmail(request, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/username", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/username", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserUsername(@RequestBody UserUsernameUpdateRequest request) throws Exception {
         iUsersInfosService.updateUserUsername(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/password", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserPassword(@RequestBody UserPasswordUpdateRequest request) throws Exception {
         iUsersInfosService.updateUserPassword(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/privacy", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/privacy", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserPrivacy(@RequestBody UserPrivacyUpdateRequest request) throws Exception {
         iUsersInfosService.updateUserPrivacy(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);

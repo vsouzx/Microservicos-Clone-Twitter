@@ -21,7 +21,7 @@ public class UserRegisterControllerImpl implements IUserRegisterController {
         this.iUsersRegisterService = iUsersRegisterService;
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> userRegister(@RequestBody UserRegistrationRequest request) throws Exception{
         iUsersRegisterService.userRegister(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
