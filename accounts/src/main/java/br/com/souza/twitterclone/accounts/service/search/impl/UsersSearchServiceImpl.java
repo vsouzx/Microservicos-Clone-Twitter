@@ -1,25 +1,26 @@
-package br.com.souza.twitterclone.accounts.service.user;
+package br.com.souza.twitterclone.accounts.service.search.impl;
 
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
+import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl {
+public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UsersSearchServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public UserDetailsResponse getUserDetails(String userIdentifier) throws Exception{
+    public UserDetailsResponse searchUserInfos(String userIdentifier) throws Exception { //TODO: Separar para um novo service
         Optional<User> possibleUser = userRepository.findById(userIdentifier);
 
-        if(possibleUser.isEmpty()){
+        if (possibleUser.isEmpty()) {
             throw new UserNotFoundException();
         }
 
@@ -32,6 +33,7 @@ public class UserServiceImpl {
                 .location(possibleUser.get().getLocation())
                 .site(possibleUser.get().getSite())
                 .registrationTime(possibleUser.get().getRegistrationTime())
+                .privateAccount(possibleUser.get().getPrivateAccount())
                 .build();
     }
 }

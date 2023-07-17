@@ -34,6 +34,7 @@ public class JWTFilter extends GenericFilterBean {
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userIdentifier, null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
+            filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
         filterChain.doFilter(servletRequest, servletResponse);

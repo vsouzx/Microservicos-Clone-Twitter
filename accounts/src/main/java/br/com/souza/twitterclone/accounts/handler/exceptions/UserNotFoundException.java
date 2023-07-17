@@ -6,10 +6,10 @@ public class UserNotFoundException extends ErrorCodeException{
 
 
     public UserNotFoundException(){
-        super(InternalTypeErrorCodesEnum.E410001);
+        super(InternalTypeErrorCodesEnum.E410000);
     }
 
     public UserNotFoundException(String message){
-        super(InternalTypeErrorCodesEnum.E410001, message);
+        super(InternalTypeErrorCodesEnum.E410000, message);
     }
 }

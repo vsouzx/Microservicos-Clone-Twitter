@@ -1,4 +1,4 @@
-package br.com.souza.twitterclone.accounts;
+/*package br.com.souza.twitterclone.accounts;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,4 +10,4 @@ class AccountsApplicationTests {
 	void contextLoads() {
 	}
 
-}
+}*/

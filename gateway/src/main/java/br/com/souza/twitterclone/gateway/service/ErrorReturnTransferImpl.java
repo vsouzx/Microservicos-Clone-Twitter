@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class ErrorReturnTransferImpl {
 
     private static final String GENERIC_ERROR = "500.000";
+    private static final String GENERIC_ERROR_MESSAGE = "Untracked internal error.";
 
     public byte[] process(ObjectMapper objectMapper, String texto) {
         CustomErrorResponse custom = null;
@@ -23,13 +24,14 @@ public class ErrorReturnTransferImpl {
 
         String strResponse = "{\n" +
                 "    \"error\": \"%s\"\n" +
+                "    \"message\": \"%s\"\n" +
                 "}";
 
         if (custom == null) {
-            strResponse = String.format(strResponse, GENERIC_ERROR);
+            strResponse = String.format(strResponse, GENERIC_ERROR, GENERIC_ERROR_MESSAGE);
             return strResponse.getBytes(StandardCharsets.UTF_8);
         } else {
-            strResponse = String.format(strResponse, custom.getCode());
+            strResponse = String.format(strResponse, custom.getCode(), custom.getError());
             return strResponse.getBytes(StandardCharsets.UTF_8);
         }
     }

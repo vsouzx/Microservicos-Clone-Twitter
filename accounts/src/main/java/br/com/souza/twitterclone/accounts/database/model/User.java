@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity(name = "users")
+@Builder
 public class User{
 
     @Id
@@ -30,6 +32,9 @@ public class User{
     @Column(name = "email", length = 255)
     private String email;
 
+    @Column(name = "password", length = 255)
+    private String password;
+
     @Column(name = "biography", length = 255)
     private String biography;
 
@@ -47,5 +52,16 @@ public class User{
 
     @Column(name = "registration_time")
     private LocalDateTime registrationTime;
+
+    @Column(name = "followers")
+    private Integer followers;
+
+    @Column(name = "following")
+    private Integer following;
+
+    @Column(name = "private_account")
+    private Boolean privateAccount;
+
+    //TODO: adicioanr linguagem
 
 }

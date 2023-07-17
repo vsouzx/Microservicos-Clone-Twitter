@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenProvider {
 
+    public static final String AUTH = "AUTH_";
     private static final int UNAUTHORIZED = 401;
     private static final int EXPIRED = 440;
     private final SecurityProperties securityProperties;
@@ -42,8 +43,10 @@ public class TokenProvider {
                 ((HttpServletResponse) response).sendError(UNAUTHORIZED);
                 return false;
             }
-            Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
-            return true;
+            Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
+            String sessionIdentifier = claims.getSubject();
+            String identifier = (String) redisService.getValue(sessionIdentifier);
+            return (identifier != null);
         } catch (ExpiredJwtException e) {
             log.error("Token expirado: {}", e);
             ((HttpServletResponse) response).sendError(EXPIRED);
@@ -61,6 +64,13 @@ public class TokenProvider {
         Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
         String sessionIdentifier = claims.getSubject();
         return (String) redisService.getValue(sessionIdentifier);
+    }
+
+    public String getSessionIdentifierFromToken(String jwt) {
+        jwt = extractToken(jwt);
+        String secret = securityProperties.getJwtKey();
+        Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
+        return claims.getSubject();
     }
 
     private String extractToken(String authToken) {
