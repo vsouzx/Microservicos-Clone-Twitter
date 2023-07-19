@@ -34,4 +34,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     //TODO: Buscar lista de users por username
+
+    //TODO: Buscar lista de follows de um usuario
+
+    //TODO: Buscar lista de followers de um usuario
+
+    //TODO: Buscar lista de pending followers de um usuario
 }

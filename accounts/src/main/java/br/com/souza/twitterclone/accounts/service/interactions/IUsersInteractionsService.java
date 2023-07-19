@@ -10,5 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IUsersInteractionsService {
 
     void blockToggle(String sessionUserIdentifier, String targetIdentifier) throws Exception;
+    void followToggle(String sessionUserIdentifier, String targetIdentifier) throws Exception;
+    void pendingFollowAcceptDecline(String sessionUserIdentifier, String targetIdentifier, boolean accept) throws Exception;
 
 }

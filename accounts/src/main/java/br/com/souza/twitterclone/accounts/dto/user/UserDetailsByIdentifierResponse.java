@@ -16,7 +16,7 @@ public class UserDetailsByIdentifierResponse {
     private String firstName;
     private String lastName;
     private String username;
-    private Integer follows;
+    private Integer following;
     private Integer followers;
     private String biography;
     private String location;
@@ -26,7 +26,9 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isBlockedByMe;
     private Boolean hasBlockedMe;
     private Boolean isFollowedByMe;
+    private Boolean isPendingFollowedByMe;
     private Boolean isFollowingMe;
+    private Boolean isSilencedByMe;
     private List<UserDetailsResponse> followersInCommon;
     private byte[] profilePhoto;
 

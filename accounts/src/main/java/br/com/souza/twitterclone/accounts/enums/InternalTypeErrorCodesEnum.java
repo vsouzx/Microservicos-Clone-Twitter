@@ -12,7 +12,9 @@ public enum InternalTypeErrorCodesEnum {
     E410006("410.006", "New password confirmation does not matches with your new password."),
     E410007("410.007", "Username can only contains letters, numbers and underscore"),
     E410008("410.008", "Your password must have at least 8 characters"),
-    E410009("410.009", "%s has blocked you.");
+    E410009("410.009", "%s has blocked you."),
+    E410010("410.010", "You can't follow this user, because he/she has blocked you OR you have blocked him/her."),
+    E410011("410.011", "There is not an pending follow request from this user to you.");
 
     private final String code;
     private final String message;

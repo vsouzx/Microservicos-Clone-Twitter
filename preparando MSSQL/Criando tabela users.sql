@@ -16,7 +16,6 @@ CREATE TABLE users(
 	[private_account] [bit] NOT NULL,
 	[language_preference] [varchar](10),
 	[profile_photo] [VARBINARY](MAX)
-	--ADD DE BLOQUEAR (vai ser uma tabela nova)
 	--ADD LÓGICA DE SILENCIAR (vai ser uma tabela nova)
 PRIMARY KEY CLUSTERED 
 (

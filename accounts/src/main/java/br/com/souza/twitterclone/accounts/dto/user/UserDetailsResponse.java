@@ -15,7 +15,7 @@ public class UserDetailsResponse {
     private String firstName;
     private String lastName;
     private String username;
-    private Integer follows;
+    private Integer following;
     private Integer followers;
     private String biography;
     private String location;

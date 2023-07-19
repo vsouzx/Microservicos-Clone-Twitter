@@ -1,13 +1,15 @@
 package br.com.souza.twitterclone.accounts.service.search.impl;
 
-import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
+import br.com.souza.twitterclone.accounts.database.model.UsersFollowsId;
+import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollowsId;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
+import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.handler.exceptions.BlockedUserException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.Optional;
@@ -18,15 +20,21 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private final UserRepository userRepository;
     private final BlockedUsersRepository blockedUsersRepository;
+    private final UsersFollowsRepository usersFollowsRepository;
+    private final UsersPendingFollowsRepository usersPendingFollowsRepository;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
-                                  BlockedUsersRepository blockedUsersRepository) {
+                                  BlockedUsersRepository blockedUsersRepository,
+                                  UsersFollowsRepository usersFollowsRepository,
+                                  UsersPendingFollowsRepository usersPendingFollowsRepository) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
+        this.usersFollowsRepository = usersFollowsRepository;
+        this.usersPendingFollowsRepository = usersPendingFollowsRepository;
     }
 
-    public UserDetailsResponse searchUserInfos(String userIdentifier) throws Exception {
-        Optional<User> possibleUser = userRepository.findById(userIdentifier);
+    public UserDetailsResponse searchUserInfos(String sessionUserIdentifier) throws Exception {
+        Optional<User> possibleUser = userRepository.findById(sessionUserIdentifier);
 
         if (possibleUser.isEmpty()) {
             throw new UserNotFoundException();
@@ -36,8 +44,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .firstName(possibleUser.get().getFirstName())
                 .lastName(possibleUser.get().getLastName())
                 .username(possibleUser.get().getUsername())
-                .follows(0)  //TODO: adicionar lógica para mostrar quantidade de followers
-                .followers(0) //TODO: adicionar lógica para mostrar quantidade de followers
+                .following(getUserFollows(possibleUser.get().getIdentifier()))
+                .followers(getUserFollowers(possibleUser.get().getIdentifier()))
                 .biography(possibleUser.get().getBiography())
                 .location(possibleUser.get().getLocation())
                 .site(possibleUser.get().getSite())
@@ -72,7 +80,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
             return responseTargetUserIdentifierBlocked(targetUser.get());
         }
 
-        return fullResponse(targetUser.get());
+        return fullResponse(targetUser.get(), sessionUserIdentifier);
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe) {
@@ -80,8 +88,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .follows(0)  //TODO: adicionar lógica para mostrar quantidade de followers
-                .followers(0) //TODO: adicionar lógica para mostrar quantidade de followers
+                .following(getUserFollows(targetUser.getIdentifier()))
+                .followers(getUserFollowers(targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -91,7 +99,9 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .hasBlockedMe(true)
                 .followersInCommon(null)
                 .isFollowedByMe(false)
+                .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
+                .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
     }
@@ -101,8 +111,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .follows(0)  //TODO: adicionar lógica para mostrar quantidade de followers
-                .followers(0) //TODO: adicionar lógica para mostrar quantidade de followers
+                .following(getUserFollows(targetUser.getIdentifier()))
+                .followers(getUserFollowers(targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -112,18 +122,20 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .hasBlockedMe(false)
                 .followersInCommon(null)
                 .isFollowedByMe(false)
+                .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
+                .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse fullResponse(User targetUser) {
+    private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .follows(0)   //TODO: adicionar lógica para mostrar quantidade de followers
-                .followers(0) //TODO: adicionar lógica para mostrar quantidade de followers
+                .following(getUserFollows(targetUser.getIdentifier()))
+                .followers(getUserFollowers(targetUser.getIdentifier()))
                 .biography(targetUser.getBiography())
                 .location(targetUser.getLocation())
                 .site(targetUser.getSite())
@@ -132,10 +144,34 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isBlockedByMe(false)
                 .hasBlockedMe(false)
                 .followersInCommon(null) //TODO: Adicionar lógica para retornar lista de seguidores em comum
-                .isFollowedByMe(null) //TODO: Adicionar lógica para saber se segue ou não
-                .isFollowingMe(null) //TODO: Adicionar lógica para saber se ta me seguindo ou não
+                .isFollowedByMe(isFollowing(sessionUser, targetUser.getIdentifier()))
+                .isPendingFollowedByMe(isPendingFollowing(sessionUser, targetUser.getIdentifier()))
+                .isFollowingMe(isFollowing(targetUser.getIdentifier(), sessionUser))
+                .isSilencedByMe(null)
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
+    }
+
+    private Integer getUserFollowers(String user){
+        return usersFollowsRepository.findAllByIdFollowedIdentifier(user).size();
+    }
+
+    private Integer getUserFollows(String user){
+        return usersFollowsRepository.findAllByIdFollowerIdentifier(user).size();
+    }
+
+    private boolean isFollowing(String sessionUser, String targetUser){
+        return usersFollowsRepository.findById(UsersFollowsId.builder()
+                        .followerIdentifier(sessionUser)
+                        .followedIdentifier(targetUser)
+                .build()).isPresent();
+    }
+
+    private boolean isPendingFollowing(String sessionUser, String targetUser){
+        return usersPendingFollowsRepository.findById(UsersPendingFollowsId.builder()
+                .pendingFollowerIdentifier(sessionUser)
+                .pendingFollowedIdentifier(targetUser)
+                .build()).isPresent();
     }
 
 }
