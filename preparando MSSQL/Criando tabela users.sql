@@ -13,9 +13,10 @@ CREATE TABLE users(
 	[confirmed_email] [bit] NOT NULL,
 	[confirmation_code] [varchar](100),
 	[registration_time] [datetime] NOT NULL,
-	[followers] [int] NOT NULL,
-	[following] [int] NOT NULL,
-	[private_account] [bit] NOT NULL
+	[private_account] [bit] NOT NULL,
+	[language_preference] [varchar](10),
+	[profile_photo] [VARBINARY](MAX)
+	--ADD DE BLOQUEAR (vai ser uma tabela nova)
 	--ADD LÓGICA DE SILENCIAR (vai ser uma tabela nova)
 PRIMARY KEY CLUSTERED 
 (
@@ -37,8 +38,8 @@ SELECT NEWID() -- identifier
 	  ,1 --confirmed email  (true false)
 	  ,null -- confirmation code
 	  ,GETDATE() -- registration_time
-	  ,0 -- Followers
-	  ,0 -- Following
 	  ,0 -- Private Account (true false)
+	  ,'pt' --Language preference
+	  ,null -- photo
 
 

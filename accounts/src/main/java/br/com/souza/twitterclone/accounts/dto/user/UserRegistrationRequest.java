@@ -27,6 +27,7 @@ public class UserRegistrationRequest {
     private String biography;
     private String location;
     private String site;
-
+    private String languagePreference;
+    private byte[] profilePhoto;
 
 }

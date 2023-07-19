@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.multipart.MultipartFile;
 
 @Validated
 public interface IUserInfosController {
@@ -50,7 +51,7 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> updateUserPassword(@Valid UserPasswordUpdateRequest request) throws Exception;
+    ResponseEntity<Void> updateUserPassword(@Valid UserPasswordUpdateRequest request, String authorization) throws Exception;
 
     @Operation(summary = "Atualiza privacidade da conta do usuário.")
     @ApiResponses(value = {
@@ -60,4 +61,13 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<Void> updateUserPrivacy(@Valid UserPrivacyUpdateRequest request) throws Exception;
+
+    @Operation(summary = "Atualiza foto de perfil da conta do usuário.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> updateProfilePhoto(MultipartFile request) throws Exception;
 }

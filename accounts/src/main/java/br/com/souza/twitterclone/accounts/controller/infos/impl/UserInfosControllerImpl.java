@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(value = "/v1/user/infos")
@@ -47,14 +49,20 @@ public class UserInfosControllerImpl implements IUserInfosController {
     }
 
     @PatchMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateUserPassword(@RequestBody UserPasswordUpdateRequest request) throws Exception {
-        iUsersInfosService.updateUserPassword(request, FindUserIdentifierHelper.getIdentifier());
+    public ResponseEntity<Void> updateUserPassword(@RequestBody UserPasswordUpdateRequest request, @RequestHeader("Authorization") String authorization) throws Exception {
+        iUsersInfosService.updateUserPassword(request, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/privacy", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateUserPrivacy(@RequestBody UserPrivacyUpdateRequest request) throws Exception {
         iUsersInfosService.updateUserPrivacy(request, FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PatchMapping(value = "/profilephoto", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file) throws Exception {
+        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

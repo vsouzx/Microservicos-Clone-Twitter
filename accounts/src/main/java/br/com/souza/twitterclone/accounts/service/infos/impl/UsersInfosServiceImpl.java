@@ -10,16 +10,19 @@ import br.com.souza.twitterclone.accounts.dto.user.UserPrivacyUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserUsernameUpdateRequest;
 import br.com.souza.twitterclone.accounts.handler.exceptions.ActualPasswordNotMatchesException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyExistsException;
+import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidPasswordException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidUsernameRegexException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NewPasswordConfirmationNotMatchesNullException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UsernameAlreadyExistsException;
 import br.com.souza.twitterclone.accounts.service.infos.IUsersInfosService;
 import br.com.souza.twitterclone.accounts.service.redis.RedisService;
+import br.com.souza.twitterclone.accounts.util.PasswordValidatorHelper;
 import br.com.souza.twitterclone.accounts.util.UsernameValidatorHelper;
 import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class UsersInfosServiceImpl implements IUsersInfosService {
@@ -109,11 +112,14 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         userRepository.save(user.get());
     }
 
-    public void updateUserPassword(UserPasswordUpdateRequest request, String identifier) throws Exception {
+    public void updateUserPassword(UserPasswordUpdateRequest request, String identifier, String authorization) throws Exception {
         Optional<User> user = userRepository.findById(identifier);
 
         if (user.isEmpty()) {
             throw new UserNotFoundException();
+        }
+        if(!PasswordValidatorHelper.isValidPassword(request.getNewPassword())){
+            throw new InvalidPasswordException();
         }
         if (!passwordEncoder.matches(request.getActualPassword(), user.get().getPassword())) {
             throw new ActualPasswordNotMatchesException();
@@ -123,6 +129,12 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         }
 
         user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        //remover autenticacao do usuário do Redis, obrigando-o a se logar novamente
+        String sessionId = tokenProvider.getSessionIdentifierFromToken(authorization);
+        redisService.removeKey(sessionId);
+        redisService.removeKey(TokenProvider.AUTH + identifier);
+
         userRepository.save(user.get());
     }
 
@@ -133,6 +145,16 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
             throw new UserNotFoundException();
         }
         user.get().setPrivateAccount(request.getPrivateAccount());
+        userRepository.save(user.get());
+    }
+
+    public void updateProfilePhoto(MultipartFile file, String identifier) throws Exception {
+        Optional<User> user = userRepository.findById(identifier);
+
+        if (user.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        user.get().setProfilePhoto(file.getBytes());
         userRepository.save(user.get());
     }
 }

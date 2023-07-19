@@ -4,13 +4,15 @@ public enum InternalTypeErrorCodesEnum {
 
     E500000("500.000", "Internal error without mapped cause."),
     E410000("410.000", "User not found."),
-    E410001("410.001", "User already exists."),
+    E410001("410.001", "Username already exists."),
     E410002("410.002", "Email already exists."),
     E410003("410.003", "Please write actual password."),
     E410004("410.004", "Password does not matches with your actual password."),
     E410005("410.005", "Please write new password confirmation."),
     E410006("410.006", "New password confirmation does not matches with your new password."),
-    E410007("410.007", "Username can only contains letters, numbers and underscore");
+    E410007("410.007", "Username can only contains letters, numbers and underscore"),
+    E410008("410.008", "Your password must have at least 8 characters"),
+    E410009("410.009", "%s has blocked you.");
 
     private final String code;
     private final String message;

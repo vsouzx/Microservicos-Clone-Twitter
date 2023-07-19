@@ -3,6 +3,7 @@ package br.com.souza.twitterclone.accounts.database.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,15 +54,14 @@ public class User{
     @Column(name = "registration_time")
     private LocalDateTime registrationTime;
 
-    @Column(name = "followers")
-    private Integer followers;
-
-    @Column(name = "following")
-    private Integer following;
-
     @Column(name = "private_account")
     private Boolean privateAccount;
 
-    //TODO: adicioanr linguagem
+    @Column(name = "language_preference")
+    private String languagePreference;
+
+    @Lob
+    @Column(name = "profile_photo")
+    private byte[] profilePhoto;
 
 }
