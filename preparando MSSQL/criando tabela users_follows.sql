@@ -21,8 +21,8 @@ GO
 
 
 INSERT users_follows
-SELECT '39077E3A-805D-46E8-A742-B492C7CDFE79' -- identifier vsouzx
-	  ,'08F85AB9-83FC-4CAD-A6F2-7C2A54739B8E' -- identifier vsouzx_
+SELECT '08F85AB9-83FC-4CAD-A6F2-7C2A54739B8E' -- identifier danielly
+	  ,'E805CCDE-E9BE-4E4F-970C-6D70922E5A00' -- identifier vinicius123
 	   
 
 

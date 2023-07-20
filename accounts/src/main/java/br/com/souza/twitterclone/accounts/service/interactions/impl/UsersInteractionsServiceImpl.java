@@ -11,10 +11,13 @@ import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersReposi
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
+import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
     }
 
+    //TODO: quebrar todos esses métodos, em services seprarados: FollowService, PendingFollowService, BlockService, SilenceService
     @Override
     public void blockToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         Optional<User> user = userRepository.findById(targetUserIdentifier);
@@ -140,24 +144,78 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         }
     }
 
-    private Optional<UsersFollows> verifyIfIsFollowing(String follower, String followed) {
+    @Override
+    public Optional<UsersFollows> verifyIfIsFollowing(String follower, String followed) {
         return usersFollowsRepository.findById(UsersFollowsId.builder()
                 .followerIdentifier(follower)
                 .followedIdentifier(followed)
                 .build());
     }
 
-    private Optional<UsersPendingFollows> verifyIfIsPendingFollowing(String follower, String followed) {
+    @Override
+    public Optional<UsersPendingFollows> verifyIfIsPendingFollowing(String follower, String followed) {
         return usersPendingFollowsRepository.findById(UsersPendingFollowsId.builder()
                 .pendingFollowerIdentifier(follower)
                 .pendingFollowedIdentifier(followed)
                 .build());
     }
 
-    private Optional<BlockedUsers> verifyIfIsBlocked(String blocker, String blocked) {
+    @Override
+    public Optional<BlockedUsers> verifyIfIsBlocked(String blocker, String blocked) {
         return blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(blocker)
                 .blockedIdentifier(blocked)
                 .build());
+    }
+
+    @Override
+    public List<UserPreviewResponse> getUserFollowers(String user){
+        List<User> followers = userRepository.findUserFollowers(user);
+        return rowMapper(followers);
+    }
+
+    @Override
+    public List<UserPreviewResponse> getUserFollows(String user){
+        List<User> followers = userRepository.findUserFollows(user);
+        return rowMapper(followers);
+    }
+
+    @Override
+    public boolean isFollowing(String sessionUser, String targetUser){
+        return usersFollowsRepository.findById(UsersFollowsId.builder()
+                .followerIdentifier(sessionUser)
+                .followedIdentifier(targetUser)
+                .build()).isPresent();
+    }
+
+    @Override
+    public boolean isPendingFollowing(String sessionUser, String targetUser){
+        return usersPendingFollowsRepository.findById(UsersPendingFollowsId.builder()
+                .pendingFollowerIdentifier(sessionUser)
+                .pendingFollowedIdentifier(targetUser)
+                .build()).isPresent();
+    }
+
+    @Override
+    public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) {
+        List<User> followers = userRepository.findSessionUserCommonFollowsWithTargerUser(sessionUser, targetUser);
+        return rowMapper(followers);
+    }
+
+    private List<UserPreviewResponse> rowMapper(List<User> followers){
+        List<UserPreviewResponse> response = new ArrayList<>();
+
+        if(!followers.isEmpty()){
+            followers.stream().forEach(f -> {
+                response.add(UserPreviewResponse.builder()
+                        .username(f.getUsername())
+                        .firstName(f.getFirstName())
+                        .biography(f.getBiography())
+                        .privateAccount(f.getPrivateAccount())
+                        .profilePhoto(f.getProfilePhoto())
+                        .build());
+            });
+        }
+        return response;
     }
 }

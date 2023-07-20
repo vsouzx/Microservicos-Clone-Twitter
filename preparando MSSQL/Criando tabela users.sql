@@ -26,13 +26,13 @@ GO
 
 INSERT users
 SELECT NEWID() -- identifier
-	  ,'Vitor' -- First Name
-	  ,'Souza' -- Last Name
-	  ,'vtsoliveira2001@gmail.com' -- email
-	  ,'vsouzx' -- username
-	  ,'21y | sofredor java backend developer' --biography
+	  ,'Vinicius' -- First Name
+	  ,'Oliveira' -- Last Name
+	  ,'vnsoliveira2512@gmail.com' -- email
+	  ,'vincius123' -- username
+	  ,'FRONTEND DEV' --biography
 	  ,'São Paulo, Brazil' --location
-	  ,'https://vsportfolio.com.br' --site
+	  ,'https://youtube.com.br' --site
 	  ,'$2a$10$hMD0AWnJ.Vu0NrGZXkudDepOJxCCmRoxJQOQg6uvGuAz50J9pYZ92' --password
 	  ,1 --confirmed email  (true false)
 	  ,null -- confirmation code

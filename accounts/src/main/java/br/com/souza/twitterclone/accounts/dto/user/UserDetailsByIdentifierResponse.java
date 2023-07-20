@@ -29,7 +29,7 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isPendingFollowedByMe;
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
-    private List<UserDetailsResponse> followersInCommon;
+    private List<UserPreviewResponse> followersInCommon;
     private byte[] profilePhoto;
 
 }
