@@ -1,0 +1,37 @@
+## Configuração Local (Máquina do Desenvolvedor) ##
+server:
+  host: localhost
+  port: 8085
+
+## Eureka - Service Discovery
+eureka:
+  host: localhost
+  name: eureka
+  port: 8081
+
+## Config Database
+database:
+  database-platform: org.hibernate.dialect.SQLServerDialect
+  url: jdbc:sqlserver://localhost:1433;databaseName=twitterclone_dev;useBulkCopyForBatchInsert=true;applicationName=${spring.application.name};encrypt=true;trustServerCertificate=true;
+  username: twitterclone_admin
+  password: admin123
+  minimum-idle: 2
+  maximum-pool-size: 3
+
+## Config do Redis
+redis:
+  host: localhost
+  port: 6379
+  pass: 6#3MxH432%eS9ngj
+
+## Config Jwt
+security:
+  jwtKey: 'x&F:?061+<=},:3F]BEOHSVZDqb<+pqg#pJKx"JBZnOl;>|`PR7#-Fga{&G~MZ!b[On1c]5IF0y9pWa_5q~sGGa:x1Gg8Ar..2]pGWL8W"QyrRZo+wkRDtH8tx5Cb/M%Z2")XA!(VCu|t0gKf8o%U@q]clbzdev]$ChGiw=/0D?I98R-HIdZE-7+Gl"Y[cg{J*B4l6F?lShmvtFGqTvf1:i7~]DAbz{y]w_xtq{QSH2>)oOqO`THIX}jUH_YstBr;:PBp8-nuTud#4X*(.+>5@pcy@"1C_5}H}$eO$nxT@^pF+W6mDv5cQa}MDKzf@w)$,W@nTEr7|d(&2FH6IQY'
+
+## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
+logging:
+  level:
+    root: INFO
+    br.absoftware.abscore_authentication: DEBUG
+    io.swagger.models.parameters.AbstractSerializableParameter: ERROR
+    org.hibernate.SQL: DEBUG

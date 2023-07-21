@@ -1,0 +1,46 @@
+## Configuração Default da Aplicação ##
+server:
+  ## HTTP Server port
+  port: 8080
+
+## Eureka - Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.host}:${eureka.port}/${eureka.name}/
+    register-with-eureka: true
+    fetch-registry: true
+
+## Config Application and Database
+spring:
+  application:
+    name: accounts
+  datasource:
+    url: ${database.url}
+    password: ${database.password}
+    username: ${database.username}
+    hikari:
+      minimum-idle: ${database.minimum-idle}
+      maximum-pool-size: ${database.maximum-pool-size}
+      connectionTimeout: 180000
+      idleTimeout: 60000
+      maxLifetime: 180000
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: ${database.database-platform}
+        ddl-auto: update
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+    servlet:
+      path: /accounts
+
+## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
+logging:
+  level:
+    root: WARN
+    br.absoftware.abscore_authentication: INFO
+    io.swagger.models.parameters.AbstractSerializableParameter: ERROR
+    org.hibernate.SQL: ERROR

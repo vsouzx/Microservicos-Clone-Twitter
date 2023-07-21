@@ -1,0 +1,23 @@
+## Configuração Local (Máquina do Desenvolvedor) ##
+server:
+  host: localhost
+  port: 8888
+
+## Eureka - Service Discovery
+eureka:
+  host: localhost
+  port: 8081
+  name: eureka
+
+## Application settings
+settings:
+  # Address configuration
+  allow-origin: '*'
+
+## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
+logging:
+  level:
+    root: INFO
+    br.absoftware.abscore_gateway: DEBUG
+    io.swagger.models.parameters.AbstractSerializableParameter: DEBUG
+    org.hibernate.SQL: DEBUG

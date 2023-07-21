@@ -146,11 +146,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(targetUser.getPrivateAccount())
                 .isBlockedByMe(false)
                 .hasBlockedMe(false)
-                .followersInCommon(iUsersInteractionsService.getCommonFollowers(sessionUser, targetUser.getIdentifier())) //TODO: Adicionar lógica para retornar lista de seguidores em comum
-                .isFollowedByMe(iUsersInteractionsService.isFollowing(sessionUser, targetUser.getIdentifier()))
-                .isPendingFollowedByMe(iUsersInteractionsService.isPendingFollowing(sessionUser, targetUser.getIdentifier()))
-                .isFollowingMe(iUsersInteractionsService.isFollowing(targetUser.getIdentifier(), sessionUser))
-                .isSilencedByMe(null)
+                .followersInCommon(iUsersInteractionsService.getCommonFollowers(sessionUser, targetUser.getIdentifier()))
+                .isFollowedByMe(iUsersInteractionsService.verifyIfIsFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
+                .isPendingFollowedByMe(iUsersInteractionsService.verifyIfIsPendingFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
+                .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
+                .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
     }

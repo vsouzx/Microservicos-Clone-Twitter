@@ -2,18 +2,22 @@ package br.com.souza.twitterclone.accounts.service.interactions.impl;
 
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
+import br.com.souza.twitterclone.accounts.database.model.SilencedUsers;
+import br.com.souza.twitterclone.accounts.database.model.SilencedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.model.UsersFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersFollowsId;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollowsId;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
+import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToFollowException;
+import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToSilenceException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import java.util.ArrayList;
@@ -28,15 +32,18 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final BlockedUsersRepository blockedUsersRepository;
     private final UsersFollowsRepository usersFollowsRepository;
     private final UsersPendingFollowsRepository usersPendingFollowsRepository;
+    private final SilencedUsersRepository silencedUsersRepository;
 
     public UsersInteractionsServiceImpl(UserRepository userRepository,
                                         BlockedUsersRepository blockedUsersRepository,
                                         UsersFollowsRepository usersFollowsRepository,
-                                        UsersPendingFollowsRepository usersPendingFollowsRepository) {
+                                        UsersPendingFollowsRepository usersPendingFollowsRepository,
+                                        SilencedUsersRepository silencedUsersRepository) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
         this.usersFollowsRepository = usersFollowsRepository;
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
+        this.silencedUsersRepository = silencedUsersRepository;
     }
 
     //TODO: quebrar todos esses métodos, em services seprarados: FollowService, PendingFollowService, BlockService, SilenceService
@@ -145,6 +152,38 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
+    public void silencetoggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+        Optional<User> targetUser = userRepository.findById(targetUserIdentifier);
+
+        if (targetUser.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        if (targetUserIsBlocked.isPresent()) {
+            throw new UnableToSilenceException();
+        }
+
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        if (sessionUserIsBlocked.isPresent()) {
+            throw new UnableToSilenceException();
+        }
+
+        Optional<SilencedUsers> isSilenced = verifyIfIsSilenced(sessionUserIdentifier, targetUserIdentifier);
+
+        if(isSilenced.isPresent()){
+            silencedUsersRepository.delete(isSilenced.get());
+        }else{
+            silencedUsersRepository.save(SilencedUsers.builder()
+                            .id(SilencedUsersId.builder()
+                                    .silencerIdentifier(sessionUserIdentifier)
+                                    .silencedIdentifier(targetUserIdentifier)
+                                    .build())
+                    .build());
+        }
+    }
+
+    @Override
     public Optional<UsersFollows> verifyIfIsFollowing(String follower, String followed) {
         return usersFollowsRepository.findById(UsersFollowsId.builder()
                 .followerIdentifier(follower)
@@ -169,6 +208,14 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
+    public Optional<SilencedUsers> verifyIfIsSilenced(String silencer, String silenced) {
+        return silencedUsersRepository.findById(SilencedUsersId.builder()
+                .silencerIdentifier(silencer)
+                .silencedIdentifier(silenced)
+                .build());
+    }
+
+    @Override
     public List<UserPreviewResponse> getUserFollowers(String user){
         List<User> followers = userRepository.findUserFollowers(user);
         return rowMapper(followers);
@@ -178,22 +225,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     public List<UserPreviewResponse> getUserFollows(String user){
         List<User> followers = userRepository.findUserFollows(user);
         return rowMapper(followers);
-    }
-
-    @Override
-    public boolean isFollowing(String sessionUser, String targetUser){
-        return usersFollowsRepository.findById(UsersFollowsId.builder()
-                .followerIdentifier(sessionUser)
-                .followedIdentifier(targetUser)
-                .build()).isPresent();
-    }
-
-    @Override
-    public boolean isPendingFollowing(String sessionUser, String targetUser){
-        return usersPendingFollowsRepository.findById(UsersPendingFollowsId.builder()
-                .pendingFollowerIdentifier(sessionUser)
-                .pendingFollowedIdentifier(targetUser)
-                .build()).isPresent();
     }
 
     @Override

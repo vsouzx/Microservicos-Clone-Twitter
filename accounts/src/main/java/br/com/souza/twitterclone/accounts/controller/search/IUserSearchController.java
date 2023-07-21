@@ -2,10 +2,12 @@ package br.com.souza.twitterclone.accounts.controller.search;
 
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
+import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 
@@ -29,4 +31,13 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier) throws Exception;
+
+    @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier) throws Exception;
 }

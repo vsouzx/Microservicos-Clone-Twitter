@@ -36,8 +36,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.searchUserInfosByIdentifier(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier), HttpStatus.OK);
     }
 
-    //TODO: Buscar lista de users por username
-    @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
+     @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(@RequestParam(value = "username", required = false) String targetUsername) throws Exception{
         return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername), HttpStatus.OK);
     }

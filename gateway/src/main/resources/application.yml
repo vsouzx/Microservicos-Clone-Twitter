@@ -1,0 +1,59 @@
+## Configuração Default da Aplicação ##
+server:
+  ## HTTP Server port
+  port: 8080
+
+## Eureka - Service Discovery
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${eureka.host}:${eureka.port}/${eureka.name}/
+    register-with-eureka: true
+
+## Config Application and Database
+spring:
+  application:
+    name: gateway
+
+  ## Routes MS
+  cloud:
+    gateway:
+      metrics:
+        enabled: true
+      routes:
+        - id: authentication
+          uri: lb://authentication
+          predicates:
+            - Path=/authentication/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 200
+                redis-rate-limiter.burstCapacity: 400
+
+## Swagger OpenAPI v3 Springdoc ##
+springdoc:
+  webjars:
+    prefix: /apis
+  api-docs:
+    groups:
+      enabled: true # Habilita acessar swagger dos microserviços através do gateway
+  swagger-ui:
+    doc-expansion: none
+    groups-order: asc
+    tags-sorter: 'alpha' # Ordena as tags alfabeticamente
+    operations-sorter: 'alpha' # Ordena as operations alfabeticamente
+    path: /swagger-ui/
+    urls: # Caminho do 'api-docs' de cada microserviço a ser exibido na lista
+      - name: authentication
+        url: /authentication/v3/api-docs
+
+## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
+logging:
+  level:
+    root: WARN
+    br.absoftware.abscore_gateway: INFO
+    io.swagger.models.parameters.AbstractSerializableParameter: ERROR
+    org.hibernate.SQL: ERROR
+    org.springframework.cloud.gateway: INFO
+    reactor.netty.http.client: INFO

@@ -36,11 +36,15 @@ public class UserInteractionsControllerImpl implements IUserInteractionsControll
 
     @PatchMapping(value = "/pendingfollow/{identifier}")
     public ResponseEntity<Void> pendingFollowAcceptDecline(@PathVariable("identifier") String targetIdentifier,
-                                                          @RequestBody UserPendingFollowRequest request) throws Exception {
+                                                           @RequestBody UserPendingFollowRequest request) throws Exception {
         iUsersInteractionsService.pendingFollowAcceptDecline(FindUserIdentifierHelper.getIdentifier(), targetIdentifier, request.isAccept());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    //TODO: fazer endpoint para silenciar um usuário
+    @PatchMapping(value = "/silencetoggle/{identifier}")
+    public ResponseEntity<Void> silencetoggle(@PathVariable("identifier") String targetIdentifier) throws Exception {
+        iUsersInteractionsService.silencetoggle(FindUserIdentifierHelper.getIdentifier(), targetIdentifier);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
 }
