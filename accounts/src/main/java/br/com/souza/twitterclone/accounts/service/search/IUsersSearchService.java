@@ -17,6 +17,8 @@ public interface IUsersSearchService {
 
     UserDetailsResponse searchUserInfos(String userIdentifier) throws Exception;
     UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String userIdentifier, String targetUserIdentifier) throws Exception;
-    CustomPage<UserPreviewResponse> getUsersByUsername(String userIdentifier, String targetUserIdentifier, Pageable pageable) throws Exception;
+    List<UserPreviewResponse> getUsersByUsername(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception;
+    List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
+    List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
 
 }

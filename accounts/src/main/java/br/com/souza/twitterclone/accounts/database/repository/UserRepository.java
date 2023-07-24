@@ -25,10 +25,10 @@ public interface UserRepository extends JpaRepository<User, String> {
     List<User> findUserFollowers(@Param("userIdentifier") String userIdentifier);
 
     @Query(value = "SELECT DISTINCT  u.* " +
-            "FROM users u " +
-            "INNER JOIN users_follows f " +
-            "  ON f.followed_identifier = u.identifier " +
-            "  AND f.follower_identifier = :userIdentifier ", nativeQuery = true)
+                   "FROM users u " +
+                   "INNER JOIN users_follows f " +
+                   "  ON f.followed_identifier = u.identifier " +
+                   "  AND f.follower_identifier = :userIdentifier ", nativeQuery = true)
     List<User> findUserFollows(@Param("userIdentifier") String userIdentifier);
 
     @Query(value = "SELECT DISTINCT  u.* " +
@@ -41,12 +41,4 @@ public interface UserRepository extends JpaRepository<User, String> {
             "  AND f2.follower_identifier = :targetUserIdentifier ", nativeQuery = true)
     List<User> findSessionUserCommonFollowsWithTargerUser(@Param("sessionUserIdentifier") String sessionUserIdentifier, @Param("targetUserIdentifier") String targetUser);
 
-    @Query(value = "SELECT u.*, IIF(f.follower_identifier IS NOT NULL, 1, 0) follow FROM Users u\n" +
-            "LEFT JOIN users_follows f \n" +
-            "\tON f.follower_identifier = '39077E3A-805D-46E8-A742-B492C7CDFE79' \n" +
-            "\tAND f.followed_identifier = u.identifier \n" +
-            "WHERE :username IS NULL  \n" +
-            "OR UPPER(username) LIKE UPPER('%'+ :username +'%') \n" +
-            "ORDER BY follow desc, username ", nativeQuery = true)
-    Page<User> findAllByUsername(@Param("username") String username, Pageable pageable);
 }

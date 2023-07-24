@@ -216,24 +216,24 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollowers(String user){
-        List<User> followers = userRepository.findUserFollowers(user);
-        return rowMapper(followers);
+    public Integer getUserFollowersCount(String sessionUserIdentifier, String targetUserIdentifier){
+        List<User> followers = userRepository.findUserFollowers(targetUserIdentifier);
+        return followers.size();
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollows(String user){
+    public Integer getUserFollowsCount(String sessionUserIdentifier, String user){
         List<User> followers = userRepository.findUserFollows(user);
-        return rowMapper(followers);
+        return followers.size();
     }
 
     @Override
     public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) {
         List<User> followers = userRepository.findSessionUserCommonFollowsWithTargerUser(sessionUser, targetUser);
-        return rowMapper(followers);
+        return rowMapper(followers, sessionUser);
     }
 
-    private List<UserPreviewResponse> rowMapper(List<User> followers){
+    private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier){
         List<UserPreviewResponse> response = new ArrayList<>();
 
         if(!followers.isEmpty()){
@@ -244,6 +244,8 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                         .biography(f.getBiography())
                         .privateAccount(f.getPrivateAccount())
                         .profilePhoto(f.getProfilePhoto())
+                        .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, f.getIdentifier()).isPresent())
+                        .isFollowingMe(verifyIfIsFollowing(f.getIdentifier(), sessionUserIdentifier).isPresent())
                         .build());
             });
         }

@@ -4,6 +4,7 @@ import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
 import br.com.souza.twitterclone.accounts.dto.pagination.CustomPage;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
@@ -22,13 +23,16 @@ import org.springframework.stereotype.Service;
 public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private final UserRepository userRepository;
+    private final UsersRepositoryImpl usersRepositoryImpl;
     private final BlockedUsersRepository blockedUsersRepository;
     private final IUsersInteractionsService iUsersInteractionsService;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
+                                  UsersRepositoryImpl usersRepositoryImpl,
                                   BlockedUsersRepository blockedUsersRepository,
-                                  IUsersInteractionsService iUsersInteractionsService){
+                                  IUsersInteractionsService iUsersInteractionsService) {
         this.userRepository = userRepository;
+        this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
         this.iUsersInteractionsService = iUsersInteractionsService;
     }
@@ -45,8 +49,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .firstName(possibleUser.get().getFirstName())
                 .lastName(possibleUser.get().getLastName())
                 .username(possibleUser.get().getUsername())
-                .following(iUsersInteractionsService.getUserFollows(possibleUser.get().getIdentifier()).size())
-                .followers(iUsersInteractionsService.getUserFollowers(possibleUser.get().getIdentifier()).size())
+                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
                 .biography(possibleUser.get().getBiography())
                 .location(possibleUser.get().getLocation())
                 .site(possibleUser.get().getSite())
@@ -76,36 +80,37 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .build()).isPresent();
 
         if (isSessionUserIdentifierBlocked) {
-            return responseSessionUserIdentifierBlocked(targetUser.get(), targetUserIdentifierBlocked);
+            return responseSessionUserIdentifierBlocked(sessionUserIdentifier, targetUser.get(), targetUserIdentifierBlocked);
         }
         if (targetUserIdentifierBlocked) {
-            return responseTargetUserIdentifierBlocked(targetUser.get());
+            return responseTargetUserIdentifierBlocked(sessionUserIdentifier, targetUser.get());
         }
 
         return fullResponse(targetUser.get(), sessionUserIdentifier);
     }
 
     @Override
-    public CustomPage<UserPreviewResponse> getUsersByUsername(String userIdentifier, String targetUsername, Pageable pageable) throws Exception {
-        Page<User> page = userRepository.findAllByUsername(targetUsername, pageable);
-
-        CustomPage<UserPreviewResponse> response = new CustomPage<>();
-        response.setContent(rowMapper(page.getContent()));
-        response.setPageSize(pageable.getPageSize());
-        response.setCurrentPage(pageable.getPageNumber());
-        response.setTotalPages(page.getTotalPages());
-        response.setTotalItems(page.getTotalElements());
-
-        return response;
+    public List<UserPreviewResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
+        return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page <= 0 ? 1 : page, size <= 0 ? 50 : size);
     }
 
-    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe) {
+    @Override
+    public List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
+        return usersRepositoryImpl.getFollowers(sessionUserIdentifier, targetUsername, page, size);
+    }
+
+    @Override
+    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
+        return usersRepositoryImpl.getUserFollows(sessionUserIdentifier, targetUsername, page, size);
+    }
+
+    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollows(targetUser.getIdentifier()).size())
-                .followers(iUsersInteractionsService.getUserFollowers(targetUser.getIdentifier()).size())
+                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -122,13 +127,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(User targetUser) {
+    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(String sessionUserIdentifier, User targetUser) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollows(targetUser.getIdentifier()).size())
-                .followers(iUsersInteractionsService.getUserFollowers(targetUser.getIdentifier()).size())
+                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -150,8 +155,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .firstName(targetUser.getFirstName())
                 .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollows(targetUser.getIdentifier()).size())
-                .followers(iUsersInteractionsService.getUserFollowers(targetUser.getIdentifier()).size())
+                .following(iUsersInteractionsService.getUserFollowsCount(sessionUser, targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUser, targetUser.getIdentifier()))
                 .biography(targetUser.getBiography())
                 .location(targetUser.getLocation())
                 .site(targetUser.getSite())
@@ -167,22 +172,4 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
     }
-
-    private List<UserPreviewResponse> rowMapper(List<User> followers){
-        List<UserPreviewResponse> response = new ArrayList<>();
-
-        if(!followers.isEmpty()){
-            followers.stream().forEach(f -> {
-                response.add(UserPreviewResponse.builder()
-                        .username(f.getUsername())
-                        .firstName(f.getFirstName())
-                        .biography(f.getBiography())
-                        .privateAccount(f.getPrivateAccount())
-                        .profilePhoto(f.getProfilePhoto())
-                        .build());
-            });
-        }
-        return response;
-    }
-
 }

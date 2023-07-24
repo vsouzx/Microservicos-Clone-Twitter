@@ -26,9 +26,9 @@ public interface IUsersInteractionsService {
 
     Optional<SilencedUsers> verifyIfIsSilenced(String silencer, String silenced);
 
-    List<UserPreviewResponse> getUserFollowers(String user);
+    Integer getUserFollowersCount(String sessionUserIdentifier, String targetUserIdentifier);
 
-    List<UserPreviewResponse> getUserFollows(String user);
+    Integer getUserFollowsCount(String sessionUserIdentifier, String targetUserIdentifier);
 
     List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser);
 

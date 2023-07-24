@@ -16,6 +16,8 @@ public class UserPreviewResponse {
     private String username;
     private String biography;
     private Boolean privateAccount;
+    private Boolean isFollowedByMe;
+    private Boolean isFollowingMe;
     private byte[] profilePhoto;
 
 }
