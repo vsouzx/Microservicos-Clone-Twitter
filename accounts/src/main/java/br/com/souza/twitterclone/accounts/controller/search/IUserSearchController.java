@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.accounts.controller.search;
 
+import br.com.souza.twitterclone.accounts.dto.pagination.CustomPage;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -39,5 +40,5 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier) throws Exception;
+    ResponseEntity<CustomPage<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier, Integer page, Integer size) throws Exception;
 }

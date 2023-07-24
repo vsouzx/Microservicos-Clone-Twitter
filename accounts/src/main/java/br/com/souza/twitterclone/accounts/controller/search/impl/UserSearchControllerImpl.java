@@ -1,12 +1,14 @@
 package br.com.souza.twitterclone.accounts.controller.search.impl;
 
 import br.com.souza.twitterclone.accounts.controller.search.IUserSearchController;
+import br.com.souza.twitterclone.accounts.dto.pagination.CustomPage;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import java.util.List;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +39,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
      @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(@RequestParam(value = "username", required = false) String targetUsername) throws Exception{
-        return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername), HttpStatus.OK);
+    public ResponseEntity<CustomPage<UserPreviewResponse>> getUsersByUsername(@RequestParam(value = "username", required = false) String targetUsername,
+                                                                              @RequestParam(value = "page", required = true) Integer page,
+                                                                              @RequestParam(value = "size", required = true) Integer size) throws Exception{
+        return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername, PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     //TODO: Buscar lista de follows de um usuario

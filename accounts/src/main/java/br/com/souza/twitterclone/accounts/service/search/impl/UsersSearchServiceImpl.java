@@ -4,14 +4,18 @@ import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.dto.pagination.CustomPage;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -82,8 +86,17 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUsersByUsername(String userIdentifier, String targetUserIdentifier) throws Exception {
-        return null;
+    public CustomPage<UserPreviewResponse> getUsersByUsername(String userIdentifier, String targetUsername, Pageable pageable) throws Exception {
+        Page<User> page = userRepository.findAllByUsername(targetUsername, pageable);
+
+        CustomPage<UserPreviewResponse> response = new CustomPage<>();
+        response.setContent(rowMapper(page.getContent()));
+        response.setPageSize(pageable.getPageSize());
+        response.setCurrentPage(pageable.getPageNumber());
+        response.setTotalPages(page.getTotalPages());
+        response.setTotalItems(page.getTotalElements());
+
+        return response;
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe) {
@@ -153,6 +166,23 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhoto(targetUser.getProfilePhoto())
                 .build();
+    }
+
+    private List<UserPreviewResponse> rowMapper(List<User> followers){
+        List<UserPreviewResponse> response = new ArrayList<>();
+
+        if(!followers.isEmpty()){
+            followers.stream().forEach(f -> {
+                response.add(UserPreviewResponse.builder()
+                        .username(f.getUsername())
+                        .firstName(f.getFirstName())
+                        .biography(f.getBiography())
+                        .privateAccount(f.getPrivateAccount())
+                        .profilePhoto(f.getProfilePhoto())
+                        .build());
+            });
+        }
+        return response;
     }
 
 }
