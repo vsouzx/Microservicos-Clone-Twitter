@@ -14,22 +14,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private static final String TOPIC = "twitterclone-new-register";
+    private static final Integer PAUSE_TIME = 15000;
+    private static final Integer LIMIT_TIME = 300;
 
     public UsersRegisterServiceImpl(UserRepository userRepository,
-                                    PasswordEncoder passwordEncoder) {
+                                    PasswordEncoder passwordEncoder,
+                                    KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
+    @Override
     public void userRegister(String requestJson, MultipartFile file) throws Exception {
         UserRegistrationRequest request;
 
@@ -70,11 +80,36 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
                 .biography(request.getBiography())
                 .location(request.getLocation())
                 .site(request.getSite())
-                .confirmedEmail(true) //TODO: Alterar para false depois que fazer o servico de validação email
+                .confirmedEmail(false) //TODO: Alterar para false depois que fazer o servico de validação email
                 .registrationTime(LocalDateTime.now())
                 .privateAccount(request.getPrivateAccount())
                 .languagePreference(request.getLanguagePreference() == null ? "pt" : request.getLanguagePreference())
                 .profilePhoto(file.getBytes())
                 .build());
+
+        trySendKafkaMessage(request.getEmail());
     }
+
+    @Override
+    public void resendConfirmationCode(String email) throws Exception {
+        trySendKafkaMessage(email);
+    }
+
+    public void trySendKafkaMessage(String email) throws Exception {
+        boolean notSent = true;
+        int waitingTime = 0;
+
+        do{
+            try{
+                kafkaTemplate.send(TOPIC, email);
+                notSent = false;
+                log.error("Mensagem enviada com SUCESSO para o tópico: {}", TOPIC);
+            }catch (Exception e){
+                log.error("Erro ao enviar mensagem para o tópico: {}", TOPIC);
+                Thread.sleep(PAUSE_TIME);
+                waitingTime += 30;
+            }
+        }while (notSent && waitingTime <= LIMIT_TIME);
+    }
+
 }

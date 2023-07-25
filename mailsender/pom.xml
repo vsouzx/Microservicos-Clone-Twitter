@@ -4,10 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>br.com.souza.twitterclone</groupId>
-	<artifactId>accounts</artifactId>
+	<artifactId>mailsender</artifactId>
 	<version>1.0.0</version>
-	<name>accounts</name>
-	<description>Account management service for Twitter Clone Microservices</description>
+	<name>mailsender</name>
+	<description>Mail Sender for Twitter Clone Microservices</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -22,12 +22,9 @@
 		<spring-cloud.version>4.0.2</spring-cloud.version>
 		<spring-cloud-netflix.version>4.0.0</spring-cloud-netflix.version>
 		<mssql.version>11.2.3.jre17</mssql.version>
-		<redis-client.version>4.4.3</redis-client.version>
-		<springdoc.openapi.starter.webmvc.ui.version>2.0.4</springdoc.openapi.starter.webmvc.ui.version>
 	</properties>
 
 	<dependencies>
-		<!-- Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -35,44 +32,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-validation</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<!-- Kafka -->
-		<dependency>
-			<groupId>org.springframework.kafka</groupId>
-			<artifactId>spring-kafka</artifactId>
-		</dependency>
-		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>provided</scope>
 		</dependency>
-		<!-- Spring boot Redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<!-- Redis Client -->
-		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>${redis-client.version}</version>
-		</dependency>
-
-		<!-- Spring Cloud -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
@@ -88,42 +54,21 @@
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
 			<version>${spring-cloud.version}</version>
 		</dependency>
-
 		<!-- Banco SqlServer -->
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<version>${mssql.version}</version>
 		</dependency>
-
-		<!--JWT-->
+		<!-- Kafka -->
 		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt</artifactId>
-			<version>0.9.1</version>
-		</dependency>
-		<!-- jjwt -->
-		<dependency>
-			<groupId>com.nimbusds</groupId>
-			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>9.31</version>
-		</dependency>
-		<!-- JAXB -->
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-			<version>2.3.1</version>
-		</dependency>
-		<!-- Swagger (OpenAPI v3) -->
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>${springdoc.openapi.starter.webmvc.ui.version}</version>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
-		<finalName>accounts</finalName>
+		<finalName>mailsender</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

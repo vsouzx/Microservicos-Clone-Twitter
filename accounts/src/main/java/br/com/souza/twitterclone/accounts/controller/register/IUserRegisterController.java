@@ -22,4 +22,13 @@ public interface IUserRegisterController {
     })
     ResponseEntity<Void> userRegister(String username, MultipartFile photo) throws Exception;
 
+    @Operation(summary = "Reenvia o código de confirmação para o email")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Enviado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> resendConfirmationCode(String email) throws Exception;
+
 }

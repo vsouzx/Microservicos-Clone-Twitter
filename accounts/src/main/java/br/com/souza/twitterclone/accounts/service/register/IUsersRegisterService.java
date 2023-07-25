@@ -12,5 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IUsersRegisterService {
 
     void userRegister(String request, MultipartFile file) throws Exception;
+    void resendConfirmationCode(String email) throws Exception;
 
 }
