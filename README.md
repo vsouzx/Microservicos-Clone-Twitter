@@ -7,8 +7,8 @@ O que será implementado:
 <p><b>Discovery</b> ✔️</p>
 <p><b>Gateway</b> (com Spring WebFlux) ✔️</p>
 <p>Serviço de <b>autenticação</b> (com Redis) ✔️</p>
-<p>Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka) 🚧 (em andamento) </p>
-<p>Serviço de <b>email </b>(sendo um Consumer Kafka) 🔜</p>
+<p>Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka) 🚧 (em andamento) 90%  </p>
+<p>Serviço de <b>email </b>(sendo um Consumer Kafka) 🚧 (em andamento) 90% </p>
 <p>Serviço de <b>feed </b>(posts, retweets, follows, likes, comentarios, etc) 🔜</p>
 <p>Serviço de <b>notificações</b> 🔜</p>
 <p>Serviço de <b>DM</b> 🔜</p>
