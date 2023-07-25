@@ -185,4 +185,54 @@ public class UsersRepositoryImpl {
 
         return response;
     }
+
+    public List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size){
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("DECLARE @sessionUser	            VARCHAR(MAX) = ?  ");
+        sb.append("	      ,@PageNumber				INT = ?  ");
+        sb.append("       ,@RowsOfPage				INT = ?     ");
+        sb.append(" ");
+        sb.append("SELECT DISTINCT  u.first_name   ");
+        sb.append("			    ,u.username   ");
+        sb.append("				,u.biography   ");
+        sb.append("				,u.private_account   ");
+        sb.append("				,IIF(uf.followed_identifier IS NOT NULL, 1, 0)	isFollowedBySessionUser   ");
+        sb.append("				,profile_photo   ");
+        sb.append("FROM users u     ");
+        sb.append("INNER JOIN users_pending_follows f     ");
+        sb.append("	ON f.pending_followed_identifier = @sessionUser ");
+        sb.append("	AND f.pending_follower_identifier = u.identifier  ");
+        sb.append("LEFT JOIN users_follows uf    ");
+        sb.append("	ON uf.followed_identifier = f.pending_follower_identifier ");
+        sb.append("	AND uf.follower_identifier = f.pending_followed_identifier  ");
+        sb.append("WHERE u.identifier <> @sessionUser   ");
+        sb.append("ORDER BY isFollowedBySessionUser   ");
+        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS   ");
+        sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
+
+        Query query = em.createNativeQuery(sb.toString());
+
+        query.setParameter(1, sessionUserIdentifier);
+        query.setParameter(2, page);
+        query.setParameter(3, size);
+
+        List<Object[]> lista = query.getResultList();
+
+        List<UserPreviewResponse> response = new ArrayList<>();
+
+        lista.stream().forEach(result -> {
+            response.add(UserPreviewResponse.builder()
+                    .firstName((String) result[0])
+                    .username((String) result[1])
+                    .biography((String) result[2])
+                    .privateAccount((Boolean) result[3])
+                    .isFollowedByMe((Boolean) result[4])
+                    .isFollowingMe((Boolean) result[5])
+                    .profilePhoto((byte[]) result[6])
+                    .build());
+        });
+
+        return response;
+    }
 }

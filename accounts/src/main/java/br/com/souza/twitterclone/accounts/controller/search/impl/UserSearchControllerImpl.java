@@ -52,10 +52,14 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     @GetMapping(value = "/follows/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getUserFollows(@PathVariable("identifier") String targetUserIdentifier,
-                                                                      @RequestParam(value = "page", required = true) Integer page,
-                                                                      @RequestParam(value = "size", required = true) Integer size) throws Exception {
+                                                                    @RequestParam(value = "page", required = true) Integer page,
+                                                                    @RequestParam(value = "size", required = true) Integer size) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getUserFollows(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, page, size), HttpStatus.OK);
     }
 
-    //TODO: Buscar lista de pending followers de um usuario
+    @GetMapping(value = "/pendingfollowers", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserPreviewResponse>> getUserPendingFollowers(@RequestParam(value = "page", required = true) Integer page,
+                                                                             @RequestParam(value = "size", required = true) Integer size) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getUserPendingFollowers(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
+    }
 }
