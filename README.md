@@ -1,6 +1,6 @@
 # Clone Twitter com Microservicos [![My Skills](https://skillicons.dev/icons?i=java,spring,kafka,docker,redis)](https://skillicons.dev)
 <p>Backend do meu futuro "clone" do twitter, usando arquitetura de microservicos com Spring.</p>
-<p>O <b>frontend</b> será feito em Angular, pelo <a href="">Vinicius Souza</a> !</p>
+<p>O <b>frontend</b> será feito em Angular, pelo <a href="https://github.com/souzxvini">Vinicius Souza</a> !</p>
 
 <br>
 
