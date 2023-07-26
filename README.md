@@ -11,7 +11,7 @@
 <p><b>Discovery</b> ✔️</p>
 <p><b>Gateway</b> (com Spring WebFlux) ✔️</p>
 <p>Micro Serviço de <b>autenticação</b> (com Redis) ✔️</p>
-<p>Micro Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka) 90%✔️</p>
+<p>Micro Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka)✔️</p>
 <p>Micro Serviço de <b>email </b>(sendo um Consumer Kafka) ✔️</p>
 <p>Micro Serviço de <b>feed </b>(posts, retweets, follows, likes, comentarios, etc) 🚧 (em andamento) </p>
 <p>Micro Serviço de <b>notificações</b> 🔜</p>
