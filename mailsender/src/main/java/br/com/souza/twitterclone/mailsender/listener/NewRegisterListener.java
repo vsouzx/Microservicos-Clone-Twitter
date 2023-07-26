@@ -22,6 +22,10 @@ public class NewRegisterListener {
     @KafkaListener(topics = TOPIC, groupId = GROUP)
     public void receiveEmail(String email) throws Exception {
         log.info("Consumer: e-mail recebido: {} ", email);
-        iMailSenderService.sendMailConfirmation(email);
+        try{
+            iMailSenderService.sendMailConfirmation(email);
+        }catch (Exception e){
+            log.error("Erro ao enviar código");
+        }
     }
 }

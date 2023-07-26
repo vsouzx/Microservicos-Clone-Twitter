@@ -3,9 +3,11 @@ package br.com.souza.twitterclone.accounts.service.register.impl;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.dto.user.UserRegistrationRequest;
+import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyConfirmedException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyExistsException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidPasswordException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidUsernameRegexException;
+import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UsernameAlreadyExistsException;
 import br.com.souza.twitterclone.accounts.service.register.IUsersRegisterService;
 import br.com.souza.twitterclone.accounts.util.PasswordValidatorHelper;
@@ -92,6 +94,16 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     @Override
     public void resendConfirmationCode(String email) throws Exception {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new UserNotFoundException();
+        }
+
+        if(user.get().getConfirmedEmail()){
+            throw new EmailAlreadyConfirmedException();
+        }
+
         trySendKafkaMessage(email);
     }
 
@@ -107,7 +119,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
             }catch (Exception e){
                 log.error("Erro ao enviar mensagem para o tópico: {}", TOPIC);
                 Thread.sleep(PAUSE_TIME);
-                waitingTime += 30;
+                waitingTime += 15;
             }
         }while (notSent && waitingTime <= LIMIT_TIME);
     }
