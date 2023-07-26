@@ -62,4 +62,6 @@ public class UserSearchControllerImpl implements IUserSearchController {
                                                                              @RequestParam(value = "size", required = true) Integer size) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getUserPendingFollowers(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
+
+    //TODO: Procurar 3 usuários aleatórios para seguir
 }

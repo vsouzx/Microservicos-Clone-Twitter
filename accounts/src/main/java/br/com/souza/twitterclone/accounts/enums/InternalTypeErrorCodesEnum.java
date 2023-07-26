@@ -16,7 +16,8 @@ public enum InternalTypeErrorCodesEnum {
     E410010("410.010", "You can't follow this user, because he/she has blocked you OR you have blocked him/her."),
     E410011("410.011", "There is not an pending follow request from this user to you."),
     E410012("410.012", "You can't silence this user, because he/she has blocked you OR you have blocked him/her."),
-    E410013("410.013", "This email is already confirmed.");
+    E410013("410.013", "This email is already confirmed."),
+    E410014("410.014", "Confirmation code not matches.");
 
     private final String code;
     private final String message;

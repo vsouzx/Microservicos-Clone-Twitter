@@ -13,5 +13,6 @@ public interface IUsersRegisterService {
 
     void userRegister(String request, MultipartFile file) throws Exception;
     void resendConfirmationCode(String email) throws Exception;
+    void confirmCode(String email, String code) throws Exception;
 
 }

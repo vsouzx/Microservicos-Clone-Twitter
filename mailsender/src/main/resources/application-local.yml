@@ -21,8 +21,8 @@ database:
 mail:
   host: smtp.gmail.com
   port: 587
-  username: vtsoliveira2001@gmail.com
-  password: afrpwsxmpglewojd
+  username: souzatestesabs@gmail.com
+  password: zmmvhhmuuycguixg
 
 ## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
 logging:

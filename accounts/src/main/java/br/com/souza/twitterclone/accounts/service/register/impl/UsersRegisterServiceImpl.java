@@ -3,6 +3,7 @@ package br.com.souza.twitterclone.accounts.service.register.impl;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.dto.user.UserRegistrationRequest;
+import br.com.souza.twitterclone.accounts.handler.exceptions.ConfirmationCodeNotMatchesException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyConfirmedException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyExistsException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidPasswordException;
@@ -107,7 +108,27 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
         trySendKafkaMessage(email);
     }
 
-    public void trySendKafkaMessage(String email) throws Exception {
+    @Override
+    public void confirmCode(String email, String code) throws Exception {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new UserNotFoundException();
+        }
+
+        if(user.get().getConfirmedEmail()){
+            throw new EmailAlreadyConfirmedException();
+        }
+
+        if(!user.get().getConfirmationCode().equals(code)){
+            throw new ConfirmationCodeNotMatchesException();
+        }
+
+        user.get().setConfirmedEmail(true);
+        userRepository.save(user.get());
+    }
+
+    private void trySendKafkaMessage(String email) throws Exception {
         boolean notSent = true;
         int waitingTime = 0;
 

@@ -52,7 +52,7 @@ spring:
           writetimeout: 5000
 
           socketFactory:
-            port: 46
+            port: 465
             class: javax.net.ssl.SSLSocketFactory
 ## Logging level can be one of TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
 logging:

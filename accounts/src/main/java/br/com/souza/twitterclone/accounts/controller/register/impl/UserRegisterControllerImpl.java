@@ -36,4 +36,11 @@ public class UserRegisterControllerImpl implements IUserRegisterController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @GetMapping(value = "/confirmcode", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> confirmCode(@RequestParam("email") String email,
+                                            @RequestParam("code") String code) throws Exception {
+        iUsersRegisterService.confirmCode(email, code);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
 }
