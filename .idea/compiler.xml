@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="twitterclone" />
+        <module name="feed" />
         <module name="mailsender" />
         <module name="discovery" />
         <module name="configserver" />
@@ -30,6 +31,7 @@
       <module name="configserver (1)" options="-parameters" />
       <module name="configserver (2)" options="-parameters" />
       <module name="discovery" options="-parameters" />
+      <module name="feed" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="mailsender" options="-parameters" />
       <module name="twitterclone" options="-parameters" />
