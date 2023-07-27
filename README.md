@@ -1,6 +1,6 @@
-# Clone Twitter com Microservicos [![My Skills](https://skillicons.dev/icons?i=twitter,spring)](https://skillicons.dev)  
+# Clone Twitter com Microsservicos [![My Skills](https://skillicons.dev/icons?i=twitter,spring)](https://skillicons.dev)  
 
-<p>Backend do meu futuro "clone" do twitter, usando arquitetura de microservicos com Spring.</p>
+<p>Backend do meu futuro "clone" do twitter, usando arquitetura de microsservicos com Spring.</p>
 <p>O <b>frontend</b> será feito em Angular, pelo <a href="https://github.com/souzxvini?tab=repositories">Vinicius Souza</a> !</p>
 
 <br>
@@ -11,8 +11,8 @@
 <p><b>Discovery</b> ✔️</p>
 <p><b>Gateway</b> (com Spring WebFlux) ✔️</p>
 <p>Micro Serviço de <b>autenticação</b> (com Redis) ✔️</p>
-<p>Micro Serviço de <b>gerenciamento de contas</b> (sendo um Producer Kafka) 90%✔️</p>
+<p>Micro Serviço de <b>gerenciamento de contas</b> (Criar conta, seguir/bloquear/silenciar outra conta, deixar a conta privada)✔️</p>
 <p>Micro Serviço de <b>email </b>(sendo um Consumer Kafka) ✔️</p>
-<p>Micro Serviço de <b>feed </b>(posts, retweets, follows, likes, comentarios, etc) 🚧 (em andamento) </p>
-<p>Micro Serviço de <b>notificações</b> 🔜</p>
-<p>Micro Serviço de <b>DM</b> 🔜</p>
+<p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, etc) 🚧 (em andamento) </p>
+<p>Micro Serviço de <b>notificações</b> 🔜 (irá notificar o user em tempo real, quando tiver uma nova curtida, seguidor, retweet ou comentário)</p>
+<p>Micro Serviço de <b>DM</b> 🔜 (os usuários poderão trocar mensagens em tempo real)</p>
