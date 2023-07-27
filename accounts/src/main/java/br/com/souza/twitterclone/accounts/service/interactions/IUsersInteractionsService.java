@@ -18,6 +18,8 @@ public interface IUsersInteractionsService {
 
     void silencetoggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
 
+    Boolean anyoneIsBlocked(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
+
     Optional<UsersFollows> verifyIfIsFollowing(String follower, String followed);
 
     Optional<UsersPendingFollows> verifyIfIsPendingFollowing(String follower, String followed);

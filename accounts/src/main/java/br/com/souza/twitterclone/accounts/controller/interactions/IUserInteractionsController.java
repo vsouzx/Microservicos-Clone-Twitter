@@ -47,4 +47,31 @@ public interface IUserInteractionsController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<Void> silencetoggle(String targetIdentifier) throws Exception;
+
+    @Operation(summary = "Verify if one of users has blocked other.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Silenciado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Boolean> anyoneIsBlocked(String targetIdentifier) throws Exception;
+
+    @Operation(summary = "Verify if session user is following target user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Silenciado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Boolean> isFollowing(String targetIdentifier) throws Exception;
+
+    @Operation(summary = "Verify if session user is following target user.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Silenciado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Boolean> isSilenced(String targetIdentifier) throws Exception;
 }

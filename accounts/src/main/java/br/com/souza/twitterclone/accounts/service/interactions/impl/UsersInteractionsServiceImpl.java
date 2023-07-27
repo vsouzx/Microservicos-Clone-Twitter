@@ -46,7 +46,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.silencedUsersRepository = silencedUsersRepository;
     }
 
-    //TODO: quebrar todos esses métodos, em services seprarados: FollowService, PendingFollowService, BlockService, SilenceService
     @Override
     public void blockToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         Optional<User> user = userRepository.findById(targetUserIdentifier);
@@ -175,12 +174,26 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
             silencedUsersRepository.delete(isSilenced.get());
         }else{
             silencedUsersRepository.save(SilencedUsers.builder()
-                            .id(SilencedUsersId.builder()
-                                    .silencerIdentifier(sessionUserIdentifier)
-                                    .silencedIdentifier(targetUserIdentifier)
-                                    .build())
+                    .id(SilencedUsersId.builder()
+                            .silencerIdentifier(sessionUserIdentifier)
+                            .silencedIdentifier(targetUserIdentifier)
+                            .build())
                     .build());
         }
+    }
+
+    @Override
+    public Boolean anyoneIsBlocked(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+        Optional<User> targetUser = userRepository.findById(targetUserIdentifier);
+
+        if (targetUser.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+
+        return targetUserIsBlocked.isPresent() || sessionUserIsBlocked.isPresent();
     }
 
     @Override
