@@ -1,8 +1,6 @@
 --CREATE TABLE tweets_views(
 --	[tweet_identifier] [uniqueidentifier] NOT NULL,
---	[user_identifier] [uniqueidentifier] NOT NULL,
---	[time] DATETIME
---) 
+--	[user_identifier] [uniqueidentifier] NOT NULL
 --GO
 
 --ALTER TABLE tweets_views  WITH CHECK ADD  CONSTRAINT [tweets_views_tweets_FK] FOREIGN KEY([tweet_identifier])
