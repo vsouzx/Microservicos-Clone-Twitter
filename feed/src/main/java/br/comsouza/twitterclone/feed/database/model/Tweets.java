@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class Tweets {
     private String type;
 
     @Column(name = "publication_time", length = 36)
-    private String publicationTime;
+    private LocalDateTime publicationTime;
 
     @Lob
     @Column(name = "attachment")

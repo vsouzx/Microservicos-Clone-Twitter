@@ -14,14 +14,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Entity(name = "tweets_views")
-public class TweetsViews {
+@Entity(name = "tweets_favs")
+public class TweetsFavs {
 
     @EmbeddedId
     @AttributeOverrides({
             @AttributeOverride(name = "tweetIdentifier", column = @Column(name = "tweet_identifier", length = 36)),
             @AttributeOverride(name = "userIdentifier", column = @Column(name = "user_identifier", length = 36)),
     })
-    private TweetsViewsId id;
+    private TweetsFavsId id;
 
 }

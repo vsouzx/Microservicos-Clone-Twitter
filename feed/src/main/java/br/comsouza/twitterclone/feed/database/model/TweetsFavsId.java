@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Embeddable
-public class TweetsViewsId {
+public class TweetsFavsId {
 
     @Column(name = "tweet_identifier", length = 36)
     private String tweetIdentifier;

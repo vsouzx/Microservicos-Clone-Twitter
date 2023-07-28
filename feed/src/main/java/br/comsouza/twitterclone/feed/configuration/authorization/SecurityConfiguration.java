@@ -23,13 +23,13 @@ public class SecurityConfiguration {
 
     private static final String[] AUTH_WHITELIST = {
             // URLS liberadas
-            "/accounts/v1/user/register/**",
+            "/feed/v1/user/register/**",
             "/v1/user/register/**",
             // -- Swagger UI v3 (OpenAPI)
-            "/accounts/v3/api-docs",
-            "/accounts/v3/api-docs/swagger-config",
-            "/accounts/swagger-ui.html",
-            "/accounts/swagger-ui/*",
+            "/feed/v3/api-docs",
+            "/feed/v3/api-docs/swagger-config",
+            "/feed/swagger-ui.html",
+            "/feed/swagger-ui/*",
             "/v3/api-docs",
             "/v3/api-docs/swagger-config",
             "/swagger-ui.html",
