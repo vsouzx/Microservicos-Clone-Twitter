@@ -1,11 +1,18 @@
 package br.comsouza.twitterclone.feed.service.posts.impl;
 
 import br.comsouza.twitterclone.feed.database.model.Tweets;
+import br.comsouza.twitterclone.feed.database.model.TweetsFavs;
+import br.comsouza.twitterclone.feed.database.model.TweetsFavsId;
+import br.comsouza.twitterclone.feed.database.model.TweetsLikes;
+import br.comsouza.twitterclone.feed.database.model.TweetsLikesId;
 import br.comsouza.twitterclone.feed.database.model.TweetsTypes;
+import br.comsouza.twitterclone.feed.database.repository.ITweetsFavsRepository;
+import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.handler.exceptions.InvalidTweetException;
 import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
+import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
@@ -19,11 +26,20 @@ public class PostsServiceImpl implements IPostsService {
 
     private final ITweetsRepository tweetsRepository;
     private final ITweetTypeService iTweetTypeService;
+    private final IInteractionsService iInteractionsService;
+    private final ITweetsLikesRepository iTweetsLikesRepository;
+    private final ITweetsFavsRepository iTweetsFavsRepository;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
-                            ITweetTypeService iTweetTypeService) {
+                            ITweetTypeService iTweetTypeService,
+                            IInteractionsService iInteractionsService,
+                            ITweetsLikesRepository iTweetsLikesRepository,
+                            ITweetsFavsRepository iTweetsFavsRepository) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
+        this.iInteractionsService = iInteractionsService;
+        this.iTweetsLikesRepository = iTweetsLikesRepository;
+        this.iTweetsFavsRepository = iTweetsFavsRepository;
     }
 
     @Override
@@ -73,6 +89,7 @@ public class PostsServiceImpl implements IPostsService {
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .build());
         }
+        iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
@@ -102,5 +119,54 @@ public class PostsServiceImpl implements IPostsService {
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .build());
         }
+        iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
+    }
+
+    @Override
+    public void likeToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
+        Optional<Tweets> tweet = tweetsRepository.findById(tweetIdentifier);
+
+        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
+        if (tweet.isEmpty()) {
+            throw new TweetNotFoundException();
+        }
+
+        Optional<TweetsLikes> liked = iTweetsLikesRepository.findAllByIdTweetIdentifierAndUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+
+        if (liked.isPresent()) {
+            iTweetsLikesRepository.delete(liked.get());
+        } else {
+            iTweetsLikesRepository.save(TweetsLikes.builder()
+                    .id(TweetsLikesId.builder()
+                            .tweetIdentifier(tweetIdentifier)
+                            .userIdentifier(sessionUserIdentifier)
+                            .build())
+                    .build());
+        }
+        iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
+    }
+
+    @Override
+    public void favToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
+        Optional<Tweets> tweet = tweetsRepository.findById(tweetIdentifier);
+
+        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
+        if (tweet.isEmpty()) {
+            throw new TweetNotFoundException();
+        }
+
+        Optional<TweetsFavs> fav = iTweetsFavsRepository.findAllByIdTweetIdentifierAndUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+
+        if (fav.isPresent()) {
+            iTweetsFavsRepository.delete(fav.get());
+        } else {
+            iTweetsFavsRepository.save(TweetsFavs.builder()
+                    .id(TweetsFavsId.builder()
+                            .tweetIdentifier(tweetIdentifier)
+                            .userIdentifier(sessionUserIdentifier)
+                            .build())
+                    .build());
+        }
+        iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 }

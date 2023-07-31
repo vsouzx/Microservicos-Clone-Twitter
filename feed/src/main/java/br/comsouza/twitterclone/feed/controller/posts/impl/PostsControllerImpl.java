@@ -54,4 +54,16 @@ public class PostsControllerImpl implements IPostsController {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    @PostMapping(value = "/liketoggle/{tweet}")
+    public ResponseEntity<Void> likeToggle(@PathVariable(value = "tweet") String tweet) throws Exception {
+        iPostsService.likeToggle(tweet, FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/favtoggle/{tweet}")
+    public ResponseEntity<Void> favToggle(@PathVariable(value = "tweet") String tweet) throws Exception {
+        iPostsService.favToggle(tweet, FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }

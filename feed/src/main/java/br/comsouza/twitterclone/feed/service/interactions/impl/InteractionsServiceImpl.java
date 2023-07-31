@@ -1,6 +1,8 @@
 package br.comsouza.twitterclone.feed.service.interactions.impl;
 
 import br.comsouza.twitterclone.feed.database.model.TweetsTypes;
+import br.comsouza.twitterclone.feed.database.model.TweetsViews;
+import br.comsouza.twitterclone.feed.database.model.TweetsViewsId;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsViewsRepository;
@@ -47,6 +49,16 @@ public class InteractionsServiceImpl implements IInteractionsService {
     @Override
     public Integer getTweetViewsCount(String tweetIdentifier) {
         return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
+    }
+
+    @Override
+    public void increaseViewsCount(String tweetIdentifier, String userIdentifier) {
+        iTweetsViewsRepository.save(TweetsViews.builder()
+                .id(TweetsViewsId.builder()
+                        .tweetIdentifier(tweetIdentifier)
+                        .userIdentifier(userIdentifier)
+                        .build())
+                .build());
     }
 
 }

@@ -6,4 +6,5 @@ public interface IInteractionsService {
     Integer getTweetRetweetsCount(String tweetIdentifier);
     Integer getTweetLikesCount(String tweetIdentifier);
     Integer getTweetViewsCount(String tweetIdentifier);
+    void increaseViewsCount(String tweetIdentifier, String userIdentifier);
 }

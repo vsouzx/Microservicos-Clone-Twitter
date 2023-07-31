@@ -24,6 +24,7 @@ public class TimelineControllerImpl implements ITimelineController {
 
     @GetMapping(value = "/following", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(){
+        //TODO: adicionar paginação
         return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
     }
 }
