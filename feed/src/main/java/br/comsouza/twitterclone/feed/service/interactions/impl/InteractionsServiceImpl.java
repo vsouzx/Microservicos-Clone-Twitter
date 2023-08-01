@@ -9,6 +9,7 @@ import br.comsouza.twitterclone.feed.database.repository.ITweetsViewsRepository;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -57,6 +58,7 @@ public class InteractionsServiceImpl implements IInteractionsService {
                 .id(TweetsViewsId.builder()
                         .tweetIdentifier(tweetIdentifier)
                         .userIdentifier(userIdentifier)
+                        .time(LocalDateTime.now())
                         .build())
                 .build());
     }

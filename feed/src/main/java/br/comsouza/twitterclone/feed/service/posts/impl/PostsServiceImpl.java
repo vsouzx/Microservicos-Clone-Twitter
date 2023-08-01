@@ -131,7 +131,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new TweetNotFoundException();
         }
 
-        Optional<TweetsLikes> liked = iTweetsLikesRepository.findAllByIdTweetIdentifierAndUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+        Optional<TweetsLikes> liked = iTweetsLikesRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
 
         if (liked.isPresent()) {
             iTweetsLikesRepository.delete(liked.get());
@@ -155,7 +155,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new TweetNotFoundException();
         }
 
-        Optional<TweetsFavs> fav = iTweetsFavsRepository.findAllByIdTweetIdentifierAndUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+        Optional<TweetsFavs> fav = iTweetsFavsRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
 
         if (fav.isPresent()) {
             iTweetsFavsRepository.delete(fav.get());
@@ -164,6 +164,7 @@ public class PostsServiceImpl implements IPostsService {
                     .id(TweetsFavsId.builder()
                             .tweetIdentifier(tweetIdentifier)
                             .userIdentifier(sessionUserIdentifier)
+                            .time(LocalDateTime.now())
                             .build())
                     .build());
         }

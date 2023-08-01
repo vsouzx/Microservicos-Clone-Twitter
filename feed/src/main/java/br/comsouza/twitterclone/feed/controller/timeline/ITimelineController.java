@@ -1,6 +1,6 @@
 package br.comsouza.twitterclone.feed.controller.timeline;
 
-import br.comsouza.twitterclone.feed.dto.handler.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,5 +19,5 @@ public interface ITimelineController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline() throws Exception;
+    ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(Integer page, Integer size) throws Exception;
 }

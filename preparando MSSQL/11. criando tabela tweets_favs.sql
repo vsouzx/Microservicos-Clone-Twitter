@@ -1,6 +1,7 @@
 CREATE TABLE tweets_favs(
 	[tweet_identifier] [uniqueidentifier] NOT NULL,
-	[user_identifier] [uniqueidentifier] NOT NULL
+	[user_identifier] [uniqueidentifier] NOT NULL,
+	[time] DATETIME
 PRIMARY KEY CLUSTERED 
 (
 	[tweet_identifier] ASC,

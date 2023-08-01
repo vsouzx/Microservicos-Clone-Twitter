@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ITweetsFavsRepository extends JpaRepository<TweetsFavs, TweetsFavsId> {
 
-    Optional<TweetsFavs> findAllByIdTweetIdentifierAndUserIdentifier(String tweetIdentifier, String userIdentifier);
+    Optional<TweetsFavs> findAllByIdTweetIdentifierAndIdUserIdentifier(String tweetIdentifier, String userIdentifier);
 }

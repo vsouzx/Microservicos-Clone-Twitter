@@ -1,7 +1,7 @@
 package br.comsouza.twitterclone.feed.controller.timeline.impl;
 
 import br.comsouza.twitterclone.feed.controller.timeline.ITimelineController;
-import br.comsouza.twitterclone.feed.dto.handler.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.timeline.ITimelineService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import java.util.List;
@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,8 +24,8 @@ public class TimelineControllerImpl implements ITimelineController {
     }
 
     @GetMapping(value = "/following", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(){
-        //TODO: adicionar paginação
-        return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
+    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@RequestParam(value = "page", required = true) Integer page,
+                                                                            @RequestParam(value = "size", required = true) Integer size){
+        return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 }

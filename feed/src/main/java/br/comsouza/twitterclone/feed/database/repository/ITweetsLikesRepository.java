@@ -11,5 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface ITweetsLikesRepository extends JpaRepository<TweetsLikes, TweetsLikesId> {
 
     List<TweetsLikes> findAllByIdTweetIdentifier(String tweetIdentifier);
-    Optional<TweetsLikes> findAllByIdTweetIdentifierAndUserIdentifier(String tweetIdentifier, String userIdentifier);
+    Optional<TweetsLikes> findAllByIdTweetIdentifierAndIdUserIdentifier(String tweetIdentifier, String userIdentifier);
 }
