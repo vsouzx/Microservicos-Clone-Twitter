@@ -2,7 +2,6 @@ package br.comsouza.twitterclone.feed.controller.favs.impl;
 
 import br.comsouza.twitterclone.feed.controller.favs.IFavoritesController;
 import br.comsouza.twitterclone.feed.dto.favs.FavTweetResponse;
-import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.favs.IFavoritesService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import java.util.List;

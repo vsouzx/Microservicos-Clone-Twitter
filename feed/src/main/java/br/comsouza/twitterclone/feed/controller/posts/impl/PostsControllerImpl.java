@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +26,9 @@ public class PostsControllerImpl implements IPostsController {
 
     @PostMapping(value = "/newtweet", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
+                                             @RequestPart(value = "canBeReplied", required = true) String flag,
                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment) throws Exception {
-        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachment);
+        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachment, flag);
 
         //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
 
@@ -36,8 +38,9 @@ public class PostsControllerImpl implements IPostsController {
     @PostMapping(value = "/retweettoggle/{originalTweet}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> retweetToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
-                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment) throws Exception {
-        iPostsService.retweetToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet);
+                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                              @RequestHeader("Authorization") String authorization) throws Exception {
+        iPostsService.retweetToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
 
         //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
 
@@ -47,8 +50,9 @@ public class PostsControllerImpl implements IPostsController {
     @PostMapping(value = "/commenttoggle/{originalTweet}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> commentToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
-                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment) throws Exception {
-        iPostsService.commentToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet);
+                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                              @RequestHeader("Authorization") String authorization) throws Exception {
+        iPostsService.commentToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
 
         //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
 
@@ -56,14 +60,16 @@ public class PostsControllerImpl implements IPostsController {
     }
 
     @PostMapping(value = "/liketoggle/{tweet}")
-    public ResponseEntity<Void> likeToggle(@PathVariable(value = "tweet") String tweet) throws Exception {
-        iPostsService.likeToggle(tweet, FindUserIdentifierHelper.getIdentifier());
+    public ResponseEntity<Void> likeToggle(@PathVariable(value = "tweet") String tweet,
+                                           @RequestHeader("Authorization") String authorization) throws Exception {
+        iPostsService.likeToggle(tweet, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/favtoggle/{tweet}")
-    public ResponseEntity<Void> favToggle(@PathVariable(value = "tweet") String tweet) throws Exception {
-        iPostsService.favToggle(tweet, FindUserIdentifierHelper.getIdentifier());
+    public ResponseEntity<Void> favToggle(@PathVariable(value = "tweet") String tweet,
+                                          @RequestHeader("Authorization") String authorization) throws Exception {
+        iPostsService.favToggle(tweet, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

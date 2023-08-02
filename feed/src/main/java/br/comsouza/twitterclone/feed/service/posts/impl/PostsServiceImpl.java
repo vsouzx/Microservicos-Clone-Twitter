@@ -1,5 +1,6 @@
 package br.comsouza.twitterclone.feed.service.posts.impl;
 
+import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.model.Tweets;
 import br.comsouza.twitterclone.feed.database.model.TweetsFavs;
 import br.comsouza.twitterclone.feed.database.model.TweetsFavsId;
@@ -9,9 +10,13 @@ import br.comsouza.twitterclone.feed.database.model.TweetsTypes;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsFavsRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
+import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.handler.exceptions.InvalidTweetException;
 import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
+import br.comsouza.twitterclone.feed.handler.exceptions.UnableToCommentException;
+import br.comsouza.twitterclone.feed.handler.exceptions.UnableToLikeException;
+import br.comsouza.twitterclone.feed.handler.exceptions.UnableToRetweetException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
@@ -29,21 +34,24 @@ public class PostsServiceImpl implements IPostsService {
     private final IInteractionsService iInteractionsService;
     private final ITweetsLikesRepository iTweetsLikesRepository;
     private final ITweetsFavsRepository iTweetsFavsRepository;
+    private final IAccountsClient iAccountsClient;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
                             ITweetTypeService iTweetTypeService,
                             IInteractionsService iInteractionsService,
                             ITweetsLikesRepository iTweetsLikesRepository,
-                            ITweetsFavsRepository iTweetsFavsRepository) {
+                            ITweetsFavsRepository iTweetsFavsRepository,
+                            IAccountsClient iAccountsClient) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
         this.iInteractionsService = iInteractionsService;
         this.iTweetsLikesRepository = iTweetsLikesRepository;
         this.iTweetsFavsRepository = iTweetsFavsRepository;
+        this.iAccountsClient = iAccountsClient;
     }
 
     @Override
-    public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment) throws Exception {
+    public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment, String flag) throws Exception {
         final String tweetIdentifier = UUID.randomUUID().toString();
 
         if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
@@ -59,16 +67,24 @@ public class PostsServiceImpl implements IPostsService {
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(LocalDateTime.now())
                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                .canBeRepliedByNotFollowedUser(flag.equals("1"))
                 .build());
     }
 
     @Override
-    public void retweetToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier) throws Exception {
+    public void retweetToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
         Optional<Tweets> originalTweet = tweetsRepository.findById(originalTweetIdentifier);
 
-        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
         if (originalTweet.isEmpty()) {
             throw new TweetNotFoundException();
+        }
+
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+
+        assert tweetUserInfos != null : "User info not found";
+
+        if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe() || tweetUserInfos.getPrivateAccount()) {
+            throw new UnableToRetweetException();
         }
 
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString());
@@ -87,18 +103,34 @@ public class PostsServiceImpl implements IPostsService {
                     .type(tweetType.getTypeIdentifier())
                     .publicationTime(LocalDateTime.now())
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                    .canBeRepliedByNotFollowedUser(true)
                     .build());
         }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
-    public void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier) throws Exception {
+    public void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
         Optional<Tweets> originalTweet = tweetsRepository.findById(originalTweetIdentifier);
 
-        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
         if (originalTweet.isEmpty()) {
             throw new TweetNotFoundException();
+        }
+
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+
+        assert tweetUserInfos != null : "User info not found";
+
+        if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
+            throw new UnableToCommentException();
+        }
+
+        if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
+            throw new UnableToCommentException();
+        }
+
+        if (!originalTweet.get().getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
+            throw new UnableToCommentException();
         }
 
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
@@ -117,18 +149,30 @@ public class PostsServiceImpl implements IPostsService {
                     .type(tweetType.getTypeIdentifier())
                     .publicationTime(LocalDateTime.now())
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                    .canBeRepliedByNotFollowedUser(true)
                     .build());
         }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
-    public void likeToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
-        Optional<Tweets> tweet = tweetsRepository.findById(tweetIdentifier);
+    public void likeToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
+        Optional<Tweets> originalTweet = tweetsRepository.findById(tweetIdentifier);
 
-        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
-        if (tweet.isEmpty()) {
+        if (originalTweet.isEmpty()) {
             throw new TweetNotFoundException();
+        }
+
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+
+        assert tweetUserInfos != null : "User info not found";
+
+        if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
+            throw new UnableToLikeException();
+        }
+
+        if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
+            throw new UnableToLikeException();
         }
 
         Optional<TweetsLikes> liked = iTweetsLikesRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
@@ -147,12 +191,24 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void favToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
-        Optional<Tweets> tweet = tweetsRepository.findById(tweetIdentifier);
+    public void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
+        Optional<Tweets> originalTweet = tweetsRepository.findById(tweetIdentifier);
 
         //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
-        if (tweet.isEmpty()) {
+        if (originalTweet.isEmpty()) {
             throw new TweetNotFoundException();
+        }
+
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+
+        assert tweetUserInfos != null : "User info not found";
+
+        if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
+            throw new UnableToLikeException();
+        }
+
+        if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
+            throw new UnableToLikeException();
         }
 
         Optional<TweetsFavs> fav = iTweetsFavsRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
