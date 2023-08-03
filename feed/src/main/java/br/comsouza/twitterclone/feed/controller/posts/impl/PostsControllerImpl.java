@@ -72,7 +72,4 @@ public class PostsControllerImpl implements IPostsController {
         iPostsService.favToggle(tweet, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    //TODO: detalhar infos de um tweet por id
-
 }

@@ -6,7 +6,8 @@
 --	[message_translations] [varchar](255),
 --	[type] [uniqueidentifier],
 --	[publication_time] DATETIME,
---	[attachment] [VARBINARY](MAX)
+--	[attachment] [VARBINARY](MAX),
+--	[can_be_replied_by_not_followed_user] BIT
 --PRIMARY KEY CLUSTERED 
 --(
 --	[tweet_identifier] ASC

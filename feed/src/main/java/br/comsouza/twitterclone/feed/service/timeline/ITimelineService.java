@@ -5,5 +5,5 @@ import java.util.List;
 
 public interface ITimelineService {
 
-    List<TimelineTweetResponse> getFollowingTimeline(String sessionUserIdentifier, Integer page, Integer size);
+    List<TimelineTweetResponse> getFollowingTimeline(String sessionUserIdentifier, Integer page, Integer size) throws Exception;
 }

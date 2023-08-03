@@ -1,8 +1,9 @@
 package br.comsouza.twitterclone.feed.service.favs.impl;
 
 import br.comsouza.twitterclone.feed.database.repository.favs.FavoriteTweetsRepository;
-import br.comsouza.twitterclone.feed.dto.favs.FavTweetResponse;
+import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.favs.IFavoritesService;
+import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +11,26 @@ import org.springframework.stereotype.Service;
 public class FavoritesServiceImpl implements IFavoritesService {
 
     private final FavoriteTweetsRepository favoriteTweetsRepository;
+    private final IPostsService iPostsService;
 
-    public FavoritesServiceImpl(FavoriteTweetsRepository favoriteTweetsRepository) {
+    public FavoritesServiceImpl(FavoriteTweetsRepository favoriteTweetsRepository,
+                                IPostsService iPostsService) {
         this.favoriteTweetsRepository = favoriteTweetsRepository;
+        this.iPostsService = iPostsService;
     }
 
     @Override
-    public List<FavTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size) {
-        return favoriteTweetsRepository.find(userIdentifier, page, size);
+    public List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size) throws Exception {
+        List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size);
+
+        for(TimelineTweetResponse fav : favs){
+            fav.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(fav, fav, userIdentifier, false));
+
+            if(fav.getOriginalTweetResponse() != null){
+                fav.getOriginalTweetResponse().setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(fav, fav.getOriginalTweetResponse(), userIdentifier, true));
+            }
+        }
+        return favs;
     }
 
 }

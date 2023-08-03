@@ -25,7 +25,7 @@ public class TimelineControllerImpl implements ITimelineController {
 
     @GetMapping(value = "/following", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@RequestParam(value = "page", required = true) Integer page,
-                                                                            @RequestParam(value = "size", required = true) Integer size){
+                                                                            @RequestParam(value = "size", required = true) Integer size) throws Exception{
         return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 }

@@ -1,12 +1,10 @@
 package br.comsouza.twitterclone.feed.database.repository.favs;
 
-import br.comsouza.twitterclone.feed.dto.favs.FavTweetResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Repository;
@@ -24,7 +22,7 @@ public class FavoriteTweetsRepository {
         this.iInteractionsService = iInteractionsService;
     }
 
-    public List<FavTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size) {
+    public List<TimelineTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserId VARCHAR(MAX) = ? ");
@@ -58,11 +56,11 @@ public class FavoriteTweetsRepository {
 
         List<Object[]> list = query.getResultList();
 
-        List<FavTweetResponse> response = new ArrayList<>();
+        List<TimelineTweetResponse> response = new ArrayList<>();
 
         if (!list.isEmpty()) {
             list.stream().forEach(result -> {
-                response.add(FavTweetResponse.builder()
+                response.add(TimelineTweetResponse.builder()
                         .tweetIdentifier((String) result[0])
                         .originalTweetIdentifier((String) result[1])
                         .tweetTypeDescription((String) result[2])
@@ -72,11 +70,12 @@ public class FavoriteTweetsRepository {
                         .userProfilePhoto((byte[]) result[6])
                         .tweetMessage((String) result[7])
                         .tweetAttachment((byte[]) result[8])
-                        .favTime(((Timestamp) result[9]).toLocalDateTime())
                         .tweetCommentsCount(iInteractionsService.getTweetCommentsCount((String) result[0]))
                         .tweetRetweetsCount(iInteractionsService.getTweetRetweetsCount((String) result[0]))
                         .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
                         .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
+                        .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
+                        .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                         .originalTweetResponse(null) //TODO: adicionar lógica para pegar response de um tweet por id
                         .build());
             });

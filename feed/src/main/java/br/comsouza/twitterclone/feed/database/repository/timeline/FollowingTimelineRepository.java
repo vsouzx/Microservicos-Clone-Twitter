@@ -14,9 +14,7 @@ public class FollowingTimelineRepository {
 
     @PersistenceContext
     private final EntityManager em;
-
     private final IInteractionsService iInteractionsService;
-
 
     public FollowingTimelineRepository(EntityManager em,
                                        IInteractionsService iInteractionsService) {
@@ -81,7 +79,8 @@ public class FollowingTimelineRepository {
                         .tweetRetweetsCount(iInteractionsService.getTweetRetweetsCount((String) result[0]))
                         .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
                         .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
-                        .originalTweetResponse(null) //TODO: adicionar lógica para pegar response de um tweet por id
+                        .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
+                        .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                         .build());
             });
         }

@@ -4,6 +4,7 @@ public enum TweetTypeEnum {
 
     TWEET,
     RETWEET,
+    NO_VALUE_RETWEET,
     COMMENT;
 
 }

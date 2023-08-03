@@ -1,7 +1,7 @@
 package br.comsouza.twitterclone.feed.controller.favs.impl;
 
 import br.comsouza.twitterclone.feed.controller.favs.IFavoritesController;
-import br.comsouza.twitterclone.feed.dto.favs.FavTweetResponse;
+import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.favs.IFavoritesService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import java.util.List;
@@ -24,8 +24,8 @@ public class FavoritesControllerImpl implements IFavoritesController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<FavTweetResponse>> getFavsTweets(@RequestParam(value = "page", required = true) Integer page,
-                                                                @RequestParam(value = "size", required = true) Integer size){
+    public ResponseEntity<List<TimelineTweetResponse>> getFavsTweets(@RequestParam(value = "page", required = true) Integer page,
+                                                                     @RequestParam(value = "size", required = true) Integer size) throws Exception {
         return new ResponseEntity<>(iFavoritesService.getFavsTweets(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 }

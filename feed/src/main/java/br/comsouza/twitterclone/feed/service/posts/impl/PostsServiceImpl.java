@@ -6,11 +6,12 @@ import br.comsouza.twitterclone.feed.database.model.TweetsFavs;
 import br.comsouza.twitterclone.feed.database.model.TweetsFavsId;
 import br.comsouza.twitterclone.feed.database.model.TweetsLikes;
 import br.comsouza.twitterclone.feed.database.model.TweetsLikesId;
-import br.comsouza.twitterclone.feed.database.model.TweetsTypes;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsFavsRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
+import br.comsouza.twitterclone.feed.database.repository.timeline.PostResumeRepository;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
+import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.handler.exceptions.InvalidTweetException;
 import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
@@ -35,19 +36,22 @@ public class PostsServiceImpl implements IPostsService {
     private final ITweetsLikesRepository iTweetsLikesRepository;
     private final ITweetsFavsRepository iTweetsFavsRepository;
     private final IAccountsClient iAccountsClient;
+    private final PostResumeRepository postResumeRepository;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
                             ITweetTypeService iTweetTypeService,
                             IInteractionsService iInteractionsService,
                             ITweetsLikesRepository iTweetsLikesRepository,
                             ITweetsFavsRepository iTweetsFavsRepository,
-                            IAccountsClient iAccountsClient) {
+                            IAccountsClient iAccountsClient,
+                            PostResumeRepository postResumeRepository) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
         this.iInteractionsService = iInteractionsService;
         this.iTweetsLikesRepository = iTweetsLikesRepository;
         this.iTweetsFavsRepository = iTweetsFavsRepository;
         this.iAccountsClient = iAccountsClient;
+        this.postResumeRepository = postResumeRepository;
     }
 
     @Override
@@ -87,9 +91,9 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToRetweetException();
         }
 
-        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString());
+        Optional<Tweets> retweet = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
 
-        Optional<Tweets> retweet = tweetsRepository.findByUserIdentifierAndOriginalTweetIdentifierAndType(sessionUserIdentifier, originalTweetIdentifier, tweetType.getTypeIdentifier());
+        String type = message == null && attachment.isEmpty() ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier() : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
         if (retweet.isPresent()) {
             tweetsRepository.delete(retweet.get());
@@ -100,7 +104,7 @@ public class PostsServiceImpl implements IPostsService {
                     .originalTweetIdentifier(originalTweetIdentifier)
                     .message(message)
                     .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
-                    .type(tweetType.getTypeIdentifier())
+                    .type(type)
                     .publicationTime(LocalDateTime.now())
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .canBeRepliedByNotFollowedUser(true)
@@ -133,9 +137,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToCommentException();
         }
 
-        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
-
-        Optional<Tweets> retweet = tweetsRepository.findByUserIdentifierAndOriginalTweetIdentifierAndType(sessionUserIdentifier, originalTweetIdentifier, tweetType.getTypeIdentifier());
+        Optional<Tweets> retweet = iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier);
 
         if (retweet.isPresent()) {
             tweetsRepository.delete(retweet.get());
@@ -146,7 +148,7 @@ public class PostsServiceImpl implements IPostsService {
                     .originalTweetIdentifier(originalTweetIdentifier)
                     .message(message)
                     .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
-                    .type(tweetType.getTypeIdentifier())
+                    .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                     .publicationTime(LocalDateTime.now())
                     .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .canBeRepliedByNotFollowedUser(true)
@@ -175,7 +177,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToLikeException();
         }
 
-        Optional<TweetsLikes> liked = iTweetsLikesRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+        Optional<TweetsLikes> liked = iInteractionsService.verifyIsLiked(tweetIdentifier, sessionUserIdentifier);
 
         if (liked.isPresent()) {
             iTweetsLikesRepository.delete(liked.get());
@@ -211,7 +213,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToLikeException();
         }
 
-        Optional<TweetsFavs> fav = iTweetsFavsRepository.findAllByIdTweetIdentifierAndIdUserIdentifier(tweetIdentifier, sessionUserIdentifier);
+        Optional<TweetsFavs> fav = iInteractionsService.verifyIsFavorited(tweetIdentifier, sessionUserIdentifier);
 
         if (fav.isPresent()) {
             iTweetsFavsRepository.delete(fav.get());
@@ -225,5 +227,24 @@ public class PostsServiceImpl implements IPostsService {
                     .build());
         }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
+    }
+
+    @Override
+    public TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse referenceTweet, TimelineTweetResponse secondTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
+
+        //se o tweet referência for do tipo TWEET, retorna null
+        if (!referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.TWEET.toString())) {
+
+            //se o tweet referência for do tipo RETWEET, carrega o segundo tweet
+            if (referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
+                return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
+            }
+
+            //se o tweet referência for do tipo NO_VALUE_RETWEET OU COMMENT, carrega o terceiro tweet
+            if (referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
+                return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
+            }
+        }
+        return null;
     }
 }

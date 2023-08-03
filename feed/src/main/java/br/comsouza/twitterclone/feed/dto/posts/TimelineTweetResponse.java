@@ -23,7 +23,8 @@ public class TimelineTweetResponse {
     private int tweetRetweetsCount;
     private int tweetLikesCount;
     private int tweetViewsCount;
+    private boolean isLikedByMe;
+    private boolean isRetweetedByMe;
     private byte[] userProfilePhoto;
     private byte[] tweetAttachment;
-
 }
