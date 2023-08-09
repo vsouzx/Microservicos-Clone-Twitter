@@ -14,6 +14,10 @@ import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -39,25 +43,32 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public Integer getTweetCommentsCount(String tweetIdentifier) {
+    public List<Tweets> getTweetComments(String tweetIdentifier) {
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndType(tweetIdentifier, tweetType.getTypeIdentifier()).size();
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()));
     }
 
     @Override
-    public Integer getTweetRetweetsCount(String tweetIdentifier) {
-        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndType(tweetIdentifier, tweetType.getTypeIdentifier()).size();
+    public List<Tweets> getTweetRetweets(String tweetIdentifier) {
+        List<String> retweetsTypes = new ArrayList<>();
+        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier());
+        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier());
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes);
     }
 
     @Override
-    public Integer getTweetLikesCount(String tweetIdentifier) {
-        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
+    public List<TweetsLikes> getTweetLikes(String tweetIdentifier) {
+        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier);
     }
 
     @Override
-    public Integer getTweetViewsCount(String tweetIdentifier) {
-        return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
+    public List<TweetsViews> getTweetViews(String tweetIdentifier) {
+        return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier);
+    }
+
+    @Override
+    public List<TweetsFavs> getTweetFavs(String tweetIdentifier) {
+        return iTweetsFavsRepository.findAllByIdTweetIdentifier(tweetIdentifier);
     }
 
     @Override

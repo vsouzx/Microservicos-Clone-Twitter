@@ -1,23 +1,31 @@
-package br.comsouza.twitterclone.feed.database.repository.timeline;
+package br.comsouza.twitterclone.feed.database.repository.postdetails;
 
+import br.comsouza.twitterclone.feed.database.model.Tweets;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
+import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class PostResumeRepository {
+public class PostDetailsRepository {
 
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
+    private final ITweetTypeService iTweetTypeService;
 
-    public PostResumeRepository(EntityManager em,
-                                IInteractionsService iInteractionsService) {
+    public PostDetailsRepository(EntityManager em,
+                                 IInteractionsService iInteractionsService,
+                                 ITweetTypeService iTweetTypeService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
+        this.iTweetTypeService = iTweetTypeService;
     }
 
     public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier) {
@@ -58,15 +66,30 @@ public class PostResumeRepository {
                     .userProfilePhoto((byte[]) result[6])
                     .tweetMessage((String) result[7])
                     .tweetAttachment((byte[]) result[8])
+                    .tweetCommentsList(new ArrayList<>())
                     .tweetCommentsCount(iInteractionsService.getTweetComments((String) result[0]).size())
-                    .tweetRetweetsCount(iInteractionsService.getTweetRetweets((String) result[0]).size())
+                    .tweetRetweetsCount(filterRetweetsValued((String) result[0]).size())
+                    .tweetNoValuesRetweetsCount(filterNoValuesRetweets((String) result[0]).size())
                     .tweetLikesCount(iInteractionsService.getTweetLikes((String) result[0]).size())
                     .tweetViewsCount(iInteractionsService.getTweetViews((String) result[0]).size())
+                    .tweetFavsCount(iInteractionsService.getTweetFavs((String) result[0]).size())
                     .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build();
         } catch (Exception e) {
             return null;
         }
+    }
+
+    private List<Tweets> filterRetweetsValued(String tweetIdentifier){
+        List<Tweets> retweets = iInteractionsService.getTweetRetweets(tweetIdentifier);
+        String typeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
+        return retweets.stream().filter(r -> r.getType().equals(typeIdentifier)).toList();
+    }
+
+    private List<Tweets> filterNoValuesRetweets(String tweetIdentifier){
+        List<Tweets> retweets = iInteractionsService.getTweetRetweets(tweetIdentifier);
+        String typeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier();
+        return retweets.stream().filter(r -> r.getType().equals(typeIdentifier)).toList();
     }
 }

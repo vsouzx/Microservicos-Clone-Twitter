@@ -5,6 +5,7 @@ import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,5 +24,8 @@ public class TweetsFavs {
             @AttributeOverride(name = "userIdentifier", column = @Column(name = "user_identifier", length = 36)),
     })
     private TweetsFavsId id;
+
+    @Column(name = "time")
+    private LocalDateTime time;
 
 }

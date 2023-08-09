@@ -21,13 +21,16 @@ public class TimelineServiceImpl implements ITimelineService {
 
     @Override
     public List<TimelineTweetResponse> getFollowingTimeline(String sessionUserIdentifier, Integer page, Integer size) throws Exception{
+        TimelineTweetResponse originalTweet;
         List<TimelineTweetResponse> posts = followingTimelineRepository.find(sessionUserIdentifier, page, size);
 
         for(TimelineTweetResponse post : posts){
             post.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
 
-            if(post.getOriginalTweetResponse() != null){
-                post.getOriginalTweetResponse().setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, post.getOriginalTweetResponse(), sessionUserIdentifier, true));
+            originalTweet = post.getOriginalTweetResponse();
+
+            if(originalTweet != null){
+                originalTweet.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
             }
         }
         return posts;

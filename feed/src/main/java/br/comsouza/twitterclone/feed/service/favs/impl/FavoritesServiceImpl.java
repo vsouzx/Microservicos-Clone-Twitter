@@ -21,13 +21,16 @@ public class FavoritesServiceImpl implements IFavoritesService {
 
     @Override
     public List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size) throws Exception {
+        TimelineTweetResponse originalTweet;
         List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size);
 
         for(TimelineTweetResponse fav : favs){
             fav.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(fav, fav, userIdentifier, false));
 
-            if(fav.getOriginalTweetResponse() != null){
-                fav.getOriginalTweetResponse().setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(fav, fav.getOriginalTweetResponse(), userIdentifier, true));
+            originalTweet = fav.getOriginalTweetResponse();
+
+            if(originalTweet != null){
+                originalTweet.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(fav, originalTweet, userIdentifier, true));
             }
         }
         return favs;

@@ -28,4 +28,6 @@ public class TimelineControllerImpl implements ITimelineController {
                                                                             @RequestParam(value = "size", required = true) Integer size) throws Exception{
         return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
+
+    //TODO: Fazer FOR YOU (postagem/retweet/comment de quem eu sigo e de quem os segue)
 }

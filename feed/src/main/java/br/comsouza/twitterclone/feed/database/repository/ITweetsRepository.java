@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ITweetsRepository extends JpaRepository<Tweets, String> {
 
-    List<Tweets> findAllByOriginalTweetIdentifierAndType(String originalTweetId, String typeIdentifier);
+    List<Tweets> findAllByOriginalTweetIdentifierAndTypeIn(String originalTweetId, List<String> typeIdentifier);
 
     Optional<Tweets> findByUserIdentifierAndOriginalTweetIdentifierAndType(String sessionUserIdentifier, String originalTweetIdentifier, String typeIdentifier);
 

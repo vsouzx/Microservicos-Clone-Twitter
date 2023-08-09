@@ -222,8 +222,8 @@ public class PostsServiceImpl implements IPostsService {
                     .id(TweetsFavsId.builder()
                             .tweetIdentifier(tweetIdentifier)
                             .userIdentifier(sessionUserIdentifier)
-                            .time(LocalDateTime.now())
                             .build())
+                    .time(LocalDateTime.now())
                     .build());
         }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
@@ -232,16 +232,15 @@ public class PostsServiceImpl implements IPostsService {
     @Override
     public TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse referenceTweet, TimelineTweetResponse secondTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
 
-        //se o tweet referência for do tipo TWEET, retorna null
-        if (!referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.TWEET.toString())) {
+        final String referenceTweetType = referenceTweet.getTweetTypeDescription();
+        final String secondTweetType = secondTweet.getTweetTypeDescription();
 
-            //se o tweet referência for do tipo RETWEET, carrega o segundo tweet
-            if (referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
+        if (!referenceTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondTweetType.equals(TweetTypeEnum.TWEET.toString())) {
+
+            if (referenceTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
                 return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
             }
-
-            //se o tweet referência for do tipo NO_VALUE_RETWEET OU COMMENT, carrega o terceiro tweet
-            if (referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || referenceTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
+            if (referenceTweetType.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || referenceTweetType.equals(TweetTypeEnum.COMMENT.toString()) || secondTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
                 return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
             }
         }
