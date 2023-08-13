@@ -15,10 +15,11 @@ import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -46,6 +47,12 @@ public class InteractionsServiceImpl implements IInteractionsService {
     public List<Tweets> getTweetComments(String tweetIdentifier) {
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
         return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()));
+    }
+
+    @Override
+    public Page<Tweets> getTweetCommentsPageable(String tweetIdentifier, Integer page, Integer size) {
+        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeInOrderByPublicationTimeDesc(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()), PageRequest.of(page, size));
     }
 
     @Override

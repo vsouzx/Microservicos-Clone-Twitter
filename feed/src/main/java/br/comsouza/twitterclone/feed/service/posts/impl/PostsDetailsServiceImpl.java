@@ -7,7 +7,9 @@ import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsDetailsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,12 +40,19 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
             originalTweet.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
         }
 
-        List<Tweets> comments = iInteractionsService.getTweetComments(post.getTweetIdentifier());
-        for(Tweets comment : comments){
-            post.getTweetCommentsList().add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
-        }
+        post.setTweetCommentsList(getTweetComments(sessionUserIdentifier, tweetIdentifier, 0, 10));
 
         return post;
+    }
+
+    @Override
+    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception {
+        List<TimelineTweetResponse> response = new ArrayList<>();
+        Page<Tweets> comments = iInteractionsService.getTweetCommentsPageable(tweetIdentifier, page, size);
+        for(Tweets comment : comments.getContent()){
+            response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
+        }
+        return response;
     }
 
 }

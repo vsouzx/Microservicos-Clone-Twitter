@@ -4,12 +4,14 @@ import br.comsouza.twitterclone.feed.controller.posts.IPostsDetailsController;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.posts.IPostsDetailsService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -28,10 +30,18 @@ public class PostsDetailsControllerImpl implements IPostsDetailsController {
         return new ResponseEntity<>(iPostsDetailsService.getTweetDetails(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/comments/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TimelineTweetResponse>> getTweetComments(@PathVariable("tweetIdentifier") String tweetIdentifier,
+                                                                        @RequestParam(value = "page", required = true) Integer page,
+                                                                        @RequestParam(value = "size", required = true) Integer size) throws Exception {
+        return new ResponseEntity<>(iPostsDetailsService.getTweetComments(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, page, size), HttpStatus.OK);
+    }
+
     //TODO: Detalhar lista de retweets sem valor de um tweet
 
     //TODO: Detalhar lista de retweets com valor de um tweet
 
     //TODO: Detalhar lista de curtidas de um tweet
+
 
 }
