@@ -50,7 +50,6 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         }
 
         user.get().setFirstName(request.getFirstName());
-        user.get().setLastName(request.getLastName());
         user.get().setBiography(request.getBiography());
         user.get().setLocation(request.getLocation());
         user.get().setSite(request.getSite());

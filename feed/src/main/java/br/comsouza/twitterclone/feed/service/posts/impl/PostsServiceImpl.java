@@ -22,6 +22,7 @@ import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -196,7 +197,6 @@ public class PostsServiceImpl implements IPostsService {
     public void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
         Optional<Tweets> originalTweet = tweetsRepository.findById(tweetIdentifier);
 
-        //TODO: adicionar lógica para ver se o dono do tweet original não bloqueou o session user ou vice versa
         if (originalTweet.isEmpty()) {
             throw new TweetNotFoundException();
         }
@@ -230,7 +230,17 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse referenceTweet, TimelineTweetResponse secondTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier) throws Exception {
+        TimelineTweetResponse originalTweet;
+
+        post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
+        originalTweet = post.getOriginalTweetResponse();
+        if (originalTweet != null) {
+            originalTweet.setOriginalTweetResponse(getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
+        }
+    }
+
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse referenceTweet, TimelineTweetResponse secondTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
 
         final String referenceTweetType = referenceTweet.getTweetTypeDescription();
         final String secondTweetType = secondTweet.getTweetTypeDescription();
@@ -246,4 +256,6 @@ public class PostsServiceImpl implements IPostsService {
         }
         return null;
     }
+
+
 }

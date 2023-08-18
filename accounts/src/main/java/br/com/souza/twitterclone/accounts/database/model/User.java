@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +25,6 @@ public class User implements Serializable {
 
     @Column(name = "first_name", length = 255)
     private String firstName;
-
-    @Column(name = "last_name", length = 255)
-    private String lastName;
 
     @Column(name = "username", length = 255)
     private String username;
@@ -51,6 +49,9 @@ public class User implements Serializable {
 
     @Column(name = "confirmation_code")
     private String confirmationCode;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Column(name = "registration_time")
     private LocalDateTime registrationTime;

@@ -70,13 +70,13 @@ public class FavoriteTweetsRepository {
                         .userProfilePhoto((byte[]) result[6])
                         .tweetMessage((String) result[7])
                         .tweetAttachment((byte[]) result[8])
-                        .tweetCommentsCount(iInteractionsService.getTweetComments((String) result[0]).size())
-                        .tweetRetweetsCount(iInteractionsService.getTweetRetweets((String) result[0]).size())
+                        .tweetCommentsCount(iInteractionsService.getAllTweetComments((String) result[0]).size())
+                        .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypes((String) result[0]).size())
                         .tweetLikesCount(iInteractionsService.getTweetLikes((String) result[0]).size())
                         .tweetViewsCount(iInteractionsService.getTweetViews((String) result[0]).size())
                         .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                         .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
-                        .originalTweetResponse(null) //TODO: adicionar lógica para pegar response de um tweet por id
+                        .originalTweetResponse(null)
                         .build());
             });
         }

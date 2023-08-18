@@ -22,8 +22,8 @@ public class TimelineTweetResponse {
     private String tweetMessage;
     private List<TimelineTweetResponse> tweetCommentsList;
     private int tweetCommentsCount;
-    private int tweetRetweetsCount;
-    private int tweetNoValuesRetweetsCount;
+    private long tweetRetweetsCount;
+    private long tweetNoValuesRetweetsCount;
     private int tweetLikesCount;
     private int tweetViewsCount;
     private int tweetFavsCount;

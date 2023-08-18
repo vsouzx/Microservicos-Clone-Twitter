@@ -25,13 +25,7 @@ public class TimelineServiceImpl implements ITimelineService {
         List<TimelineTweetResponse> posts = followingTimelineRepository.find(sessionUserIdentifier, page, size);
 
         for(TimelineTweetResponse post : posts){
-            post.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
-
-            originalTweet = post.getOriginalTweetResponse();
-
-            if(originalTweet != null){
-                originalTweet.setOriginalTweetResponse(iPostsService.getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
-            }
+            iPostsService.loadTweetResponses(post, sessionUserIdentifier);
         }
         return posts;
     }

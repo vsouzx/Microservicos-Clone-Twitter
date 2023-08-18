@@ -44,7 +44,7 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<Tweets> getTweetComments(String tweetIdentifier) {
+    public List<Tweets> getAllTweetComments(String tweetIdentifier) {
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
         return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()));
     }
@@ -56,7 +56,7 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<Tweets> getTweetRetweets(String tweetIdentifier) {
+    public List<Tweets> getTweetAllRetweetsTypes(String tweetIdentifier) {
         List<String> retweetsTypes = new ArrayList<>();
         retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier());
         retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier());
@@ -64,8 +64,27 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
+    public Page<Tweets> getTweetOnlyValuedRetweetsPageable(String tweetIdentifier, Integer page, Integer size) {
+        List<String> retweetsTypes = new ArrayList<>();
+        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier());
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes, PageRequest.of(page, size));
+    }
+
+    @Override
+    public Page<Tweets> getTweetOnlyNoValueRetweetsPageable(String tweetIdentifier, Integer page, Integer size) {
+        List<String> retweetsTypes = new ArrayList<>();
+        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier());
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes, PageRequest.of(page, size));
+    }
+
+    @Override
     public List<TweetsLikes> getTweetLikes(String tweetIdentifier) {
         return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier);
+    }
+
+    @Override
+    public Page<TweetsLikes> getTweetLikesPageable(String tweetIdentifier, Integer page, Integer size) {
+        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier, PageRequest.of(page, size));
     }
 
     @Override

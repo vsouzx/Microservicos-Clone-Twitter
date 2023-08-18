@@ -10,10 +10,13 @@ import org.springframework.data.domain.Page;
 
 public interface IInteractionsService {
 
-    List<Tweets> getTweetComments(String tweetIdentifier);
+    List<Tweets> getAllTweetComments(String tweetIdentifier);
     Page<Tweets> getTweetCommentsPageable(String tweetIdentifier, Integer page, Integer size);
-    List<Tweets> getTweetRetweets(String tweetIdentifier);
+    List<Tweets> getTweetAllRetweetsTypes(String tweetIdentifier);
+    Page<Tweets> getTweetOnlyNoValueRetweetsPageable(String tweetIdentifier, Integer page, Integer size);
+    Page<Tweets> getTweetOnlyValuedRetweetsPageable(String tweetIdentifier, Integer page, Integer size);
     List<TweetsLikes> getTweetLikes(String tweetIdentifier);
+    Page<TweetsLikes> getTweetLikesPageable(String tweetIdentifier, Integer page, Integer size);
     List<TweetsViews> getTweetViews(String tweetIdentifier);
     List<TweetsFavs> getTweetFavs(String tweetIdentifier);
     void increaseViewsCount(String tweetIdentifier, String userIdentifier);

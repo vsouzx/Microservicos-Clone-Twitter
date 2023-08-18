@@ -76,18 +76,18 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
         userRepository.save(User.builder()
                 .identifier(UUID.randomUUID().toString())
                 .firstName(request.getFirstName())
-                .lastName(request.getLastName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .username(request.getUsername())
                 .biography(request.getBiography())
                 .location(request.getLocation())
                 .site(request.getSite())
-                .confirmedEmail(false) //TODO: Alterar para false depois que fazer o servico de validação email
+                .confirmedEmail(false)
                 .registrationTime(LocalDateTime.now())
                 .privateAccount(request.getPrivateAccount())
                 .languagePreference(request.getLanguagePreference() == null ? "pt" : request.getLanguagePreference())
                 .profilePhoto(file.getBytes())
+                .birthDate(request.getBirthDate())
                 .build());
 
         trySendKafkaMessage(request.getEmail());

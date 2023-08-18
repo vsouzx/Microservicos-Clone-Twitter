@@ -43,7 +43,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
         return UserDetailsResponse.builder()
                 .firstName(possibleUser.get().getFirstName())
-                .lastName(possibleUser.get().getLastName())
                 .username(possibleUser.get().getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
                 .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
@@ -108,7 +107,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
-                .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
                 .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
@@ -131,7 +129,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(String sessionUserIdentifier, User targetUser) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
-                .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
                 .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
@@ -154,7 +151,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser) {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
-                .lastName(targetUser.getLastName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUser, targetUser.getIdentifier()))
                 .followers(iUsersInteractionsService.getUserFollowersCount(sessionUser, targetUser.getIdentifier()))

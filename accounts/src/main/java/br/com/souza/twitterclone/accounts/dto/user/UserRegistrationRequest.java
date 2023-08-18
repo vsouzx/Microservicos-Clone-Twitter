@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.dto.user;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,8 +16,6 @@ public class UserRegistrationRequest {
     @NotNull
     private String firstName;
     @NotNull
-    private String lastName;
-    @NotNull
     private String username;
     @NotNull
     private String email;
@@ -24,6 +23,8 @@ public class UserRegistrationRequest {
     private String password;
     @NotNull
     private Boolean privateAccount;
+    @NotNull
+    private LocalDate birthDate;
     private String biography;
     private String location;
     private String site;
