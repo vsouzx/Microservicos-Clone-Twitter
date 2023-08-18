@@ -44,9 +44,9 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<Tweets> getAllTweetComments(String tweetIdentifier) {
+    public Integer getAllTweetCommentsCount(String tweetIdentifier) {
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()));
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier())).size();
     }
 
     @Override
@@ -56,11 +56,11 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<Tweets> getTweetAllRetweetsTypes(String tweetIdentifier) {
+    public Integer getTweetAllRetweetsTypesCount(String tweetIdentifier) {
         List<String> retweetsTypes = new ArrayList<>();
         retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier());
         retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes);
+        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes).size();
     }
 
     @Override
@@ -78,8 +78,8 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<TweetsLikes> getTweetLikes(String tweetIdentifier) {
-        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier);
+    public Integer getTweetLikesCount(String tweetIdentifier) {
+        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
     }
 
     @Override
@@ -88,13 +88,13 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public List<TweetsViews> getTweetViews(String tweetIdentifier) {
-        return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier);
+    public Integer getTweetViewsCount(String tweetIdentifier) {
+        return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
     }
 
     @Override
-    public List<TweetsFavs> getTweetFavs(String tweetIdentifier) {
-        return iTweetsFavsRepository.findAllByIdTweetIdentifier(tweetIdentifier);
+    public Integer getTweetFavsCount(String tweetIdentifier) {
+        return iTweetsFavsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
     }
 
     @Override

@@ -23,8 +23,4 @@ public class RedisService {
         return template.opsForValue().get(key);
     }
 
-    public boolean removeKey(final String key) {
-        return template.delete(key);
-    }
-
 }

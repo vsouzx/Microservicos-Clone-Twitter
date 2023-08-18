@@ -2,7 +2,6 @@ package br.comsouza.twitterclone.feed.database.repository.postdetails;
 
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
-import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -63,12 +62,12 @@ public class PostDetailsRepository {
                     .tweetMessage((String) result[7])
                     .tweetAttachment((byte[]) result[8])
                     .tweetCommentsList(new ArrayList<>())
-                    .tweetCommentsCount(iInteractionsService.getAllTweetComments((String) result[0]).size())
+                    .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
                     .tweetRetweetsCount(iInteractionsService.getTweetOnlyValuedRetweetsPageable((String) result[0], CUSTOM_PAGE, CUSTOM_PAGE_SIZE).getTotalElements())
                     .tweetNoValuesRetweetsCount(iInteractionsService.getTweetOnlyNoValueRetweetsPageable((String) result[0], CUSTOM_PAGE, CUSTOM_PAGE_SIZE).getTotalElements())
-                    .tweetLikesCount(iInteractionsService.getTweetLikes((String) result[0]).size())
-                    .tweetViewsCount(iInteractionsService.getTweetViews((String) result[0]).size())
-                    .tweetFavsCount(iInteractionsService.getTweetFavs((String) result[0]).size())
+                    .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
+                    .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
+                    .tweetFavsCount(iInteractionsService.getTweetFavsCount((String) result[0]))
                     .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build();
