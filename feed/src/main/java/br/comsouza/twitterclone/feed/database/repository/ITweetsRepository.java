@@ -15,7 +15,6 @@ public interface ITweetsRepository extends JpaRepository<Tweets, String> {
     List<Tweets> findAllByOriginalTweetIdentifierAndTypeIn(String originalTweetId, List<String> typeIdentifier);
     Page<Tweets> findAllByOriginalTweetIdentifierAndTypeIn(String originalTweetId, List<String> typeIdentifier, Pageable pageable);
     Page<Tweets> findAllByOriginalTweetIdentifierAndTypeInOrderByPublicationTimeDesc(String originalTweetId, List<String> typeIdentifier, @Nullable Pageable pageable);
-
     Optional<Tweets> findByUserIdentifierAndOriginalTweetIdentifierAndType(String sessionUserIdentifier, String originalTweetIdentifier, String typeIdentifier);
 
 }

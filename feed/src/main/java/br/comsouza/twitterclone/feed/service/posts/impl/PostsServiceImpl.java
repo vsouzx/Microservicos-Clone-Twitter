@@ -22,8 +22,6 @@ import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,51 +76,48 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public void retweetToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
-        Optional<Tweets> originalTweet = tweetsRepository.findById(originalTweetIdentifier);
+        Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
+                .orElseThrow(TweetNotFoundException::new);
 
-        if (originalTweet.isEmpty()) {
-            throw new TweetNotFoundException();
-        }
-
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
-
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
         assert tweetUserInfos != null : "User info not found";
 
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe() || tweetUserInfos.getPrivateAccount()) {
             throw new UnableToRetweetException();
         }
 
-        Optional<Tweets> retweet = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
+        String type = message == null && attachment.isEmpty()
+                ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
+                : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
-        String type = message == null && attachment.isEmpty() ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier() : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
+        iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier)
+                .ifPresentOrElse(tweetsRepository::delete, () -> {
+                    try{
+                        tweetsRepository.save(Tweets.builder()
+                                .tweetIdentifier(UUID.randomUUID().toString())
+                                .userIdentifier(sessionUserIdentifier)
+                                .originalTweetIdentifier(originalTweetIdentifier)
+                                .message(message)
+                                .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
+                                .type(type)
+                                .publicationTime(LocalDateTime.now())
+                                .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                                .canBeRepliedByNotFollowedUser(true)
+                                .build());
+                    }catch (Exception e){
+                        throw new RuntimeException();
+                    }
+                });
 
-        if (retweet.isPresent()) {
-            tweetsRepository.delete(retweet.get());
-        } else {
-            tweetsRepository.save(Tweets.builder()
-                    .tweetIdentifier(UUID.randomUUID().toString())
-                    .userIdentifier(sessionUserIdentifier)
-                    .originalTweetIdentifier(originalTweetIdentifier)
-                    .message(message)
-                    .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
-                    .type(type)
-                    .publicationTime(LocalDateTime.now())
-                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
-                    .canBeRepliedByNotFollowedUser(true)
-                    .build());
-        }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
     public void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
-        Optional<Tweets> originalTweet = tweetsRepository.findById(originalTweetIdentifier);
+        Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
+                .orElseThrow(TweetNotFoundException::new);
 
-        if (originalTweet.isEmpty()) {
-            throw new TweetNotFoundException();
-        }
-
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
 
         assert tweetUserInfos != null : "User info not found";
 
@@ -134,39 +129,38 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToCommentException();
         }
 
-        if (!originalTweet.get().getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
+        if (!originalTweet.getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
             throw new UnableToCommentException();
         }
 
-        Optional<Tweets> retweet = iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier);
+        iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier)
+                .ifPresentOrElse(tweetsRepository::delete, () -> {
+                    try {
+                        tweetsRepository.save(Tweets.builder()
+                                .tweetIdentifier(UUID.randomUUID().toString())
+                                .userIdentifier(sessionUserIdentifier)
+                                .originalTweetIdentifier(originalTweetIdentifier)
+                                .message(message)
+                                .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
+                                .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
+                                .publicationTime(LocalDateTime.now())
+                                .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                                .canBeRepliedByNotFollowedUser(true)
+                                .build());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
-        if (retweet.isPresent()) {
-            tweetsRepository.delete(retweet.get());
-        } else {
-            tweetsRepository.save(Tweets.builder()
-                    .tweetIdentifier(UUID.randomUUID().toString())
-                    .userIdentifier(sessionUserIdentifier)
-                    .originalTweetIdentifier(originalTweetIdentifier)
-                    .message(message)
-                    .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
-                    .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
-                    .publicationTime(LocalDateTime.now())
-                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
-                    .canBeRepliedByNotFollowedUser(true)
-                    .build());
-        }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
     public void likeToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
-        Optional<Tweets> originalTweet = tweetsRepository.findById(tweetIdentifier);
+        Tweets originalTweet = tweetsRepository.findById(tweetIdentifier)
+                .orElseThrow(TweetNotFoundException::new);
 
-        if (originalTweet.isEmpty()) {
-            throw new TweetNotFoundException();
-        }
-
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
 
         assert tweetUserInfos != null : "User info not found";
 
@@ -178,30 +172,25 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToLikeException();
         }
 
-        Optional<TweetsLikes> liked = iInteractionsService.verifyIsLiked(tweetIdentifier, sessionUserIdentifier);
+        iInteractionsService.verifyIsLiked(tweetIdentifier, sessionUserIdentifier)
+                .ifPresentOrElse(iTweetsLikesRepository::delete, () -> {
+                    iTweetsLikesRepository.save(TweetsLikes.builder()
+                            .id(TweetsLikesId.builder()
+                                    .tweetIdentifier(tweetIdentifier)
+                                    .userIdentifier(sessionUserIdentifier)
+                                    .build())
+                            .build());
+                });
 
-        if (liked.isPresent()) {
-            iTweetsLikesRepository.delete(liked.get());
-        } else {
-            iTweetsLikesRepository.save(TweetsLikes.builder()
-                    .id(TweetsLikesId.builder()
-                            .tweetIdentifier(tweetIdentifier)
-                            .userIdentifier(sessionUserIdentifier)
-                            .build())
-                    .build());
-        }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
     public void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
-        Optional<Tweets> originalTweet = tweetsRepository.findById(tweetIdentifier);
+        Tweets originalTweet = tweetsRepository.findById(tweetIdentifier)
+                .orElseThrow(TweetNotFoundException::new);
 
-        if (originalTweet.isEmpty()) {
-            throw new TweetNotFoundException();
-        }
-
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.get().getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
 
         assert tweetUserInfos != null : "User info not found";
 
@@ -213,19 +202,17 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToLikeException();
         }
 
-        Optional<TweetsFavs> fav = iInteractionsService.verifyIsFavorited(tweetIdentifier, sessionUserIdentifier);
+        iInteractionsService.verifyIsFavorited(tweetIdentifier, sessionUserIdentifier)
+                .ifPresentOrElse(iTweetsFavsRepository::delete, () -> {
+                    iTweetsFavsRepository.save(TweetsFavs.builder()
+                            .id(TweetsFavsId.builder()
+                                    .tweetIdentifier(tweetIdentifier)
+                                    .userIdentifier(sessionUserIdentifier)
+                                    .build())
+                            .time(LocalDateTime.now())
+                            .build());
+                });
 
-        if (fav.isPresent()) {
-            iTweetsFavsRepository.delete(fav.get());
-        } else {
-            iTweetsFavsRepository.save(TweetsFavs.builder()
-                    .id(TweetsFavsId.builder()
-                            .tweetIdentifier(tweetIdentifier)
-                            .userIdentifier(sessionUserIdentifier)
-                            .build())
-                    .time(LocalDateTime.now())
-                    .build());
-        }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 
