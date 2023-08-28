@@ -12,7 +12,6 @@ import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundExcepti
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,34 +34,28 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public UserDetailsResponse searchUserInfos(String sessionUserIdentifier) throws Exception {
-        Optional<User> possibleUser = userRepository.findById(sessionUserIdentifier);
-
-        if (possibleUser.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+        User possibleUser = userRepository.findById(sessionUserIdentifier)
+                .orElseThrow(UserNotFoundException::new);
 
         return UserDetailsResponse.builder()
-                .firstName(possibleUser.get().getFirstName())
-                .username(possibleUser.get().getUsername())
-                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
-                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, possibleUser.get().getIdentifier()))
-                .biography(possibleUser.get().getBiography())
-                .location(possibleUser.get().getLocation())
-                .site(possibleUser.get().getSite())
-                .registrationTime(possibleUser.get().getRegistrationTime())
-                .privateAccount(possibleUser.get().getPrivateAccount())
-                .languagePreference(possibleUser.get().getLanguagePreference())
-                .profilePhoto(possibleUser.get().getProfilePhoto())
+                .firstName(possibleUser.getFirstName())
+                .username(possibleUser.getUsername())
+                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, possibleUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, possibleUser.getIdentifier()))
+                .biography(possibleUser.getBiography())
+                .location(possibleUser.getLocation())
+                .site(possibleUser.getSite())
+                .registrationTime(possibleUser.getRegistrationTime())
+                .privateAccount(possibleUser.getPrivateAccount())
+                .languagePreference(possibleUser.getLanguagePreference())
+                .profilePhoto(possibleUser.getProfilePhoto())
                 .build();
     }
 
     @Override
     public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        Optional<User> targetUser = userRepository.findById(targetUserIdentifier);
-
-        if (targetUser.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+        User targetUser = userRepository.findById(targetUserIdentifier)
+                .orElseThrow(UserNotFoundException::new);
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(targetUserIdentifier)
@@ -75,13 +68,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .build()).isPresent();
 
         if (isSessionUserIdentifierBlocked) {
-            return responseSessionUserIdentifierBlocked(sessionUserIdentifier, targetUser.get(), targetUserIdentifierBlocked);
+            return responseSessionUserIdentifierBlocked(sessionUserIdentifier, targetUser, targetUserIdentifierBlocked);
         }
         if (targetUserIdentifierBlocked) {
-            return responseTargetUserIdentifierBlocked(sessionUserIdentifier, targetUser.get());
+            return responseTargetUserIdentifierBlocked(sessionUserIdentifier, targetUser);
         }
 
-        return fullResponse(targetUser.get(), sessionUserIdentifier);
+        return fullResponse(targetUser, sessionUserIdentifier);
     }
 
     @Override

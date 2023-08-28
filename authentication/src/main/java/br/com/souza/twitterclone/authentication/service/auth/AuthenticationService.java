@@ -41,9 +41,7 @@ public class AuthenticationService {
             Authentication authentication = authenticationManager.authenticate(request.build());
             User user = tokenProvider.getUsuario(authentication);
 
-            if(!userService.validateUserEmail(user)){
-                throw new NotConfirmedEmailException();
-            }
+            if(!userService.validateUserEmail(user)) throw new NotConfirmedEmailException();
 
             TokenResponse response = (TokenResponse) redisService.getValue(TokenProvider.AUTH + user.getIdentifier(), TokenResponse.class);
             if(response == null){

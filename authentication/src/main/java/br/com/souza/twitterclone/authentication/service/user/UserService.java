@@ -2,7 +2,6 @@ package br.com.souza.twitterclone.authentication.service.user;
 
 import br.com.souza.twitterclone.authentication.database.model.User;
 import br.com.souza.twitterclone.authentication.database.repository.UserRepository;
-import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,16 +18,8 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> possibleUser = userRepository.findByUsername(username);
-
-        if(possibleUser.isEmpty()){
-            possibleUser = userRepository.findByEmail(username);
-        }
-
-        if(possibleUser.isEmpty()){
-            throw new UsernameNotFoundException("User not found");
-        }
-        return possibleUser.get();
+        return userRepository.findByUsernameOrEmail(username, username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public boolean validateUserEmail(User user){

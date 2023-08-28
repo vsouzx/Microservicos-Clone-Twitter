@@ -20,10 +20,13 @@ import br.com.souza.twitterclone.accounts.service.redis.RedisService;
 import br.com.souza.twitterclone.accounts.util.PasswordValidatorHelper;
 import br.com.souza.twitterclone.accounts.util.UsernameValidatorHelper;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class UsersInfosServiceImpl implements IUsersInfosService {
 
@@ -31,129 +34,141 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
     private final TokenProvider tokenProvider;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+    private static final String TOPIC = "twitterclone-new-register";
+    private static final Integer PAUSE_TIME = 15000;
+    private static final Integer LIMIT_TIME = 300;
 
     public UsersInfosServiceImpl(UserRepository userRepository,
                                  PasswordEncoder passwordEncoder,
                                  RedisService redisService,
-                                 TokenProvider tokenProvider) {
+                                 TokenProvider tokenProvider,
+                                 KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.redisService = redisService;
         this.tokenProvider = tokenProvider;
+        this.kafkaTemplate = kafkaTemplate;
     }
 
+    @Override
     public void updateUserInfos(UserInfosUpdateRequest request, String identifier) throws Exception {
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
+        user.setFirstName(request.getFirstName());
+        user.setBiography(request.getBiography());
+        user.setLocation(request.getLocation());
+        user.setSite(request.getSite());
 
-        user.get().setFirstName(request.getFirstName());
-        user.get().setBiography(request.getBiography());
-        user.get().setLocation(request.getLocation());
-        user.get().setSite(request.getSite());
-
-        userRepository.save(user.get());
+        userRepository.save(user);
     }
 
+    @Override
     public void updateUserEmail(UserEmailUpdateRequest request, String identifier, String authorization) throws Exception {
-        Optional<User> possibleUser = Optional.empty();
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        if(request.getEmail().equals(user.get().getEmail())){
+        if(request.getEmail().equals(user.getEmail())){
             return;
         }
-
-        possibleUser = userRepository.findByEmail(request.getEmail());
-
+        Optional<User> possibleUser = userRepository.findByEmail(request.getEmail());
         if(possibleUser.isPresent()){
             throw new EmailAlreadyExistsException();
         }
 
-        user.get().setConfirmedEmail(false);
-        user.get().setConfirmationCode(null);
-        user.get().setEmail(request.getEmail());
+        user.setConfirmedEmail(false);
+        user.setConfirmationCode(null);
+        user.setEmail(request.getEmail());
 
         //remover autenticacao do usuário do Redis, obrigando-o a se logar novamente
         String sessionId = tokenProvider.getSessionIdentifierFromToken(authorization);
         redisService.removeKey(sessionId);
         redisService.removeKey(TokenProvider.AUTH + identifier);
 
-        //TODO: enviar mensagem para servico de email pelo kafka
+        userRepository.save(user);
 
-        userRepository.save(user.get());
+        trySendKafkaMessage(request.getEmail());
     }
 
+    @Override
     public void updateUserUsername(UserUsernameUpdateRequest request, String identifier) throws Exception {
-        Optional<User> possibleUser = Optional.empty();
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        if(request.getUsername().equals(user.get().getUsername())){
+        if(request.getUsername().equals(user.getUsername())){
             return;
         }
         if(UsernameValidatorHelper.isValidUsername(request.getUsername())){
             throw new InvalidUsernameRegexException();
         }
 
-        possibleUser = userRepository.findByUsername(request.getUsername());
+        Optional<User> possibleUser = userRepository.findByUsername(request.getUsername());
         if(possibleUser.isPresent()){
             throw new UsernameAlreadyExistsException();
         }
 
-        user.get().setUsername(request.getUsername());
-        userRepository.save(user.get());
+        user.setUsername(request.getUsername());
+        userRepository.save(user);
     }
 
+    @Override
     public void updateUserPassword(UserPasswordUpdateRequest request, String identifier, String authorization) throws Exception {
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
         if(!PasswordValidatorHelper.isValidPassword(request.getNewPassword())){
             throw new InvalidPasswordException();
         }
-        if (!passwordEncoder.matches(request.getActualPassword(), user.get().getPassword())) {
+        if (!passwordEncoder.matches(request.getActualPassword(), user.getPassword())) {
             throw new ActualPasswordNotMatchesException();
         }
         if (!request.getNewPassword().equals(request.getNewPasswordConfirmation())) {
             throw new NewPasswordConfirmationNotMatchesNullException();
         }
 
-        user.get().setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         //remover autenticacao do usuário do Redis, obrigando-o a se logar novamente
         String sessionId = tokenProvider.getSessionIdentifierFromToken(authorization);
         redisService.removeKey(sessionId);
         redisService.removeKey(TokenProvider.AUTH + identifier);
 
-        userRepository.save(user.get());
+        userRepository.save(user);
     }
 
+    @Override
     public void updateUserPrivacy(UserPrivacyUpdateRequest request, String identifier) throws Exception {
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        user.get().setPrivateAccount(request.getPrivateAccount());
-        userRepository.save(user.get());
+        user.setPrivateAccount(request.getPrivateAccount());
+        userRepository.save(user);
     }
 
+    @Override
     public void updateProfilePhoto(MultipartFile file, String identifier) throws Exception {
-        Optional<User> user = userRepository.findById(identifier);
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
 
-        if (user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        user.get().setProfilePhoto(file.getBytes());
-        userRepository.save(user.get());
+        user.setProfilePhoto(file.getBytes());
+        userRepository.save(user);
+    }
+
+    private void trySendKafkaMessage(String email) throws Exception {
+        boolean notSent = true;
+        int waitingTime = 0;
+
+        do{
+            try{
+                kafkaTemplate.send(TOPIC, email);
+                notSent = false;
+                log.error("Mensagem enviada com SUCESSO para o tópico: {}", TOPIC);
+            }catch (Exception e){
+                log.error("Erro ao enviar mensagem para o tópico: {}", TOPIC);
+                Thread.sleep(PAUSE_TIME);
+                waitingTime += 15;
+            }
+        }while (notSent && waitingTime <= LIMIT_TIME);
     }
 }

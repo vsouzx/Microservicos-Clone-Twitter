@@ -54,13 +54,11 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
         }
 
         Optional<User> user = userRepository.findByUsername(request.getUsername());
-
         if (user.isPresent()) {
             throw new UsernameAlreadyExistsException();
         }
 
         user = userRepository.findByEmail(request.getEmail());
-
         if (user.isPresent()) {
             throw new EmailAlreadyExistsException();
         }
@@ -95,13 +93,10 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     @Override
     public void resendConfirmationCode(String email) throws Exception {
-        Optional<User> user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
 
-        if(user.isEmpty()){
-            throw new UserNotFoundException();
-        }
-
-        if(user.get().getConfirmedEmail()){
+        if(user.getConfirmedEmail()){
             throw new EmailAlreadyConfirmedException();
         }
 
@@ -110,22 +105,19 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     @Override
     public void confirmCode(String email, String code) throws Exception {
-        Optional<User> user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(UserNotFoundException::new);
 
-        if(user.isEmpty()){
-            throw new UserNotFoundException();
-        }
-
-        if(user.get().getConfirmedEmail()){
+        if(user.getConfirmedEmail()){
             throw new EmailAlreadyConfirmedException();
         }
 
-        if(!user.get().getConfirmationCode().equals(code)){
+        if(!user.getConfirmationCode().equals(code)){
             throw new ConfirmationCodeNotMatchesException();
         }
 
-        user.get().setConfirmedEmail(true);
-        userRepository.save(user.get());
+        user.setConfirmedEmail(true);
+        userRepository.save(user);
     }
 
     private void trySendKafkaMessage(String email) throws Exception {
