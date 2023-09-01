@@ -1,6 +1,8 @@
 package br.comsouza.twitterclone.feed.controller.posts.impl;
 
 import br.comsouza.twitterclone.feed.controller.posts.IPostsController;
+import br.comsouza.twitterclone.feed.database.model.Tweets;
+import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import org.springframework.http.HttpStatus;
@@ -27,11 +29,9 @@ public class PostsControllerImpl implements IPostsController {
     @PostMapping(value = "/newtweet", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
                                              @RequestPart(value = "canBeReplied", required = true) String flag,
-                                             @RequestPart(value = "attachment", required = false) MultipartFile attachment) throws Exception {
-        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachment, flag);
-
-        //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
-
+                                             @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                             @RequestHeader("Authorization") String authorization) throws Exception {
+        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachment, flag, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -29,5 +29,9 @@ public class TimelineControllerImpl implements ITimelineController {
         return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 
-    //TODO: Fazer FOR YOU (postagem/retweet/comment de quem eu sigo e de quem os segue)
+    @GetMapping(value = "/foryou", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TimelineTweetResponse>> getForyouTimeline(@RequestParam(value = "page", required = true) Integer page,
+                                                                            @RequestParam(value = "size", required = true) Integer size) throws Exception{
+        return new ResponseEntity<>(iTimelineService.getForyouTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
+    }
 }

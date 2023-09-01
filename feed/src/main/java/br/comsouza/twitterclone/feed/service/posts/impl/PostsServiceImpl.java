@@ -19,6 +19,7 @@ import br.comsouza.twitterclone.feed.handler.exceptions.UnableToCommentException
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToLikeException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToRetweetException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
+import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import java.time.LocalDateTime;
@@ -36,6 +37,7 @@ public class PostsServiceImpl implements IPostsService {
     private final ITweetsFavsRepository iTweetsFavsRepository;
     private final IAccountsClient iAccountsClient;
     private final PostResumeRepository postResumeRepository;
+    private final IPostsMessageTranslatorService messageTranslatorService;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
                             ITweetTypeService iTweetTypeService,
@@ -43,7 +45,8 @@ public class PostsServiceImpl implements IPostsService {
                             ITweetsLikesRepository iTweetsLikesRepository,
                             ITweetsFavsRepository iTweetsFavsRepository,
                             IAccountsClient iAccountsClient,
-                            PostResumeRepository postResumeRepository) {
+                            PostResumeRepository postResumeRepository,
+                            IPostsMessageTranslatorService messageTranslatorService) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
         this.iInteractionsService = iInteractionsService;
@@ -51,27 +54,30 @@ public class PostsServiceImpl implements IPostsService {
         this.iTweetsFavsRepository = iTweetsFavsRepository;
         this.iAccountsClient = iAccountsClient;
         this.postResumeRepository = postResumeRepository;
+        this.messageTranslatorService = messageTranslatorService;
     }
 
     @Override
-    public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment, String flag) throws Exception {
+    public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment, String flag, String authorization) throws Exception {
         final String tweetIdentifier = UUID.randomUUID().toString();
 
         if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
             throw new InvalidTweetException();
         }
 
-        tweetsRepository.save(Tweets.builder()
+        Tweets tweet = tweetsRepository.save(Tweets.builder()
                 .tweetIdentifier(tweetIdentifier)
                 .userIdentifier(sessionUserIdentifier)
                 .originalTweetIdentifier(tweetIdentifier)
                 .message(message)
-                .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
+                .messageTranslations(null)
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(LocalDateTime.now())
                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                 .canBeRepliedByNotFollowedUser(flag.equals("1"))
                 .build());
+
+        messageTranslatorService.translateMessage(tweet, authorization);
     }
 
     @Override
