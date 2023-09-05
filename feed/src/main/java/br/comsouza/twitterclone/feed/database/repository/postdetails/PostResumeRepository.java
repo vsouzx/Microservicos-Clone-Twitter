@@ -1,4 +1,4 @@
-package br.comsouza.twitterclone.feed.database.repository.timeline;
+package br.comsouza.twitterclone.feed.database.repository.postdetails;
 
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;

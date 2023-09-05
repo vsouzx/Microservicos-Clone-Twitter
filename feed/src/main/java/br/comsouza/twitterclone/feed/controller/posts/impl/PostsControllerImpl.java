@@ -1,8 +1,6 @@
 package br.comsouza.twitterclone.feed.controller.posts.impl;
 
 import br.comsouza.twitterclone.feed.controller.posts.IPostsController;
-import br.comsouza.twitterclone.feed.database.model.Tweets;
-import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import org.springframework.http.HttpStatus;
@@ -41,9 +39,6 @@ public class PostsControllerImpl implements IPostsController {
                                               @RequestPart(value = "attachment", required = false) MultipartFile attachment,
                                               @RequestHeader("Authorization") String authorization) throws Exception {
         iPostsService.retweetToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
-
-        //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -53,9 +48,6 @@ public class PostsControllerImpl implements IPostsController {
                                               @RequestPart(value = "attachment", required = false) MultipartFile attachment,
                                               @RequestHeader("Authorization") String authorization) throws Exception {
         iPostsService.commentToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
-
-        //TODO: implementar lógica de buscar tradução da mensagens (se tiver) no Chat GPT
-
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

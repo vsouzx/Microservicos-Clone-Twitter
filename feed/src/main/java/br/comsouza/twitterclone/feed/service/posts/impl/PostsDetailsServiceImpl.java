@@ -4,7 +4,7 @@ import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.model.Tweets;
 import br.comsouza.twitterclone.feed.database.model.TweetsLikes;
 import br.comsouza.twitterclone.feed.database.repository.postdetails.PostDetailsRepository;
-import br.comsouza.twitterclone.feed.database.repository.timeline.PostResumeRepository;
+import br.comsouza.twitterclone.feed.database.repository.postdetails.PostResumeRepository;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
@@ -46,36 +46,34 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size){
         List<TimelineTweetResponse> response = new ArrayList<>();
-        Page<Tweets> comments = iInteractionsService.getTweetCommentsPageable(tweetIdentifier, page, size);
-        for(Tweets comment : comments.getContent()){
-            response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
-        }
+        iInteractionsService.getTweetCommentsPageable(tweetIdentifier, page, size).getContent()
+                .forEach(comment -> {
+                    response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
+                });
         return response;
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getTweetNoValueRetweets(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getTweetNoValueRetweets(String authorization, String tweetIdentifier, Integer page, Integer size){
 
         List<UserDetailsByIdentifierResponse> response = new ArrayList<>();
-        Page<Tweets> retweets = iInteractionsService.getTweetOnlyNoValueRetweetsPageable(tweetIdentifier, page, size);
-
-        for (Tweets retweet : retweets.getContent()){
-            response.add(iAccountsClient.getUserInfosByIdentifier(retweet.getUserIdentifier(), authorization));
-        }
+        iInteractionsService.getTweetOnlyNoValueRetweetsPageable(tweetIdentifier, page, size).getContent()
+                .forEach(retweet -> {
+                    response.add(iAccountsClient.getUserInfosByIdentifier(retweet.getUserIdentifier(), authorization));
+                });
         return response;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size){
 
         List<TimelineTweetResponse> response = new ArrayList<>();
-        Page<Tweets> retweets = iInteractionsService.getTweetOnlyValuedRetweetsPageable(tweetIdentifier, page, size);
-
-        for (Tweets retweet : retweets.getContent()){
-            response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier()));
-        }
+        iInteractionsService.getTweetOnlyValuedRetweetsPageable(tweetIdentifier, page, size).getContent()
+                .forEach(retweet -> {
+                    response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier()));
+                });
 
         for(TimelineTweetResponse post : response){
             iPostsService.loadTweetResponses(post, sessionUserIdentifier);
@@ -85,14 +83,13 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getTweetLikes(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getTweetLikes(String authorization, String tweetIdentifier, Integer page, Integer size){
 
         List<UserDetailsByIdentifierResponse> response = new ArrayList<>();
-        Page<TweetsLikes> likes = iInteractionsService.getTweetLikesPageable(tweetIdentifier, page, size);
-
-        for (TweetsLikes like : likes){
-            response.add(iAccountsClient.getUserInfosByIdentifier(like.getId().getUserIdentifier(), authorization));
-        }
+        iInteractionsService.getTweetLikesPageable(tweetIdentifier, page, size).getContent()
+                .forEach(like -> {
+                    response.add(iAccountsClient.getUserInfosByIdentifier(like.getId().getUserIdentifier(), authorization));
+                });
         return response;
     }
 

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,15 +24,11 @@ public class TimelineControllerImpl implements ITimelineController {
         this.iTimelineService = iTimelineService;
     }
 
-    @GetMapping(value = "/following", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@RequestParam(value = "page", required = true) Integer page,
+    @GetMapping(value = "/following/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@PathVariable("type") String type,
+                                                                            @RequestParam(value = "page", required = true) Integer page,
                                                                             @RequestParam(value = "size", required = true) Integer size) throws Exception{
-        return new ResponseEntity<>(iTimelineService.getFollowingTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
+        return new ResponseEntity<>(iTimelineService.getTimeline(FindUserIdentifierHelper.getIdentifier(), page, size, type), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/foryou", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TimelineTweetResponse>> getForyouTimeline(@RequestParam(value = "page", required = true) Integer page,
-                                                                            @RequestParam(value = "size", required = true) Integer size) throws Exception{
-        return new ResponseEntity<>(iTimelineService.getForyouTimeline(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
-    }
 }

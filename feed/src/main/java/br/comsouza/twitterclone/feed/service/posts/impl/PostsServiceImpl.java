@@ -9,7 +9,7 @@ import br.comsouza.twitterclone.feed.database.model.TweetsLikesId;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsFavsRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
-import br.comsouza.twitterclone.feed.database.repository.timeline.PostResumeRepository;
+import br.comsouza.twitterclone.feed.database.repository.postdetails.PostResumeRepository;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
@@ -99,17 +99,19 @@ public class PostsServiceImpl implements IPostsService {
         iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier)
                 .ifPresentOrElse(tweetsRepository::delete, () -> {
                     try{
-                        tweetsRepository.save(Tweets.builder()
+                        Tweets tweet = tweetsRepository.save(Tweets.builder()
                                 .tweetIdentifier(UUID.randomUUID().toString())
                                 .userIdentifier(sessionUserIdentifier)
                                 .originalTweetIdentifier(originalTweetIdentifier)
                                 .message(message)
-                                .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
+                                .messageTranslations(null)
                                 .type(type)
                                 .publicationTime(LocalDateTime.now())
                                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                                 .canBeRepliedByNotFollowedUser(true)
                                 .build());
+
+                        messageTranslatorService.translateMessage(tweet, authorization);
                     }catch (Exception e){
                         throw new RuntimeException();
                     }
@@ -142,17 +144,19 @@ public class PostsServiceImpl implements IPostsService {
         iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier)
                 .ifPresentOrElse(tweetsRepository::delete, () -> {
                     try {
-                        tweetsRepository.save(Tweets.builder()
+                        Tweets tweet = tweetsRepository.save(Tweets.builder()
                                 .tweetIdentifier(UUID.randomUUID().toString())
                                 .userIdentifier(sessionUserIdentifier)
                                 .originalTweetIdentifier(originalTweetIdentifier)
                                 .message(message)
-                                .messageTranslations(null) // TODO: Fazer chamada ao chat GPT numa thread paralela
+                                .messageTranslations(null)
                                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                                 .publicationTime(LocalDateTime.now())
                                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                                 .canBeRepliedByNotFollowedUser(true)
                                 .build());
+
+                        messageTranslatorService.translateMessage(tweet, authorization);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -223,7 +227,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier) throws Exception {
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier){
         TimelineTweetResponse originalTweet;
 
         post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
@@ -233,18 +237,18 @@ public class PostsServiceImpl implements IPostsService {
         }
     }
 
-    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse referenceTweet, TimelineTweetResponse secondTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel){
 
-        final String referenceTweetType = referenceTweet.getTweetTypeDescription();
-        final String secondTweetType = secondTweet.getTweetTypeDescription();
+        final String mainTweetType = mainTweet.getTweetTypeDescription();
+        final String secondaryTweetType = secondaryTweet.getTweetTypeDescription();
 
-        if (!referenceTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondTweetType.equals(TweetTypeEnum.TWEET.toString())) {
+        if (!mainTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondaryTweetType.equals(TweetTypeEnum.TWEET.toString())) {
 
-            if (referenceTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
-                return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
+            if (mainTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
             }
-            if (referenceTweetType.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || referenceTweetType.equals(TweetTypeEnum.COMMENT.toString()) || secondTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
-                return postResumeRepository.find(sessionUserIdentifier, secondTweet.getOriginalTweetIdentifier());
+            if (mainTweetType.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || mainTweetType.equals(TweetTypeEnum.COMMENT.toString()) || secondaryTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
             }
         }
         return null;

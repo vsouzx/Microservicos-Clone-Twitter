@@ -11,15 +11,17 @@ import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorServic
 import br.comsouza.twitterclone.feed.util.TextHelper;
 import java.math.BigDecimal;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslatorService {
 
     private final IChatGPTClient iChatGPTClient;
     private final IAccountsClient iAccountsClient;
     private final ITweetsRepository iTweetsRepository;
-    private final String prompt = "Por favor traduza esta mensagem do %s para o %: %s";
+    private static final String PROMPT = "Por favor traduza esta mensagem do %s para o %: %s";
 
     public PostsMessageTranslatorServiceImpl(IChatGPTClient iChatGPTClient,
                                              IAccountsClient iAccountsClient,
@@ -41,21 +43,31 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
             @SneakyThrows
             @Override
             public void run() {
-                GPTResponse response = iChatGPTClient.generate("Bearer " /*+ apiKey*/,
-                        GPTRequest.builder()
-                                .prompt(String.format(prompt,
-                                        sessionUser.getLanguagePreference().equals("pt") ? "português" : "inglês",
-                                        sessionUser.getLanguagePreference().equals("pt") ? "inglês" : "português",
-                                        tweet.getMessage())
-                                )
-                                .max_tokens(1000)
-                                .n(1)
-                                .temperature(new BigDecimal("0.8"))
-                                .stop(null)
-                                .build());
+                GPTResponse response;
 
-                tweet.setMessageTranslations(TextHelper.removeQuotationMarksAndDots(response.getChoices().get(0).getText()));
-                iTweetsRepository.save(tweet);
+                try{
+                    log.debug("Searching translation on ChatGPT..");
+                    response = iChatGPTClient.generate("Bearer " /*+ apiKey*/,
+                            GPTRequest.builder()
+                                    .prompt(String.format(PROMPT,
+                                            sessionUser.getLanguagePreference().equals("pt") ? "português" : "inglês",
+                                            sessionUser.getLanguagePreference().equals("pt") ? "inglês" : "português",
+                                            tweet.getMessage())
+                                    )
+                                    .max_tokens(1000)
+                                    .n(1)
+                                    .temperature(new BigDecimal("0.8"))
+                                    .stop(null)
+                                    .build());
+
+                    tweet.setMessageTranslations(TextHelper.removeQuotationMarksAndDots(response.getChoices().get(0).getText()));
+                    iTweetsRepository.save(tweet);
+
+                    log.debug("Translation successfull saved..");
+
+                }catch (Exception e){
+                    log.error("Error while calling Chat GPT API...", e);
+                }
             }
         }.start();
     }
