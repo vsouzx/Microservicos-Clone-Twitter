@@ -20,7 +20,7 @@ public interface IUserRegisterController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> userRegister(String username, MultipartFile photo) throws Exception;
+    ResponseEntity<Void> userRegister(@Valid UserRegistrationRequest request) throws Exception;
 
     @Operation(summary = "Reenvia o código de confirmação para o email")
     @ApiResponses(value = {
@@ -29,7 +29,7 @@ public interface IUserRegisterController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> resendConfirmationCode(String email) throws Exception;
+    ResponseEntity<Void> sendConfirmationCode(String email) throws Exception;
 
     @Operation(summary = "Confirma o código de confirmação")
     @ApiResponses(value = {

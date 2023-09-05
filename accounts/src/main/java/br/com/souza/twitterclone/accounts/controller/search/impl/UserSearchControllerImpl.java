@@ -64,4 +64,6 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     //TODO: Procurar 3 usuários aleatórios para seguir
+
+    //TODO: Fazer endpoint autocomplete para busca de email
 }

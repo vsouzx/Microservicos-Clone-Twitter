@@ -1,12 +1,14 @@
 package br.com.souza.twitterclone.accounts.controller.register.impl;
 
 import br.com.souza.twitterclone.accounts.controller.register.IUserRegisterController;
+import br.com.souza.twitterclone.accounts.dto.user.UserRegistrationRequest;
 import br.com.souza.twitterclone.accounts.service.register.IUsersRegisterService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -24,15 +26,14 @@ public class UserRegisterControllerImpl implements IUserRegisterController {
     }
 
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<Void> userRegister(@RequestPart("request") String request,
-                                             @RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) throws Exception {
-        iUsersRegisterService.userRegister(request, profilePhoto);
+    public ResponseEntity<Void> userRegister(@RequestBody UserRegistrationRequest request) throws Exception {
+        iUsersRegisterService.userRegister(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping(value = "/resendcode", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> resendConfirmationCode(@RequestParam("email") String email) throws Exception {
-        iUsersRegisterService.resendConfirmationCode(email);
+    @GetMapping(value = "/sendcode")
+    public ResponseEntity<Void> sendConfirmationCode(@RequestParam("email") String email) throws Exception {
+        iUsersRegisterService.sendConfirmationCode(email);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -42,5 +43,14 @@ public class UserRegisterControllerImpl implements IUserRegisterController {
         iUsersRegisterService.confirmCode(email, code);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+    //TODO: fazer endpoint separado para enviar foto de perfil
+//    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+//    public ResponseEntity<Void> userProfilePhoto(@RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) throws Exception {
+//        //iUsersRegisterService.userRegister(request, profilePhoto);
+//        return new ResponseEntity<>(HttpStatus.CREATED);
+//    }
+
+    //TODO: fazer endpoint separado para criar username próprio
 
 }

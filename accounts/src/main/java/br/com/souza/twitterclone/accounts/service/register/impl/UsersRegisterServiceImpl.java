@@ -2,26 +2,23 @@ package br.com.souza.twitterclone.accounts.service.register.impl;
 
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.dto.user.UserConfirmationCodeResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserRegistrationRequest;
 import br.com.souza.twitterclone.accounts.handler.exceptions.ConfirmationCodeNotMatchesException;
-import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyConfirmedException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.EmailAlreadyExistsException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidPasswordException;
-import br.com.souza.twitterclone.accounts.handler.exceptions.InvalidUsernameRegexException;
-import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
-import br.com.souza.twitterclone.accounts.handler.exceptions.UsernameAlreadyExistsException;
+import br.com.souza.twitterclone.accounts.service.redis.RedisService;
 import br.com.souza.twitterclone.accounts.service.register.IUsersRegisterService;
 import br.com.souza.twitterclone.accounts.util.PasswordValidatorHelper;
-import br.com.souza.twitterclone.accounts.util.UsernameValidatorHelper;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import br.com.souza.twitterclone.accounts.util.RandomNumberUtil;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -29,6 +26,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private static final String TOPIC = "twitterclone-new-register";
     private static final Integer PAUSE_TIME = 15000;
@@ -36,39 +34,40 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
 
     public UsersRegisterServiceImpl(UserRepository userRepository,
                                     PasswordEncoder passwordEncoder,
+                                    RedisService redisService,
                                     KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.redisService = redisService;
         this.kafkaTemplate = kafkaTemplate;
     }
 
     @Override
-    public void userRegister(String requestJson, MultipartFile file) throws Exception {
-        UserRegistrationRequest request;
+    public void userRegister(UserRegistrationRequest request) throws Exception {
+        String username;
+        Optional<User> user;
+        boolean isValid = false;
+        do{
+            username = request.getFirstName() + RandomNumberUtil.generateRandomCode();
 
-        try{
-            ObjectMapper mapper = new ObjectMapper();
-            request = mapper.readValue(requestJson, UserRegistrationRequest.class);
-        }catch (Exception e){
-            throw new Exception("Erro ao ler Json: " + e);
-        }
-
-        Optional<User> user = userRepository.findByUsername(request.getUsername());
-        if (user.isPresent()) {
-            throw new UsernameAlreadyExistsException();
-        }
+            user = userRepository.findByUsername(username);
+            if (user.isEmpty()) {
+                isValid = true;
+            }
+        }while(!isValid);
 
         user = userRepository.findByEmail(request.getEmail());
         if (user.isPresent()) {
             throw new EmailAlreadyExistsException();
         }
 
-        if(UsernameValidatorHelper.isValidUsername(request.getUsername())){
-            throw new InvalidUsernameRegexException();
+        if (!PasswordValidatorHelper.isValidPassword(request.getPassword())) {
+            throw new InvalidPasswordException();
         }
 
-        if(!PasswordValidatorHelper.isValidPassword(request.getPassword())){
-            throw new InvalidPasswordException();
+        UserConfirmationCodeResponse confirmationCodeResponse = (UserConfirmationCodeResponse) redisService.getValue(request.getEmail(), UserConfirmationCodeResponse.class);
+        if(confirmationCodeResponse == null || !confirmationCodeResponse.getConfirmationCode().equals(request.getConfirmationCode())){
+            throw new ConfirmationCodeNotMatchesException();
         }
 
         userRepository.save(User.builder()
@@ -76,65 +75,66 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
                 .firstName(request.getFirstName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .username(request.getUsername())
-                .biography(request.getBiography())
-                .location(request.getLocation())
-                .site(request.getSite())
-                .confirmedEmail(false)
+                .username(username)
                 .registrationTime(LocalDateTime.now())
-                .privateAccount(request.getPrivateAccount())
-                .languagePreference(request.getLanguagePreference() == null ? "pt" : request.getLanguagePreference())
-                .profilePhoto(file.getBytes())
+                .privateAccount(false)
+                .confirmedEmail(true)
+                .languagePreference("pt")
                 .birthDate(request.getBirthDate())
+                .firstAccess(true)
                 .build());
 
-        trySendKafkaMessage(request.getEmail());
+        redisService.removeKey(request.getEmail());
     }
 
     @Override
-    public void resendConfirmationCode(String email) throws Exception {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        if(user.getConfirmedEmail()){
-            throw new EmailAlreadyConfirmedException();
+    public void sendConfirmationCode(String email) throws Exception {
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            throw new EmailAlreadyExistsException();
         }
 
-        trySendKafkaMessage(email);
+        UserConfirmationCodeResponse confirmationCodeResponse = (UserConfirmationCodeResponse) redisService.getValue(email, UserConfirmationCodeResponse.class);
+        if(confirmationCodeResponse == null){
+            confirmationCodeResponse = UserConfirmationCodeResponse.builder()
+                    .email(email)
+                    .confirmationCode(RandomNumberUtil.generateRandomCode())
+                    .build();
+
+            redisService.setValue(email, confirmationCodeResponse, TimeUnit.MILLISECONDS, 180000L, true);
+        }
+
+        trySendKafkaMessage(confirmationCodeResponse.toString());
     }
 
     @Override
     public void confirmCode(String email, String code) throws Exception {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(UserNotFoundException::new);
-
-        if(user.getConfirmedEmail()){
-            throw new EmailAlreadyConfirmedException();
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            throw new EmailAlreadyExistsException();
         }
 
-        if(!user.getConfirmationCode().equals(code)){
+        UserConfirmationCodeResponse confirmationCodeResponse = (UserConfirmationCodeResponse) redisService.getValue(email, UserConfirmationCodeResponse.class);
+        if (!confirmationCodeResponse.getConfirmationCode().equals(code)) {
             throw new ConfirmationCodeNotMatchesException();
         }
-
-        user.setConfirmedEmail(true);
-        userRepository.save(user);
     }
 
     private void trySendKafkaMessage(String email) throws Exception {
         boolean notSent = true;
         int waitingTime = 0;
 
-        do{
-            try{
+        do {
+            try {
                 kafkaTemplate.send(TOPIC, email);
                 notSent = false;
                 log.error("Mensagem enviada com SUCESSO para o tópico: {}", TOPIC);
-            }catch (Exception e){
+            } catch (Exception e) {
                 log.error("Erro ao enviar mensagem para o tópico: {}", TOPIC);
                 Thread.sleep(PAUSE_TIME);
                 waitingTime += 15;
             }
-        }while (notSent && waitingTime <= LIMIT_TIME);
+        } while (notSent && waitingTime <= LIMIT_TIME);
     }
 
 }

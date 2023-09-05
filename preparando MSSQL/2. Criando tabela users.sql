@@ -15,8 +15,8 @@ CREATE TABLE users(
 	[registration_time] [datetime] NOT NULL,
 	[private_account] [bit] NOT NULL,
 	[language_preference] [varchar](10),
-	[profile_photo] [VARBINARY](MAX)
-	--ADD LÓGICA DE SILENCIAR (vai ser uma tabela nova)
+	[profile_photo] [VARBINARY](MAX),
+	[first_access] [BIT] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
 	[identifier] ASC

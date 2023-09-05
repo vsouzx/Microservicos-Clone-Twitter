@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 public class PasswordValidatorHelper {
 
     public static boolean isValidPassword(String password){
-        return !(password.toCharArray().length < 8);
+        return password.toCharArray().length >= 8 && password.toCharArray().length <= 15;
     }
 }

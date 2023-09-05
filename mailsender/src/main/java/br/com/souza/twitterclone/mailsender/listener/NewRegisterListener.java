@@ -25,7 +25,7 @@ public class NewRegisterListener {
         try{
             iMailSenderService.sendMailConfirmation(email);
         }catch (Exception e){
-            log.error("Erro ao enviar código");
+            log.error("Erro ao enviar código", e);
         }
     }
 }

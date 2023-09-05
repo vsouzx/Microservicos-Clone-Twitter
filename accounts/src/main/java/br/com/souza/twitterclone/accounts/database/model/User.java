@@ -66,4 +66,7 @@ public class User implements Serializable {
     @Column(name = "profile_photo")
     private byte[] profilePhoto;
 
+    @Column(name = "first_access")
+    private Boolean firstAccess;
+
 }

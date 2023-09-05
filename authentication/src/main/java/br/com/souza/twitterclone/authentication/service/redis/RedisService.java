@@ -49,8 +49,8 @@ public class RedisService {
         template.expire(key, timeout, unit);
     }
 
-    public boolean removeKey(final String key) {
-        return template.delete(key);
+    public void removeKey(final String key) {
+        template.delete(key);
     }
 
 }
