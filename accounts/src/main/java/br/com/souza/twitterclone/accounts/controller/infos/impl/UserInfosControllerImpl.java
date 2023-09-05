@@ -66,4 +66,5 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    //TODO: Atualizar flag first_access
 }

@@ -101,7 +101,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
                     .confirmationCode(RandomNumberUtil.generateRandomCode())
                     .build();
 
-            redisService.setValue(email, confirmationCodeResponse, TimeUnit.MILLISECONDS, 180000L, true);
+            redisService.setValue(email, confirmationCodeResponse, TimeUnit.MILLISECONDS, 1800000L, true);
         }
 
         trySendKafkaMessage(confirmationCodeResponse.toString());

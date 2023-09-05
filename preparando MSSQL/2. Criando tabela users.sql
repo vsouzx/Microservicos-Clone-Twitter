@@ -16,6 +16,7 @@ CREATE TABLE users(
 	[private_account] [bit] NOT NULL,
 	[language_preference] [varchar](10),
 	[profile_photo] [VARBINARY](MAX),
+	[background_photo] [VARBINARY](MAX),
 	[first_access] [BIT] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
