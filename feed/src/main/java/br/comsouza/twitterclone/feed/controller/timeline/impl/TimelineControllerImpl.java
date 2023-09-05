@@ -24,7 +24,7 @@ public class TimelineControllerImpl implements ITimelineController {
         this.iTimelineService = iTimelineService;
     }
 
-    @GetMapping(value = "/following/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@PathVariable("type") String type,
                                                                             @RequestParam(value = "page", required = true) Integer page,
                                                                             @RequestParam(value = "size", required = true) Integer size) throws Exception{
