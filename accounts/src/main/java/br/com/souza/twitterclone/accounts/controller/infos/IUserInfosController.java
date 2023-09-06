@@ -70,4 +70,23 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<Void> updateProfilePhoto(MultipartFile request) throws Exception;
+
+    @Operation(summary = "Atualiza plano de fundo da conta do usuário.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> updateBackgroundPhoto(MultipartFile request) throws Exception;
+
+    @Operation(summary = "Atualiza a flag de primeiro acesso do usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> updateFirstAccessFlag() throws Exception;
+
 }

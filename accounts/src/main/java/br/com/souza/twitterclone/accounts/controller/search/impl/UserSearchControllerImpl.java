@@ -4,6 +4,7 @@ import br.com.souza.twitterclone.accounts.controller.search.IUserSearchControlle
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import java.util.List;
@@ -65,5 +66,8 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     //TODO: Procurar 3 usuários aleatórios para seguir
 
-    //TODO: Fazer endpoint autocomplete para busca de email
+    @GetMapping(value = "/isvalidemail", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.isValidEmail(email), HttpStatus.OK);
+    }
 }

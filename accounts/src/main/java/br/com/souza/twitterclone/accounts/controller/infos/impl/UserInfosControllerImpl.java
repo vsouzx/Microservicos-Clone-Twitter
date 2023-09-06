@@ -66,5 +66,15 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    //TODO: Atualizar flag first_access
+    @PatchMapping(value = "/backgroundphoto", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file) throws Exception {
+        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PatchMapping(value = "/firstaccess", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateFirstAccessFlag() throws Exception {
+        iUsersInfosService.updateFirstAccessFlag(FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 }
