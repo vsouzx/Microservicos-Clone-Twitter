@@ -1,9 +1,6 @@
 package br.com.souza.twitterclone.accounts.service.search;
 
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
-import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
+import br.com.souza.twitterclone.accounts.dto.user.*;
 
 import java.util.List;
 
@@ -16,5 +13,6 @@ public interface IUsersSearchService {
     List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
     List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size) throws Exception;
     ValidEmailResponse isValidEmail(String email) throws Exception;
+    ValidUsernameResponse isValidUsername(String username) throws Exception;
 
 }

@@ -5,10 +5,7 @@ import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
-import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
+import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
@@ -104,6 +101,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     public ValidEmailResponse isValidEmail(String email){
         return ValidEmailResponse.builder()
                 .isValidEmail(userRepository.findByEmail(email).isEmpty())
+                .build();
+    }
+
+    @Override
+    public ValidUsernameResponse isValidUsername(String username) throws Exception {
+        return ValidUsernameResponse.builder()
+                .isValidUsername(userRepository.findByUsername(username).isEmpty())
                 .build();
     }
 

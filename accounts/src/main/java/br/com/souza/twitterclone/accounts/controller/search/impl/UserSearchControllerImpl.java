@@ -1,10 +1,7 @@
 package br.com.souza.twitterclone.accounts.controller.search.impl;
 
 import br.com.souza.twitterclone.accounts.controller.search.IUserSearchController;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
-import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
+import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import java.util.List;
@@ -69,5 +66,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     @GetMapping(value = "/isvalidemail", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.isValidEmail(email), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/isvalidusername", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ValidUsernameResponse> isValidUsername(@RequestParam(value = "username", required = true) String username) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.isValidUsername(username), HttpStatus.OK);
     }
 }
