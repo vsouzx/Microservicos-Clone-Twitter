@@ -48,7 +48,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
         Optional<User> user;
         boolean isValid = false;
         do{
-            username = request.getFirstName() + RandomNumberUtil.generateRandomCode();
+            username = request.getFirstName().replace(" ", "") + RandomNumberUtil.generateRandomCode();
 
             user = userRepository.findByUsername(username);
             if (user.isEmpty()) {
