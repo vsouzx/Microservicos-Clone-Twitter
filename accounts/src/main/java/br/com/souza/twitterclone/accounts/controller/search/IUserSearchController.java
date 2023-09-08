@@ -1,9 +1,8 @@
 package br.com.souza.twitterclone.accounts.controller.search;
 
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.dto.user.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -67,5 +66,23 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<UserPreviewResponse>> getUserPendingFollowers(Integer page, Integer size) throws Exception;
+
+    @Operation(summary = "Verifica se o e-mail existe ou não")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<ValidEmailResponse> isValidEmail(@Parameter(description = "Email a ser validado") String email) throws Exception;
+
+    @Operation(summary = "Verifica se o username (@) existe ou não")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<ValidUsernameResponse> isValidUsername(@Parameter(description = "Email a ser validado") String username) throws Exception;
 
 }

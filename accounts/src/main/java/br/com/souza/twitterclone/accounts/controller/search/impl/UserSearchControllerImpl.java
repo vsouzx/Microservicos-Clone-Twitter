@@ -61,8 +61,6 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.getUserPendingFollowers(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 
-    //TODO: Procurar 3 usuários aleatórios para seguir
-
     @GetMapping(value = "/isvalidemail", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.isValidEmail(email), HttpStatus.OK);
@@ -72,4 +70,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
     public ResponseEntity<ValidUsernameResponse> isValidUsername(@RequestParam(value = "username", required = true) String username) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.isValidUsername(username), HttpStatus.OK);
     }
+
+    //TODO: Procurar 3 usuários aleatórios para seguir
+
 }
