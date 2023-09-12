@@ -27,6 +27,8 @@ public class User implements UserDetails {
     private String password;
     @Column(name = "confirmed_email")
     private Boolean confirmedEmail;
+    @Column(name = "first_access")
+    private Boolean firstAccess;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
