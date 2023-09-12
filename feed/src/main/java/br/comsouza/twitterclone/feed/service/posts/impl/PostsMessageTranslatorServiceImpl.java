@@ -2,7 +2,9 @@ package br.comsouza.twitterclone.feed.service.posts.impl;
 
 import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.client.IChatGPTClient;
+import br.comsouza.twitterclone.feed.database.model.CoreConfig;
 import br.comsouza.twitterclone.feed.database.model.Tweets;
+import br.comsouza.twitterclone.feed.database.repository.ICoreConfigRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
 import br.comsouza.twitterclone.feed.dto.client.GPTRequest;
 import br.comsouza.twitterclone.feed.dto.client.GPTResponse;
@@ -21,14 +23,18 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
     private final IChatGPTClient iChatGPTClient;
     private final IAccountsClient iAccountsClient;
     private final ITweetsRepository iTweetsRepository;
+    private final ICoreConfigRepository iCoreConfigRepository;
+    private static final String KEY = "GPT_KEY";
     private static final String PROMPT = "Por favor traduza esta mensagem do %s para o %: %s";
 
     public PostsMessageTranslatorServiceImpl(IChatGPTClient iChatGPTClient,
                                              IAccountsClient iAccountsClient,
-                                             ITweetsRepository iTweetsRepository) {
+                                             ITweetsRepository iTweetsRepository,
+                                             ICoreConfigRepository iCoreConfigRepository) {
         this.iChatGPTClient = iChatGPTClient;
         this.iAccountsClient = iAccountsClient;
         this.iTweetsRepository = iTweetsRepository;
+        this.iCoreConfigRepository = iCoreConfigRepository;
     }
 
     @Override
@@ -44,10 +50,12 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
             @Override
             public void run() {
                 GPTResponse response;
-
                 try{
+                    CoreConfig key = iCoreConfigRepository.findByKeyName(KEY)
+                            .orElseThrow(() -> new Exception("GPT Key not found"));
+
                     log.debug("Searching translation on ChatGPT..");
-                    response = iChatGPTClient.generate("Bearer " /*+ apiKey*/,
+                    response = iChatGPTClient.generate("Bearer " + key.getKeyValue() ,
                             GPTRequest.builder()
                                     .prompt(String.format(PROMPT,
                                             sessionUser.getLanguagePreference().equals("pt") ? "português" : "inglês",
@@ -64,7 +72,6 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
                     iTweetsRepository.save(tweet);
 
                     log.debug("Translation successfull saved..");
-
                 }catch (Exception e){
                     log.error("Error while calling Chat GPT API...", e);
                 }
