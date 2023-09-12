@@ -151,7 +151,25 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         User user = userRepository.findById(identifier)
                 .orElseThrow(UserNotFoundException::new);
 
-        user.setProfilePhoto(file.getBytes());
+        user.setProfilePhoto(!file.isEmpty() ? file.getBytes() : null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateBackgroundPhoto(MultipartFile file, String identifier) throws Exception {
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setBackgroundPhoto(!file.isEmpty() ? file.getBytes() : null);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateFirstAccessFlag(String identifier) throws Exception {
+        User user = userRepository.findById(identifier)
+                .orElseThrow(UserNotFoundException::new);
+
+        user.setFirstAccess(false);
         userRepository.save(user);
     }
 

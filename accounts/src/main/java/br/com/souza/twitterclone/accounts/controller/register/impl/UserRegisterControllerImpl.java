@@ -43,14 +43,4 @@ public class UserRegisterControllerImpl implements IUserRegisterController {
         iUsersRegisterService.confirmCode(email, code);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
-    //TODO: fazer endpoint separado para enviar foto de perfil
-//    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-//    public ResponseEntity<Void> userProfilePhoto(@RequestPart(value = "profilePhoto", required = false) MultipartFile profilePhoto) throws Exception {
-//        //iUsersRegisterService.userRegister(request, profilePhoto);
-//        return new ResponseEntity<>(HttpStatus.CREATED);
-//    }
-
-    //TODO: fazer endpoint separado para criar username próprio
-
 }

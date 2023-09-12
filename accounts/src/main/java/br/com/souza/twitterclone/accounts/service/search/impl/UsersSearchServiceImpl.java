@@ -5,13 +5,13 @@ import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
-import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -95,6 +95,20 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     @Override
     public List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size) throws Exception {
         return usersRepositoryImpl.getUserPendingFollowers(sessionUserIdentifier, page, size);
+    }
+
+    @Override
+    public ValidEmailResponse isValidEmail(String email){
+        return ValidEmailResponse.builder()
+                .isValidEmail(userRepository.findByEmail(email).isEmpty())
+                .build();
+    }
+
+    @Override
+    public ValidUsernameResponse isValidUsername(String username) throws Exception {
+        return ValidUsernameResponse.builder()
+                .isValidUsername(userRepository.findByUsername(username).isEmpty())
+                .build();
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) {
