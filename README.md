@@ -13,6 +13,6 @@
 <p>Micro Serviço de <b>autenticação</b> (com Redis) ✔️</p>
 <p>Micro Serviço de <b>gerenciamento de contas</b> (Criar conta, seguir/bloquear/silenciar outra conta, deixar a conta privada)✔️</p>
 <p>Micro Serviço de <b>email </b>(sendo um Consumer Kafka) ✔️</p>
-<p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) 🚧 (em andamento) </p>
-<p>Micro Serviço de <b>notificações</b> 🔜 (irá notificar o user em tempo real, quando tiver uma nova curtida, seguidor, retweet ou comentário)</p>
+<p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) ✔️ </p>
+<p>Micro Serviço de <b>notificações</b> 🚧 (em andamento) (irá notificar o user em tempo real, quando tiver uma nova curtida, seguidor, retweet ou comentário)</p>
 <p>Micro Serviço de <b>DM</b> 🔜 (os usuários poderão trocar mensagens em tempo real)</p>
