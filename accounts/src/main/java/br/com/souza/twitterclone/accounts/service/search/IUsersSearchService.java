@@ -12,7 +12,8 @@ public interface IUsersSearchService {
     List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
     List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
     List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size) throws Exception;
-    ValidEmailResponse isValidEmail(String email) throws Exception;
-    ValidUsernameResponse isValidUsername(String username) throws Exception;
+    ValidEmailResponse isValidEmail(String email);
+    ValidUsernameResponse isValidUsername(String username);
+    ValidUserResponse isValidUser(String username);
 
 }

@@ -105,9 +105,36 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public ValidUsernameResponse isValidUsername(String username) throws Exception {
+    public ValidUsernameResponse isValidUsername(String username){
         return ValidUsernameResponse.builder()
                 .isValidUsername(userRepository.findByUsername(username).isEmpty())
+                .build();
+    }
+
+    @Override
+    public ValidUserResponse isValidUser(String username){
+        Optional<User> user;
+
+        user = userRepository.findByUsername(username);
+        if(user.isPresent()){
+            return ValidUserResponse.builder()
+                    .isValidUser(true)
+                    .isUsername(true)
+                    .isEmail(false)
+                    .build();
+        }
+
+        user = userRepository.findByEmail(username);
+        if(user.isPresent()){
+            return ValidUserResponse.builder()
+                    .isValidUser(true)
+                    .isUsername(false)
+                    .isEmail(true)
+                    .build();
+        }
+
+        return ValidUserResponse.builder()
+                .isValidUser(false)
                 .build();
     }
 

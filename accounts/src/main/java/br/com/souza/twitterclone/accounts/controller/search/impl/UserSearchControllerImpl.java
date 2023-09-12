@@ -71,6 +71,11 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.isValidUsername(username), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/isvaliduser", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ValidUserResponse> isValidUser(@RequestParam(value = "username", required = true) String username) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.isValidUser(username), HttpStatus.OK);
+    }
+
     //TODO: Procurar 3 usuários aleatórios para seguir
 
 }
