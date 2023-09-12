@@ -14,6 +14,7 @@
         <module name="configserver" />
         <module name="accounts" />
         <module name="gateway" />
+        <module name="notifications" />
         <module name="authentication" />
       </profile>
     </annotationProcessing>
@@ -34,6 +35,7 @@
       <module name="feed" options="-parameters" />
       <module name="gateway" options="-parameters" />
       <module name="mailsender" options="-parameters" />
+      <module name="notifications" options="-parameters" />
       <module name="twitterclone" options="-parameters" />
     </option>
   </component>

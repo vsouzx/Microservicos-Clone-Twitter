@@ -1,4 +1,4 @@
-package br.comsouza.twitterclone.feed.configuration.authorization;
+package br.com.souza.twitterclone.notifications.configuration.authorization;
 
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

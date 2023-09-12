@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/accounts/pom.xml" />
         <option value="$PROJECT_DIR$/mailsender/pom.xml" />
         <option value="$PROJECT_DIR$/feed/pom.xml" />
+        <option value="$PROJECT_DIR$/notifications/pom.xml" />
       </list>
     </option>
   </component>

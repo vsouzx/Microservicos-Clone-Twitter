@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface IChatGPTClient {
 
     @PostMapping
-    public GPTResponse generate(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody GPTRequest request);
+    GPTResponse generate(@RequestHeader(value = "Authorization") String authorizationHeader, @RequestBody GPTRequest request);
 }

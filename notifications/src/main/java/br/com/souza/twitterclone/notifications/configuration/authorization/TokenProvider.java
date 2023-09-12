@@ -1,7 +1,7 @@
-package br.comsouza.twitterclone.feed.configuration.authorization;
+package br.com.souza.twitterclone.notifications.configuration.authorization;
 
-import br.comsouza.twitterclone.feed.properties.SecurityProperties;
-import br.comsouza.twitterclone.feed.service.redis.RedisService;
+import br.com.souza.twitterclone.notifications.properties.SecurityProperties;
+import br.com.souza.twitterclone.notifications.service.redis.RedisService;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.SignedJWT;
