@@ -18,6 +18,6 @@ public class UserPreviewResponse {
     private Boolean privateAccount;
     private Boolean isFollowedByMe;
     private Boolean isFollowingMe;
-    private byte[] profilePhoto;
+    private ProfilePhotoResponse profilePhoto;
 
 }

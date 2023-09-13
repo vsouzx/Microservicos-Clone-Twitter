@@ -1,5 +1,7 @@
 package br.com.souza.twitterclone.accounts.database.repository.impl;
 
+import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
+import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -11,14 +13,17 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UsersRepositoryImpl {
 
+    private final IImagesRepository iImagesRepository;
     @PersistenceContext
     private final EntityManager em;
 
-    public UsersRepositoryImpl(EntityManager em) {
+    public UsersRepositoryImpl(IImagesRepository iImagesRepository,
+                               EntityManager em) {
+        this.iImagesRepository = iImagesRepository;
         this.em = em;
     }
 
-    public List<UserPreviewResponse> findAllByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size){
+    public List<UserPreviewResponse> findAllByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -32,7 +37,7 @@ public class UsersRepositoryImpl {
         sb.append("	  ,u.private_account ");
         sb.append("   ,CONVERT(BIT, IIF(f.followed_identifier IS NOT NULL, 1, 0)) isFollowedBySessionUser ");
         sb.append("   ,CONVERT(BIT, IIF(f2.followed_identifier IS NOT NULL, 1, 0)) isFollowingSessionUser ");
-        sb.append("	  ,u.profile_photo ");
+        sb.append("	  ,u.profile_photo_identifier ");
         sb.append("FROM Users u  ");
         sb.append("LEFT JOIN users_follows f  ");
         sb.append("  ON f.follower_identifier = @sessionUser ");
@@ -59,7 +64,7 @@ public class UsersRepositoryImpl {
 
         List<UserPreviewResponse> response = new ArrayList<>();
 
-        lista.stream().forEach(result -> {
+        for (Object[] result : lista) {
             response.add(UserPreviewResponse.builder()
                     .firstName((String) result[0])
                     .username((String) result[1])
@@ -67,14 +72,14 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto((byte[]) result[6])
+                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
                     .build());
-        });
+        }
 
         return response;
     }
 
-    public List<UserPreviewResponse> getFollowers(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size){
+    public List<UserPreviewResponse> getFollowers(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -115,22 +120,22 @@ public class UsersRepositoryImpl {
 
         List<UserPreviewResponse> response = new ArrayList<>();
 
-        lista.stream().forEach(result -> {
+        for (Object[] result : lista) {
             response.add(UserPreviewResponse.builder()
-                            .firstName((String) result[0])
-                            .username((String) result[1])
-                            .biography((String) result[2])
-                            .privateAccount((Boolean) result[3])
-                            .isFollowedByMe((Boolean) result[4])
-                            .isFollowingMe((Boolean) result[5])
-                            .profilePhoto((byte[]) result[6])
+                    .firstName((String) result[0])
+                    .username((String) result[1])
+                    .biography((String) result[2])
+                    .privateAccount((Boolean) result[3])
+                    .isFollowedByMe((Boolean) result[4])
+                    .isFollowingMe((Boolean) result[5])
+                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
                     .build());
-        });
+        }
 
         return response;
     }
 
-    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size){
+    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -171,7 +176,7 @@ public class UsersRepositoryImpl {
 
         List<UserPreviewResponse> response = new ArrayList<>();
 
-        lista.stream().forEach(result -> {
+        for (Object[] result : lista) {
             response.add(UserPreviewResponse.builder()
                     .firstName((String) result[0])
                     .username((String) result[1])
@@ -179,14 +184,14 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto((byte[]) result[6])
+                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
                     .build());
-        });
+        }
 
         return response;
     }
 
-    public List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size){
+    public List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size) throws Exception {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	            VARCHAR(MAX) = ?  ");
@@ -221,7 +226,7 @@ public class UsersRepositoryImpl {
 
         List<UserPreviewResponse> response = new ArrayList<>();
 
-        lista.stream().forEach(result -> {
+        for (Object[] result : lista) {
             response.add(UserPreviewResponse.builder()
                     .firstName((String) result[0])
                     .username((String) result[1])
@@ -229,9 +234,9 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto((byte[]) result[6])
+                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
                     .build());
-        });
+        }
 
         return response;
     }

@@ -30,6 +30,6 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
     private List<UserPreviewResponse> followersInCommon;
-    private byte[] profilePhoto;
+    private ProfilePhotoResponse profilePhoto;
 
 }

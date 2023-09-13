@@ -32,7 +32,7 @@ public interface IUsersInteractionsService {
 
     Integer getUserFollowsCount(String sessionUserIdentifier, String targetUserIdentifier);
 
-    List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser);
+    List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception;
 
 
 }

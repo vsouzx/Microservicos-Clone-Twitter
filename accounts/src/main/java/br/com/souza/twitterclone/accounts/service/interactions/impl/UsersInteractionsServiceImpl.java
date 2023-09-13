@@ -10,10 +10,12 @@ import br.com.souza.twitterclone.accounts.database.model.UsersFollowsId;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollowsId;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
+import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
+import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToFollowException;
@@ -33,17 +35,20 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final UsersFollowsRepository usersFollowsRepository;
     private final UsersPendingFollowsRepository usersPendingFollowsRepository;
     private final SilencedUsersRepository silencedUsersRepository;
+    private final IImagesRepository iImagesRepository;
 
     public UsersInteractionsServiceImpl(UserRepository userRepository,
                                         BlockedUsersRepository blockedUsersRepository,
                                         UsersFollowsRepository usersFollowsRepository,
                                         UsersPendingFollowsRepository usersPendingFollowsRepository,
-                                        SilencedUsersRepository silencedUsersRepository) {
+                                        SilencedUsersRepository silencedUsersRepository,
+                                        IImagesRepository iImagesRepository) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
         this.usersFollowsRepository = usersFollowsRepository;
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
         this.silencedUsersRepository = silencedUsersRepository;
+        this.iImagesRepository = iImagesRepository;
     }
 
     @Override
@@ -223,26 +228,26 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) {
+    public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception {
         List<User> followers = userRepository.findSessionUserCommonFollowsWithTargerUser(sessionUser, targetUser);
         return rowMapper(followers, sessionUser);
     }
 
-    private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier) {
+    private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier) throws Exception {
         List<UserPreviewResponse> response = new ArrayList<>();
 
         if (!followers.isEmpty()) {
-            followers.stream().forEach(f -> {
+            for(User follower : followers){
                 response.add(UserPreviewResponse.builder()
-                        .username(f.getUsername())
-                        .firstName(f.getFirstName())
-                        .biography(f.getBiography())
-                        .privateAccount(f.getPrivateAccount())
-                        .profilePhoto(f.getProfilePhoto())
-                        .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, f.getIdentifier()).isPresent())
-                        .isFollowingMe(verifyIfIsFollowing(f.getIdentifier(), sessionUserIdentifier).isPresent())
+                        .username(follower.getUsername())
+                        .firstName(follower.getFirstName())
+                        .biography(follower.getBiography())
+                        .privateAccount(follower.getPrivateAccount())
+                        .profilePhoto(follower.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, follower.getProfilePhotoIdentifier()) : null)
+                        .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, follower.getIdentifier()).isPresent())
+                        .isFollowingMe(verifyIfIsFollowing(follower.getIdentifier(), sessionUserIdentifier).isPresent())
                         .build());
-            });
+            }
         }
         return response;
     }

@@ -62,13 +62,11 @@ public class User implements Serializable {
     @Column(name = "language_preference")
     private String languagePreference;
 
-    @Lob
-    @Column(name = "profile_photo")
-    private byte[] profilePhoto;
+    @Column(name = "profile_photo_identifier", length = 36)
+    private String profilePhotoIdentifier;
 
-    @Lob
-    @Column(name = "background_photo")
-    private byte[] backgroundPhoto;
+    @Column(name = "background_photo_identifier", length = 36)
+    private String backgroundPhotoIdentifier;
 
     @Column(name = "first_access")
     private Boolean firstAccess;

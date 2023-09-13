@@ -1,8 +1,6 @@
 package br.comsouza.twitterclone.feed.service.posts.impl;
 
 import br.comsouza.twitterclone.feed.client.IAccountsClient;
-import br.comsouza.twitterclone.feed.database.model.Tweets;
-import br.comsouza.twitterclone.feed.database.model.TweetsLikes;
 import br.comsouza.twitterclone.feed.database.repository.postdetails.PostDetailsRepository;
 import br.comsouza.twitterclone.feed.database.repository.postdetails.PostResumeRepository;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
@@ -12,7 +10,6 @@ import br.comsouza.twitterclone.feed.service.posts.IPostsDetailsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service

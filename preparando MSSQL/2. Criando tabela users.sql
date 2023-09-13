@@ -15,14 +15,22 @@ CREATE TABLE users(
 	[registration_time] [datetime] NOT NULL,
 	[private_account] [bit] NOT NULL,
 	[language_preference] [varchar](10),
-	[profile_photo] [VARBINARY](MAX),
-	[background_photo] [VARBINARY](MAX),
+	[profile_photo_identifier] [uniqueidentifier],
+	[background_photo_identifier] [uniqueidentifier],
 	[first_access] [BIT] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
 	[identifier] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+
+ALTER TABLE [users]  WITH CHECK ADD  CONSTRAINT [users_images_FK] FOREIGN KEY([profile_photo_identifier])
+REFERENCES [images] ([identifier])
+GO
+
+ALTER TABLE [users]  WITH CHECK ADD  CONSTRAINT [users_images_FK2] FOREIGN KEY([background_photo_identifier])
+REFERENCES [images] ([identifier])
 GO
 
 INSERT users

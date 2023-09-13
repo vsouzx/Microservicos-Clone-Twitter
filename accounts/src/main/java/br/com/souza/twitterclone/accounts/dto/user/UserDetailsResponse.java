@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 public class UserDetailsResponse {
 
     private String firstName;
-    private String lastName;
     private String username;
     private Integer following;
     private Integer followers;
@@ -23,6 +22,6 @@ public class UserDetailsResponse {
     private LocalDateTime registrationTime;
     private Boolean privateAccount;
     private String languagePreference;
-    private byte[] profilePhoto;
+    private ProfilePhotoResponse profilePhoto;
 
 }

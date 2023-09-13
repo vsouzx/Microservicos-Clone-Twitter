@@ -60,15 +60,19 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/profilephoto", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file) throws Exception {
-        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier());
+    @PatchMapping(value = "/profilephoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file,
+                                                   @RequestPart("xPosition") String xPosition,
+                                                   @RequestPart("yPosition") String yPosition) throws Exception {
+        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/backgroundphoto", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file) throws Exception {
-        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier());
+    @PatchMapping(value = "/backgroundphoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file,
+                                                      @RequestPart("xPosition") String xPosition,
+                                                      @RequestPart("yPosition") String yPosition) throws Exception {
+        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
