@@ -154,7 +154,7 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     }
 
     @Override
-    public void updateProfilePhoto(MultipartFile file, String userIdentifier, Integer xPosition, Integer yPosition) throws Exception {
+    public void updateProfilePhoto(MultipartFile file, String userIdentifier) throws Exception {
         User user = userRepository.findById(userIdentifier)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -163,16 +163,16 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
                     .orElseThrow(() -> new Exception("Image could not be found"));
 
             profilePhoto.setPhoto(!file.isEmpty() ? file.getBytes() : null);
-            profilePhoto.setXPosition(xPosition);
-            profilePhoto.setYPosition(yPosition);
+            //profilePhoto.setXPosition(xPosition);
+            //profilePhoto.setYPosition(yPosition);
 
             iImagesRepository.save(profilePhoto);
         } else {
             Images profilePhoto = iImagesRepository.save(Images.builder()
                     .identifier(UUID.randomUUID().toString())
                     .photo(!file.isEmpty() ? file.getBytes() : null)
-                    .xPosition(xPosition)
-                    .yPosition(yPosition)
+                    //.xPosition(xPosition)
+                    //.yPosition(yPosition)
                     .build());
 
             user.setProfilePhotoIdentifier(profilePhoto.getIdentifier());

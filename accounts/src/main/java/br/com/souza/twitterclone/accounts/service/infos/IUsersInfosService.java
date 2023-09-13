@@ -19,7 +19,7 @@ public interface IUsersInfosService {
 
     void updateUserPrivacy(UserPrivacyUpdateRequest request, String identifier) throws Exception;
 
-    void updateProfilePhoto(MultipartFile file, String identifier, Integer xPosition, Integer yPosition) throws Exception;
+    void updateProfilePhoto(MultipartFile file, String identifier) throws Exception;
 
     void updateBackgroundPhoto(MultipartFile file, String identifier, Integer xPosition, Integer yPosition) throws Exception;
 

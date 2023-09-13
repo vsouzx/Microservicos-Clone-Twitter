@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.controller.infos.impl;
 
 import br.com.souza.twitterclone.accounts.controller.infos.IUserInfosController;
+import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserEmailUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserInfosUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPasswordUpdateRequest;
@@ -60,11 +61,9 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/profilephoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file,
-                                                   @RequestPart("xPosition") String xPosition,
-                                                   @RequestPart("yPosition") String yPosition) throws Exception {
-        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
+    @PatchMapping(value = "/profilephoto", consumes = {"multipart/form-data"})
+    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file) throws Exception {
+        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

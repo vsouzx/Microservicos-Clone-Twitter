@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.accounts.controller.infos;
 
+import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserEmailUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserInfosUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPasswordUpdateRequest;
@@ -69,7 +70,7 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> updateProfilePhoto(MultipartFile request, String xPosition, String yPosition) throws Exception;
+    ResponseEntity<Void> updateProfilePhoto(MultipartFile file) throws Exception;
 
     @Operation(summary = "Atualiza plano de fundo da conta do usuário.")
     @ApiResponses(value = {
