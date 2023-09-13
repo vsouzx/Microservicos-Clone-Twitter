@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,17 +63,17 @@ public class UserInfosControllerImpl implements IUserInfosController {
 
     @PatchMapping(value = "/profilephoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file,
-                                                   @RequestPart("xPosition") String xPosition,
-                                                   @RequestPart("yPosition") String yPosition) throws Exception {
-        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
+                                                   @RequestParam("xPosition") Integer xPosition,
+                                                   @RequestParam("yPosition") Integer yPosition) throws Exception {
+        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/backgroundphoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file,
-                                                      @RequestPart("xPosition") String xPosition,
-                                                      @RequestPart("yPosition") String yPosition) throws Exception {
-        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
+                                                      @RequestParam("xPosition") Integer xPosition,
+                                                      @RequestParam("yPosition") Integer yPosition) throws Exception {
+        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
