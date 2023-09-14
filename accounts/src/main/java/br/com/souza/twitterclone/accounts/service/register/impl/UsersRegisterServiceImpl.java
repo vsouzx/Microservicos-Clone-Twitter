@@ -82,6 +82,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
                 .languagePreference("pt")
                 .birthDate(request.getBirthDate())
                 .firstAccess(true)
+                .verified(false)
                 .build());
 
         redisService.removeKey(request.getEmail());
