@@ -1,0 +1,35 @@
+package br.com.souza.twitterclone.notifications.database.model;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@Entity(name = "notifications")
+public class Notifications {
+
+    @Id
+    @Column(name = "identifier", length = 36)
+    private String identifier;
+
+    @Column(name = "tweet_identifer", length = 50)
+    private String tweetIdentifier;
+
+    @Column(name = "type_identifer", length = 36)
+    private String typeIdentifier;
+
+    @Column(name = "visualized")
+    private Boolean visualized;
+
+    @Column(name = "creation_date")
+    private LocalDateTime creationDate;
+
+}

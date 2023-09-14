@@ -11,6 +11,7 @@ import br.com.souza.twitterclone.accounts.service.redis.RedisService;
 import br.com.souza.twitterclone.accounts.service.register.IUsersRegisterService;
 import br.com.souza.twitterclone.accounts.util.PasswordValidatorHelper;
 import br.com.souza.twitterclone.accounts.util.RandomNumberUtil;
+import br.com.souza.twitterclone.accounts.util.UsefulDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class UsersRegisterServiceImpl implements IUsersRegisterService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .username(username)
-                .registrationTime(LocalDateTime.now())
+                .registrationTime(UsefulDate.now())
                 .privateAccount(false)
                 .confirmedEmail(true)
                 .languagePreference("pt")

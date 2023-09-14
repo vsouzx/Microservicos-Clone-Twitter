@@ -22,6 +22,7 @@ import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
+import br.comsouza.twitterclone.feed.util.UsefulDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -72,7 +73,7 @@ public class PostsServiceImpl implements IPostsService {
                 .message(message)
                 .messageTranslations(null)
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
-                .publicationTime(LocalDateTime.now())
+                .publicationTime(UsefulDate.now())
                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                 .canBeRepliedByNotFollowedUser(flag.equals("1"))
                 .build());
@@ -106,7 +107,7 @@ public class PostsServiceImpl implements IPostsService {
                                 .message(message)
                                 .messageTranslations(null)
                                 .type(type)
-                                .publicationTime(LocalDateTime.now())
+                                .publicationTime(UsefulDate.now())
                                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                                 .canBeRepliedByNotFollowedUser(true)
                                 .build());
@@ -151,7 +152,7 @@ public class PostsServiceImpl implements IPostsService {
                                 .message(message)
                                 .messageTranslations(null)
                                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
-                                .publicationTime(LocalDateTime.now())
+                                .publicationTime(UsefulDate.now())
                                 .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                                 .canBeRepliedByNotFollowedUser(true)
                                 .build());
@@ -193,6 +194,8 @@ public class PostsServiceImpl implements IPostsService {
                 });
 
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
+
+        //iNotificationsClient.createNewNotification(tweetIdentifier, ENUM.NEW_LIKE.toString());
     }
 
     @Override
@@ -219,7 +222,7 @@ public class PostsServiceImpl implements IPostsService {
                                     .tweetIdentifier(tweetIdentifier)
                                     .userIdentifier(sessionUserIdentifier)
                                     .build())
-                            .time(LocalDateTime.now())
+                            .time(UsefulDate.now())
                             .build());
                 });
 
