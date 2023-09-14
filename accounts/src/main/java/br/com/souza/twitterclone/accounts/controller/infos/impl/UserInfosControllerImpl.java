@@ -1,7 +1,6 @@
 package br.com.souza.twitterclone.accounts.controller.infos.impl;
 
 import br.com.souza.twitterclone.accounts.controller.infos.IUserInfosController;
-import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserEmailUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserInfosUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPasswordUpdateRequest;
@@ -13,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -61,17 +61,19 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/profilephoto", consumes = {"multipart/form-data"})
-    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file) throws Exception {
-        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier());
+    @PatchMapping(value = "/profilephoto/{xposition}/{yposition}", consumes = {"multipart/form-data"})
+    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file,
+                                                   @PathVariable("xposition") Integer xPosition,
+                                                   @PathVariable("yposition") Integer yPosition) throws Exception {
+        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/backgroundphoto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/backgroundphoto/{xposition}/{yposition}", consumes = {"multipart/form-data"})
     public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file,
-                                                      @RequestPart("xPosition") String xPosition,
-                                                      @RequestPart("yPosition") String yPosition) throws Exception {
-        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), Integer.valueOf(xPosition), Integer.valueOf(yPosition));
+                                                      @PathVariable("xposition") Integer xPosition,
+                                                      @PathVariable("yposition") Integer yPosition) throws Exception {
+        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
