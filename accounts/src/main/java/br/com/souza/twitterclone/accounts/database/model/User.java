@@ -71,4 +71,7 @@ public class User implements Serializable {
     @Column(name = "first_access")
     private Boolean firstAccess;
 
+    @Column(name = "verified")
+    private Boolean verified;
+
 }

@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.dto.user;
 
-import java.time.LocalDateTime;
+import br.com.souza.twitterclone.accounts.database.model.User;
+import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,5 +20,15 @@ public class UserPreviewResponse {
     private Boolean isFollowedByMe;
     private Boolean isFollowingMe;
     private ProfilePhotoResponse profilePhoto;
+
+    public UserPreviewResponse(User user, IImagesRepository iImagesRepository) throws Exception {
+        this.firstName = user.getFirstName();
+        this.username = user.getUsername();
+        this.biography = user.getBiography();
+        this.privateAccount = user.getPrivateAccount();
+        this.isFollowedByMe = false;
+        this.isFollowingMe = false;
+        this.profilePhoto = new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier());
+    }
 
 }

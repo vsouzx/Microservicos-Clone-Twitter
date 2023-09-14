@@ -15,5 +15,6 @@ public interface IUsersSearchService {
     ValidEmailResponse isValidEmail(String email);
     ValidUsernameResponse isValidUsername(String username);
     ValidUserResponse isValidUser(String username);
+    List<UserPreviewResponse> getVerified();
 
 }

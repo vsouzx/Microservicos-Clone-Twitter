@@ -41,5 +41,5 @@ public interface UserRepository extends JpaRepository<User, String> {
             "  AND f2.follower_identifier = :targetUserIdentifier ", nativeQuery = true)
     List<User> findSessionUserCommonFollowsWithTargerUser(@Param("sessionUserIdentifier") String sessionUserIdentifier, @Param("targetUserIdentifier") String targetUser);
 
-    List<User> findAllByEmailContaining(String email);
+    List<User> findAllByVerified(Boolean verified);
 }

@@ -13,6 +13,7 @@ import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -140,6 +141,19 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         return ValidUserResponse.builder()
                 .isValidUser(false)
                 .build();
+    }
+
+    @Override
+    public List<UserPreviewResponse> getVerified() {
+        return userRepository.findAllByVerified(true).stream()
+                .map(u -> {
+                    try {
+                        return new UserPreviewResponse(u, iImagesRepository);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) throws Exception {

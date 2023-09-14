@@ -17,7 +17,8 @@ CREATE TABLE users(
 	[language_preference] [varchar](10),
 	[profile_photo_identifier] [uniqueidentifier],
 	[background_photo_identifier] [uniqueidentifier],
-	[first_access] [BIT] NOT NULL
+	[first_access] [BIT] NOT NULL,
+	[verified] [BIT] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
 	[identifier] ASC

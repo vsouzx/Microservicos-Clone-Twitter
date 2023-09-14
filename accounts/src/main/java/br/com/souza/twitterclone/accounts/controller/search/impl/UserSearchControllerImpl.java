@@ -78,4 +78,8 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     //TODO: Procurar 3 usuários aleatórios para seguir
 
+    @GetMapping(value = "/verified", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserPreviewResponse>> getVerified(){
+        return new ResponseEntity<>(iUsersSearchService.getVerified(), HttpStatus.OK);
+    }
 }

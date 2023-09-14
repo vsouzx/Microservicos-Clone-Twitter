@@ -27,7 +27,6 @@ public class ProfilePhotoResponse {
         this.xPosition = image.getXPosition();
         this.yPosition = image.getYPosition();
         this.photo = image.getPhoto();
-
     }
 
 }
