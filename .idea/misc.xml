@@ -4,7 +4,6 @@
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>
-        <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/configserver/pom.xml" />
         <option value="$PROJECT_DIR$/discovery/pom.xml" />
         <option value="$PROJECT_DIR$/authentication/pom.xml" />
@@ -13,6 +12,7 @@
         <option value="$PROJECT_DIR$/mailsender/pom.xml" />
         <option value="$PROJECT_DIR$/feed/pom.xml" />
         <option value="$PROJECT_DIR$/notifications/pom.xml" />
+        <option value="$PROJECT_DIR$/pom.xml" />
       </list>
     </option>
   </component>

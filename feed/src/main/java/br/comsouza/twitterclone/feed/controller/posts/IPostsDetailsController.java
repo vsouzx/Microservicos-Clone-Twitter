@@ -21,7 +21,8 @@ public interface IPostsDetailsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<TimelineTweetResponse> getTweetDetails(String identifier) throws Exception;
+    ResponseEntity<TimelineTweetResponse> getTweetDetails(String identifier,
+                                                          String authorization) throws Exception;
 
     @Operation(summary = "Get tweet list comments.")
     @ApiResponses(value = {
@@ -32,6 +33,7 @@ public interface IPostsDetailsController {
     })
     ResponseEntity<List<TimelineTweetResponse>> getTweetComments(String identifier,
                                                                  @Parameter(description = "Page number") @NotNull Integer page,
-                                                                 @Parameter(description = "Page size") @NotNull Integer size) throws Exception;
+                                                                 @Parameter(description = "Page size") @NotNull Integer size,
+                                                                 String authorization) throws Exception;
 
 }

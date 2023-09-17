@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
+
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 
@@ -102,4 +104,13 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<UserPreviewResponse>> getVerified() throws Exception;
+
+    @Operation(summary = "Retorna os dados da foto de perfil do user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<ProfilePhotoResponse> loadProfilePhoto(String userIdentifier) throws Exception;
 }

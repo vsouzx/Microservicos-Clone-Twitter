@@ -82,4 +82,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     public ResponseEntity<List<UserPreviewResponse>> getVerified(){
         return new ResponseEntity<>(iUsersSearchService.getVerified(), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/profilephoto", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProfilePhotoResponse> loadProfilePhoto(@RequestParam(value = "profilePhotoIdentifier", required = false) String profilePhotoIdentifier) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.loadProfilePhoto(profilePhotoIdentifier), HttpStatus.OK);
+    }
+
 }

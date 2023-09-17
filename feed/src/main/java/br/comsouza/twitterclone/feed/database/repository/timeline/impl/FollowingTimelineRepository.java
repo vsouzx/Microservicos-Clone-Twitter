@@ -1,5 +1,6 @@
 package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 
+import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
@@ -16,15 +17,18 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
+    private final IAccountsClient iAccountsClient;
 
     public FollowingTimelineRepository(EntityManager em,
-                                       IInteractionsService iInteractionsService) {
+                                       IInteractionsService iInteractionsService,
+                                       IAccountsClient iAccountsClient) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
+        this.iAccountsClient = iAccountsClient;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size) {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier VARCHAR(MAX) = ? ");
@@ -37,7 +41,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         sb.append("	  ,u.identifier ");
         sb.append("	  ,u.username ");
         sb.append("   ,u.first_name ");
-        sb.append("	  ,u.profile_photo ");
+        sb.append("	  ,u.profile_photo_identifier ");
         sb.append("	  ,t.message ");
         sb.append("	  ,t.attachment ");
         sb.append("FROM tweets t ");
@@ -74,7 +78,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
                         .userIdentifier((String) result[3])
                         .userUsername((String) result[4])
                         .userFirstName((String) result[5])
-                        .userProfilePhoto((byte[]) result[6])
+                        .userProfilePhoto(iAccountsClient.loadProfilePhoto((String) result[6], authorization))
                         .tweetMessage((String) result[7])
                         .tweetAttachment((byte[]) result[8])
                         .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))

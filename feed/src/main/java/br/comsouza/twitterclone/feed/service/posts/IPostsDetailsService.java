@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface IPostsDetailsService {
 
-    TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier) throws Exception;
-    List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception;
+    TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier, String authorization) throws Exception;
+    List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization) throws Exception;
     List<UserDetailsByIdentifierResponse> getTweetNoValueRetweets(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception;
-    List<TimelineTweetResponse> getTweetRetweets(String authorization, String tweetIdentifier, Integer page, Integer size);
+    List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization);
     List<UserDetailsByIdentifierResponse> getTweetLikes(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception;
 }

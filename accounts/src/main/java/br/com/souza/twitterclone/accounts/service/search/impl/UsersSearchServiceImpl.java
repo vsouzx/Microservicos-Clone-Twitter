@@ -53,7 +53,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .registrationTime(user.getRegistrationTime())
                 .privateAccount(user.getPrivateAccount())
                 .languagePreference(user.getLanguagePreference())
-                .profilePhoto(user.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier()) : null)
+                .profilePhoto(user.getProfilePhotoIdentifier() != null ? loadProfilePhoto(user.getProfilePhotoIdentifier()) : null)
                 .build();
     }
 
@@ -156,6 +156,14 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public ProfilePhotoResponse loadProfilePhoto(String photoIdentifier) throws Exception {
+        if (photoIdentifier != null){
+            return new ProfilePhotoResponse(iImagesRepository, photoIdentifier);
+        }
+        return null;
+    }
+
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .firstName(targetUser.getFirstName())
@@ -174,7 +182,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, targetUser.getProfilePhotoIdentifier()) : null)
+                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
                 .build();
     }
 
@@ -196,7 +204,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, targetUser.getProfilePhotoIdentifier()) : null)
+                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
                 .build();
     }
 
@@ -218,7 +226,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(iUsersInteractionsService.verifyIfIsPendingFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, targetUser.getProfilePhotoIdentifier()) : null)
+                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
                 .build();
     }
 }

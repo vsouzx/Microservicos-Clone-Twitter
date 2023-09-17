@@ -1,5 +1,3 @@
-DROP TABLE silenced_users;
-
 CREATE TABLE silenced_users(
 	[silencer_identifier] [uniqueidentifier] NOT NULL,
 	[silenced_identifier] [uniqueidentifier]NOT NULL,

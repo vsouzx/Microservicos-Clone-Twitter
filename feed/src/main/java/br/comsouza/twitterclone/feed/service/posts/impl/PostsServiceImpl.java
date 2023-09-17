@@ -230,17 +230,17 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier){
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization){
         TimelineTweetResponse originalTweet;
 
-        post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
+        post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false, authorization));
         originalTweet = post.getOriginalTweetResponse();
         if (originalTweet != null) {
-            originalTweet.setOriginalTweetResponse(getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
+            originalTweet.setOriginalTweetResponse(getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true, authorization));
         }
     }
 
-    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel){
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization){
 
         final String mainTweetType = mainTweet.getTweetTypeDescription();
         final String secondaryTweetType = secondaryTweet.getTweetTypeDescription();
@@ -248,10 +248,10 @@ public class PostsServiceImpl implements IPostsService {
         if (!mainTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondaryTweetType.equals(TweetTypeEnum.TWEET.toString())) {
 
             if (mainTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
-                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier(), authorization);
             }
             if (mainTweetType.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || mainTweetType.equals(TweetTypeEnum.COMMENT.toString()) || secondaryTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
-                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier(), authorization);
             }
         }
         return null;

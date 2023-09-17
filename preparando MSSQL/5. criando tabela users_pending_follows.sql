@@ -1,5 +1,3 @@
-DROP TABLE users_pending_follows;
-
 CREATE TABLE users_pending_follows(
 	[pending_follower_identifier] [uniqueidentifier] NOT NULL,
 	[pending_followed_identifier] [uniqueidentifier]NOT NULL,
@@ -19,10 +17,6 @@ ALTER TABLE [users_pending_follows]  WITH CHECK ADD  CONSTRAINT [users_pending_f
 REFERENCES [users] ([identifier])
 GO
 
-
-INSERT [users_pending_follows]
-SELECT '39077E3A-805D-46E8-A742-B492C7CDFE79' -- identifier vsouzx
-	  ,'08F85AB9-83FC-4CAD-A6F2-7C2A54739B8E' -- identifier vsouzx_
 	   
 
 

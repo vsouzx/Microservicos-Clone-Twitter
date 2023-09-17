@@ -34,20 +34,20 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier) throws Exception {
-        TimelineTweetResponse post = postDetailsRepository.find(sessionUserIdentifier, tweetIdentifier);
-        iPostsService.loadTweetResponses(post, sessionUserIdentifier);
-        post.setTweetCommentsList(getTweetComments(sessionUserIdentifier, tweetIdentifier, 0, 10));
+    public TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier, String authorization) throws Exception {
+        TimelineTweetResponse post = postDetailsRepository.find(sessionUserIdentifier, tweetIdentifier, authorization);
+        iPostsService.loadTweetResponses(post, sessionUserIdentifier, authorization);
+        post.setTweetCommentsList(getTweetComments(sessionUserIdentifier, tweetIdentifier, 0, 10, authorization));
 
         return post;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size){
+    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization){
         List<TimelineTweetResponse> response = new ArrayList<>();
         iInteractionsService.getTweetCommentsPageable(tweetIdentifier, page, size).getContent()
                 .forEach(comment -> {
-                    response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
+                    response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier(), authorization));
                 });
         return response;
     }
@@ -64,16 +64,16 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size){
+    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization){
 
         List<TimelineTweetResponse> response = new ArrayList<>();
         iInteractionsService.getTweetOnlyValuedRetweetsPageable(tweetIdentifier, page, size).getContent()
                 .forEach(retweet -> {
-                    response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier()));
+                    response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier(), authorization));
                 });
 
         for(TimelineTweetResponse post : response){
-            iPostsService.loadTweetResponses(post, sessionUserIdentifier);
+            iPostsService.loadTweetResponses(post, sessionUserIdentifier, authorization);
         }
 
         return response;

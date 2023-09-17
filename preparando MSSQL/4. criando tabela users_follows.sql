@@ -1,4 +1,3 @@
-DROP TABLE users_follows;
 
 CREATE TABLE users_follows(
 	[follower_identifier] [uniqueidentifier] NOT NULL,
@@ -20,9 +19,5 @@ REFERENCES [users] ([identifier])
 GO
 
 
-INSERT users_follows
-SELECT '08F85AB9-83FC-4CAD-A6F2-7C2A54739B8E' -- identifier danielly
-	  ,'E805CCDE-E9BE-4E4F-970C-6D70922E5A00' -- identifier vinicius123
-	   
 
 

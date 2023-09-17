@@ -22,12 +22,12 @@ public class TimelineServiceImpl implements ITimelineService {
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeline(String sessionUserIdentifier, Integer page, Integer size, String type) throws Exception{
+    public List<TimelineTweetResponse> getTimeline(String sessionUserIdentifier, Integer page, Integer size, String type, String authorization) throws Exception{
         ITimelineStrategy strategy = followingTimelineStrategyFactory.getStrategy(type);
-        List<TimelineTweetResponse> posts = strategy.getTimeLine(sessionUserIdentifier, page, size);
+        List<TimelineTweetResponse> posts = strategy.getTimeLine(sessionUserIdentifier, page, size, authorization);
 
         for(TimelineTweetResponse post : posts){
-            iPostsService.loadTweetResponses(post, sessionUserIdentifier);
+            iPostsService.loadTweetResponses(post, sessionUserIdentifier, authorization);
         }
         
         return posts;

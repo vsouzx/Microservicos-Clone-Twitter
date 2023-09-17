@@ -1,6 +1,8 @@
 package br.comsouza.twitterclone.feed.dto.posts;
 
 import java.util.List;
+
+import br.comsouza.twitterclone.feed.dto.client.ProfilePhotoResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +31,6 @@ public class TimelineTweetResponse {
     private int tweetFavsCount;
     private boolean isLikedByMe;
     private boolean isRetweetedByMe;
-    private byte[] userProfilePhoto;
+    private ProfilePhotoResponse userProfilePhoto;
     private byte[] tweetAttachment;
 }

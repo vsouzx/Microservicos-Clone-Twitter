@@ -7,8 +7,8 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="twitterclone" />
         <module name="feed" />
+        <module name="twitterclone" />
         <module name="mailsender" />
         <module name="discovery" />
         <module name="configserver" />

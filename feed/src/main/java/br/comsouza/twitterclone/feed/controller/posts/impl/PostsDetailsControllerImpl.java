@@ -27,15 +27,17 @@ public class PostsDetailsControllerImpl implements IPostsDetailsController {
     }
 
     @GetMapping(value = "/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<TimelineTweetResponse> getTweetDetails(@PathVariable("tweetIdentifier") String tweetIdentifier) throws Exception {
-        return new ResponseEntity<>(iPostsDetailsService.getTweetDetails(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier), HttpStatus.OK);
+    public ResponseEntity<TimelineTweetResponse> getTweetDetails(@PathVariable("tweetIdentifier") String tweetIdentifier,
+                                                                 @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iPostsDetailsService.getTweetDetails(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/comments/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TimelineTweetResponse>> getTweetComments(@PathVariable("tweetIdentifier") String tweetIdentifier,
                                                                         @RequestParam(value = "page", required = true) Integer page,
-                                                                        @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iPostsDetailsService.getTweetComments(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, page, size), HttpStatus.OK);
+                                                                        @RequestParam(value = "size", required = true) Integer size,
+                                                                        @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iPostsDetailsService.getTweetComments(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, page, size, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/novalueretweets/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -49,8 +51,9 @@ public class PostsDetailsControllerImpl implements IPostsDetailsController {
     @GetMapping(value = "/retweets/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TimelineTweetResponse>> getTweetRetweets(@PathVariable("tweetIdentifier") String tweetIdentifier,
                                                                         @RequestParam(value = "page", required = true) Integer page,
-                                                                        @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iPostsDetailsService.getTweetRetweets(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, page, size), HttpStatus.OK);
+                                                                        @RequestParam(value = "size", required = true) Integer size,
+                                                                        @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iPostsDetailsService.getTweetRetweets(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, page, size, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/likes/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
