@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserPreviewResponse {
 
+    private String userIdentifier;
     private String firstName;
     private String username;
     private String biography;
@@ -22,6 +23,7 @@ public class UserPreviewResponse {
     private ProfilePhotoResponse profilePhoto;
 
     public UserPreviewResponse(User user, IImagesRepository iImagesRepository) throws Exception {
+        this.userIdentifier = user.getIdentifier();
         this.firstName = user.getFirstName();
         this.username = user.getUsername();
         this.biography = user.getBiography();
