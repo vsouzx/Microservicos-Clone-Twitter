@@ -3,7 +3,9 @@ package br.com.souza.twitterclone.notifications.enums;
 public enum InternalTypeErrorCodesEnum {
 
     E500000("500.000", "Error while calling another microservice."),
-    E420001("420.001", "This tweet doesn't exists.");
+    E410000("410.000", "User not found."),
+    E420001("420.001", "This tweet doesn't exists."),
+    E430001("430.001", "The tweet type is invalid.");
 
     private final String code;
     private final String message;

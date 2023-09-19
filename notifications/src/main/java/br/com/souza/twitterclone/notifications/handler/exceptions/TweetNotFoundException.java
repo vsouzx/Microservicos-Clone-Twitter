@@ -1,6 +1,5 @@
 package br.com.souza.twitterclone.notifications.handler.exceptions;
 
-
 import br.com.souza.twitterclone.notifications.enums.InternalTypeErrorCodesEnum;
 
 public class TweetNotFoundException extends ErrorCodeException{

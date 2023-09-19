@@ -23,6 +23,9 @@ public class Notifications {
     @Column(name = "tweet_identifier", length = 50)
     private String tweetIdentifier;
 
+    @Column(name = "user_identifier", length = 50)
+    private String userIdentifier;
+
     @Column(name = "type_identifier", length = 36)
     private String typeIdentifier;
 
