@@ -21,12 +21,11 @@ public class ProfilePhotoResponse {
     private byte[] photo;
 
     public ProfilePhotoResponse(IImagesRepository iImagesRepository, String profilePhotoIdentifier) throws Exception {
-        Images image = iImagesRepository.findById(profilePhotoIdentifier)
-                .orElseThrow(() -> new Exception("Image could not be found"));
+            Images image = iImagesRepository.findById(profilePhotoIdentifier)
+                    .orElseThrow(() -> new Exception("Image could not be found"));
 
-        this.xPosition = image.getXPosition();
-        this.yPosition = image.getYPosition();
-        this.photo = image.getPhoto();
+            this.xPosition = image.getXPosition();
+            this.yPosition = image.getYPosition();
+            this.photo = image.getPhoto();
     }
-
 }

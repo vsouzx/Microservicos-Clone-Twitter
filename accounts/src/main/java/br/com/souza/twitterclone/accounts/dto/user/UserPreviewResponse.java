@@ -30,7 +30,7 @@ public class UserPreviewResponse {
         this.privateAccount = user.getPrivateAccount();
         this.isFollowedByMe = false;
         this.isFollowingMe = false;
-        this.profilePhoto = new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier());
+        this.profilePhoto = user.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier()) : null;
     }
 
 }
