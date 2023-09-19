@@ -20,10 +20,10 @@ public class Notifications {
     @Column(name = "identifier", length = 36)
     private String identifier;
 
-    @Column(name = "tweet_identifer", length = 50)
+    @Column(name = "tweet_identifier", length = 50)
     private String tweetIdentifier;
 
-    @Column(name = "type_identifer", length = 36)
+    @Column(name = "type_identifier", length = 36)
     private String typeIdentifier;
 
     @Column(name = "visualized")

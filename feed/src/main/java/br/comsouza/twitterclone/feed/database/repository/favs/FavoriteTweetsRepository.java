@@ -2,6 +2,7 @@ package br.comsouza.twitterclone.feed.database.repository.favs;
 
 import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.handler.exceptions.ServerSideErrorException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -26,7 +27,7 @@ public class FavoriteTweetsRepository {
         this.iAccountsClient = iAccountsClient;
     }
 
-    public List<TimelineTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size, String authorization) {
+    public List<TimelineTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size, String authorization) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserId VARCHAR(MAX) = ? ");
@@ -61,28 +62,32 @@ public class FavoriteTweetsRepository {
         List<Object[]> list = query.getResultList();
 
         List<TimelineTweetResponse> response = new ArrayList<>();
-
         if (!list.isEmpty()) {
-            list.stream().forEach(result -> {
-                response.add(TimelineTweetResponse.builder()
-                        .tweetIdentifier((String) result[0])
-                        .originalTweetIdentifier((String) result[1])
-                        .tweetTypeDescription((String) result[2])
-                        .userIdentifier((String) result[3])
-                        .userUsername((String) result[4])
-                        .userFirstName((String) result[5])
-                        .userProfilePhoto(iAccountsClient.loadProfilePhoto((String) result[6], authorization))
-                        .tweetMessage((String) result[7])
-                        .tweetAttachment((byte[]) result[8])
-                        .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
-                        .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
-                        .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
-                        .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
-                        .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
-                        .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
-                        .originalTweetResponse(null)
-                        .build());
-            });
+            try {
+
+                for (Object[] result : list) {
+                    response.add(TimelineTweetResponse.builder()
+                            .tweetIdentifier((String) result[0])
+                            .originalTweetIdentifier((String) result[1])
+                            .tweetTypeDescription((String) result[2])
+                            .userIdentifier((String) result[3])
+                            .userUsername((String) result[4])
+                            .userFirstName((String) result[5])
+                            .userProfilePhoto(iAccountsClient.loadProfilePhoto((String) result[6], authorization))
+                            .tweetMessage((String) result[7])
+                            .tweetAttachment((byte[]) result[8])
+                            .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
+                            .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
+                            .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
+                            .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
+                            .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
+                            .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
+                            .originalTweetResponse(null)
+                            .build());
+                }
+            } catch (ServerSideErrorException e) {
+                throw new ServerSideErrorException();
+            }
         }
         return response;
     }

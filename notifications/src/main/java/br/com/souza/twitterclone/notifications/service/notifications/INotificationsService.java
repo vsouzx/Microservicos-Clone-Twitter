@@ -4,5 +4,5 @@ import br.com.souza.twitterclone.notifications.dto.notifications.NewNotification
 
 public interface INotificationsService {
 
-    void createNewNotification(NewNotificationRequest request) throws Exception;
+    void createNewNotification(NewNotificationRequest request, String authorization) throws Exception;
 }

@@ -28,8 +28,9 @@ public class PostsDetailsControllerImpl implements IPostsDetailsController {
 
     @GetMapping(value = "/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimelineTweetResponse> getTweetDetails(@PathVariable("tweetIdentifier") String tweetIdentifier,
-                                                                 @RequestHeader("Authorization") String authorization) throws Exception {
-        return new ResponseEntity<>(iPostsDetailsService.getTweetDetails(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, authorization), HttpStatus.OK);
+                                                                 @RequestHeader("Authorization") String authorization,
+                                                                 @RequestParam(value = "load", required = false) Boolean load) throws Exception {
+        return new ResponseEntity<>(iPostsDetailsService.getTweetDetails(FindUserIdentifierHelper.getIdentifier(), tweetIdentifier, authorization, load), HttpStatus.OK);
     }
 
     @GetMapping(value = "/comments/{tweetIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)

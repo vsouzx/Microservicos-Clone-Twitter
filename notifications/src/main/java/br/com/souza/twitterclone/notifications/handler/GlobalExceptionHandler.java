@@ -2,6 +2,7 @@ package br.com.souza.twitterclone.notifications.handler;
 
 import br.com.souza.twitterclone.notifications.dto.handler.CustomErrorResponse;
 import br.com.souza.twitterclone.notifications.handler.exceptions.ErrorCodeException;
+import br.com.souza.twitterclone.notifications.handler.exceptions.ServerErrorException;
 import jakarta.annotation.Resource;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +41,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         return handleExceptionInternal(e, error, headers, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({ServerErrorException.class})
+    private ResponseEntity<Object> handleServerError(Exception e, WebRequest request) {
+        ServerErrorException errorCodeException = (ServerErrorException) e;
+        CustomErrorResponse error = new CustomErrorResponse();
+        error.setError(e.getMessage());
+        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        error.setCode(errorCodeException.getErrorcode().getCode());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return handleExceptionInternal(e, error, headers, HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 
 }

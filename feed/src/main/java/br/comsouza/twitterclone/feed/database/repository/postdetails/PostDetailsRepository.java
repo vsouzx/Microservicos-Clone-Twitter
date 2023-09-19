@@ -2,6 +2,7 @@ package br.comsouza.twitterclone.feed.database.repository.postdetails;
 
 import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.handler.exceptions.ServerSideErrorException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -27,7 +28,7 @@ public class PostDetailsRepository {
         this.iAccountsClient = iAccountsClient;
     }
 
-    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier, String authorization) {
+    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier, String authorization) throws ServerSideErrorException {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");
@@ -75,6 +76,8 @@ public class PostDetailsRepository {
                     .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build();
+        } catch (ServerSideErrorException e) {
+            throw new ServerSideErrorException();
         } catch (Exception e) {
             return null;
         }

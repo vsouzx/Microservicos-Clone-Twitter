@@ -1,4 +1,4 @@
-package br.comsouza.twitterclone.feed.dto.client;
+package br.com.souza.twitterclone.notifications.dto.client;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

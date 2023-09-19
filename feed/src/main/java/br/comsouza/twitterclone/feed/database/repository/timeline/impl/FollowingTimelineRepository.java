@@ -3,6 +3,7 @@ package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.handler.exceptions.ServerSideErrorException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,7 +29,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization) {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier VARCHAR(MAX) = ? ");
@@ -70,7 +71,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         List<TimelineTweetResponse> response = new ArrayList<>();
 
         if (!list.isEmpty()) {
-            list.stream().forEach(result -> {
+            for (Object[] result : list) {
                 response.add(TimelineTweetResponse.builder()
                         .tweetIdentifier((String) result[0])
                         .originalTweetIdentifier((String) result[1])
@@ -88,7 +89,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
                         .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                         .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                         .build());
-            });
+            }
         }
         return response;
     }

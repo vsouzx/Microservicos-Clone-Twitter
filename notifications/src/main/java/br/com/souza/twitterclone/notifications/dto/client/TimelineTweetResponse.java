@@ -1,4 +1,4 @@
-package br.comsouza.twitterclone.feed.dto.posts;
+package br.com.souza.twitterclone.notifications.dto.client;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
