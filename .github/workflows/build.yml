@@ -1,24 +1,17 @@
 name: Build and Push Docker Image
-
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  build-container:
+    name: Build Docker Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: vtsoliveira2001@gmail.com
-          password: Vs368797@
-
-      - name: Build and push Docker image
+        uses: actions/checkout@v1
         run: |
-          docker build -t vsouzx/twitter-configserver --file .\configserver\Dockerfile .
-          docker push vsouzx/twitter-configserver
+          echo "Vs368797" | docker login -u "vtsoliveira2001@gmail.com" --password-stdin
+          docker build -t vsouzx/twitter-configserver:1.0.2 --file .\configserver\Dockerfile .
+          docker push vsouzx/twitter-configserver:1.0.2
