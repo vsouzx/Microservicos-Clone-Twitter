@@ -10,13 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Login to Docker Hub
         run: echo "Vs368797@" | docker login -u "vtsoliveira2001@gmail.com" --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file $GITHUB_WORKSPACE/configserver/Dockerfile .
+        working-directory: Microservicos-Clone-Twitter/configserver
+        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file Dockerfile .
 
       - name: Push Docker Image
         run: docker push vsouzx/twitter-configserver:1.0.2
