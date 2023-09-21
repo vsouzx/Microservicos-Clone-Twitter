@@ -16,8 +16,7 @@ jobs:
         run: echo "Vs368797@" | docker login -u "vtsoliveira2001@gmail.com" --password-stdin
 
       - name: Build Docker Image
-        working-directory: Microservicos-Clone-Twitter/configserver # Muda para o diretório do Dockerfile
-        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file Dockerfile .
+        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file $GITHUB_WORKSPACE/Microservicos-Clone-Twitter/accounts/Dockerfile $GITHUB_WORKSPACE
 
       - name: Push Docker Image
         run: docker push vsouzx/twitter-configserver:1.0.2
