@@ -16,7 +16,7 @@ jobs:
         run: echo "Vs368797@" | docker login -u "vtsoliveira2001@gmail.com" --password-stdin
 
       - name: Build Docker Image
-        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file $GITHUB_WORKSPACE/accounts/Dockerfile .
+        run: docker build -t vsouzx/twitter-configserver:1.0.2 --file $GITHUB_WORKSPACE/configserver/Dockerfile .
 
       - name: Push Docker Image
         run: docker push vsouzx/twitter-configserver:1.0.2
