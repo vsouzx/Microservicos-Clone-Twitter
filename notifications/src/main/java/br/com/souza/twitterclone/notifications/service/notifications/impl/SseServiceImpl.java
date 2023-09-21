@@ -4,6 +4,9 @@ import br.com.souza.twitterclone.notifications.configuration.authorization.Token
 import br.com.souza.twitterclone.notifications.service.notifications.ISseService;
 import br.com.souza.twitterclone.notifications.service.redis.RedisService;
 import br.com.souza.twitterclone.notifications.util.SseEmittersSingleton;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -11,22 +14,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class SseServiceImpl implements ISseService {
 
     private final TokenProvider tokenProvider;
-    private final RedisService redisService;
     private final SseEmittersSingleton sseEmittersSingleton;
     private static final Long EXPIRATION = 600_000L;
+    private static final String EVENT_NAME = "new-notification";
 
-    public SseServiceImpl(TokenProvider tokenProvider,
-                          RedisService redisService) {
+    public SseServiceImpl(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
-        this.redisService = redisService;
         this.sseEmittersSingleton = SseEmittersSingleton.getInstance();
     }
 
     @Override
     public SseEmitter subscribe(String token) {
         if (tokenProvider.validateTokenForEmitter(token)) {
-            String sessionId = tokenProvider.getIdentifierFromToken(token);
-            final String identificador = (String) redisService.getValue(sessionId);
+            String identificador = tokenProvider.getIdentifierFromToken(token);
 
             SseEmitter sseEmitter = instanciarNovoEmitter(identificador);
 
@@ -46,6 +46,26 @@ public class SseServiceImpl implements ISseService {
             return sseEmitter;
         }
         return null;
+    }
+
+    @Override
+    public void notifyFrontend(String userToBeNotified) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.put("status", EVENT_NAME);
+
+        String jsonMessage = objectMapper.writeValueAsString(objectNode);
+
+        SseEmitter emitter = sseEmittersSingleton.get(userToBeNotified);
+        if(emitter != null){
+            try{
+                emitter.send(SseEmitter.event().name(EVENT_NAME).data(jsonMessage));
+                emitter.complete();
+            }catch (Exception e){
+                emitter.completeWithError(e);
+                sseEmittersSingleton.remove(userToBeNotified);
+            }
+        }
     }
 
     private SseEmitter instanciarNovoEmitter(final String identificador) {

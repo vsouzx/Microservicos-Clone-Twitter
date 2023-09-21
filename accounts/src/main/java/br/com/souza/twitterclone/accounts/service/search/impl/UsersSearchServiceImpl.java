@@ -166,6 +166,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
+                .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
@@ -188,6 +189,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(String sessionUserIdentifier, User targetUser) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
+                .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
@@ -210,6 +212,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
+                .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
                 .following(iUsersInteractionsService.getUserFollowsCount(sessionUser, targetUser.getIdentifier()))

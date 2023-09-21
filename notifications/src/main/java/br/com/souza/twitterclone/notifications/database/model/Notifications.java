@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,8 +24,11 @@ public class Notifications {
     @Column(name = "tweet_identifier", length = 50)
     private String tweetIdentifier;
 
-    @Column(name = "user_identifier", length = 50)
-    private String userIdentifier;
+    @Column(name = "user_sender_identifier", length = 36)
+    private String userSenderIdentifier;
+
+    @Column(name = "user_receiver_identifier", length = 36)
+    private String userReceiverIdentifier;
 
     @Column(name = "type_identifier", length = 36)
     private String typeIdentifier;

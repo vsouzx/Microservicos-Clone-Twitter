@@ -7,15 +7,20 @@ import br.com.souza.twitterclone.notifications.database.model.NotificationsTypes
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsRepository;
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsTypesRepository;
 import br.com.souza.twitterclone.notifications.dto.notifications.NewNotificationRequest;
+import br.com.souza.twitterclone.notifications.dto.notifications.NotificationsResponse;
+import br.com.souza.twitterclone.notifications.handler.exceptions.NotificationTypeNotFoundException;
 import br.com.souza.twitterclone.notifications.handler.exceptions.ServerSideErrorException;
 import br.com.souza.twitterclone.notifications.handler.exceptions.TweetNotFoundException;
-import br.com.souza.twitterclone.notifications.handler.exceptions.NotificationTypeNotFoundException;
 import br.com.souza.twitterclone.notifications.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.notifications.service.notifications.INotificationsService;
+import br.com.souza.twitterclone.notifications.service.notifications.ISseService;
 import br.com.souza.twitterclone.notifications.util.UsefulDate;
-import org.springframework.stereotype.Service;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
 
 @Service
 public class NotificationsServiceImpl implements INotificationsService {
@@ -24,15 +29,18 @@ public class NotificationsServiceImpl implements INotificationsService {
     private final INotificationsRepository iNotificationsRepository;
     private final IFeedClient iFeedClient;
     private final IAccountsClient iAccountsClient;
+    private final ISseService iSseService;
 
     public NotificationsServiceImpl(INotificationsTypesRepository iNotificationsTypesRepository,
                                     INotificationsRepository iNotificationsRepository,
                                     IFeedClient iFeedClient,
-                                    IAccountsClient iAccountsClient) {
+                                    IAccountsClient iAccountsClient,
+                                    ISseService iSseService) {
         this.iNotificationsTypesRepository = iNotificationsTypesRepository;
         this.iNotificationsRepository = iNotificationsRepository;
         this.iFeedClient = iFeedClient;
         this.iAccountsClient = iAccountsClient;
+        this.iSseService = iSseService;
     }
 
     @Override
@@ -40,33 +48,57 @@ public class NotificationsServiceImpl implements INotificationsService {
         NotificationsTypes notificationType = iNotificationsTypesRepository.findByDescription(request.getTypeDescription())
                 .orElseThrow(NotificationTypeNotFoundException::new);
 
-        if(request.getTweetIdentifier() != null){
-            try{
+        if (request.getTweetIdentifier() != null) {
+            try {
                 iFeedClient.getTweetDetails(request.getTweetIdentifier(), authorization, false);
-            }catch (ServerSideErrorException e){
+            } catch (ServerSideErrorException e) {
                 throw new ServerSideErrorException();
-            } catch (Exception e){
+            } catch (Exception e) {
                 throw new TweetNotFoundException();
             }
         }
 
         try {
-            iAccountsClient.getUserInfosByIdentifier(request.getUserIdentifier(), authorization);
-        }catch (ServerSideErrorException e){
+            iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier(), authorization);
+        } catch (ServerSideErrorException e) {
             throw new ServerSideErrorException();
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new UserNotFoundException();
         }
 
         iNotificationsRepository.save(Notifications.builder()
                 .identifier(UUID.randomUUID().toString())
                 .tweetIdentifier(request.getTweetIdentifier())
-                .userIdentifier(request.getUserIdentifier())
+                .userSenderIdentifier(request.getUserSenderIdentifier())
+                .userReceiverIdentifier(request.getUserReceiverIdentifier())
                 .typeIdentifier(notificationType.getTypeIdentifier())
                 .visualized(false)
                 .creationDate(UsefulDate.now())
                 .build());
 
-        //TODO: Após criar, notificar via SSE
+        iSseService.notifyFrontend(request.getUserReceiverIdentifier());
+    }
+
+    @Override
+    public List<NotificationsResponse> getUserNotifications(PageRequest request, String authorization, String userIdentifier) throws Exception {
+        List<NotificationsResponse> response = new ArrayList<>();
+        NotificationsTypes notificationsType;
+
+        Page<Notifications> notificationsPage = iNotificationsRepository.findAllByUserReceiverIdentifier(userIdentifier, request);
+
+        for (Notifications notification : notificationsPage.getContent()) {
+            notificationsType = iNotificationsTypesRepository.findById(notification.getTypeIdentifier())
+                    .orElseThrow(() -> new Exception("Notification type not found"));
+
+            response.add(NotificationsResponse.builder()
+                    .notificationIdentifier(notification.getIdentifier())
+                    .typeDescription(notificationsType.getDescription())
+                    .userResponse(iAccountsClient.getUserInfosByIdentifier(notification.getUserSenderIdentifier(), authorization))
+                    .tweetResponse(notification.getTweetIdentifier() != null
+                            ? iFeedClient.getTweetDetails(notification.getTweetIdentifier(), authorization, true)
+                            : null)
+                    .build());
+        }
+        return response;
     }
 }

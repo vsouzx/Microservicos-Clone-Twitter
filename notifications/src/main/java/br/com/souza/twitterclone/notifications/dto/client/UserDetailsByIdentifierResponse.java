@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserDetailsByIdentifierResponse {
 
+    private String userIdentifier;
     private String firstName;
     private String username;
     private Integer following;

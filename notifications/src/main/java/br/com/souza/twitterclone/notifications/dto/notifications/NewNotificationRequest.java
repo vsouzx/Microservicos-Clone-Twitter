@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.notifications.dto.notifications;
 
 import jakarta.validation.constraints.NotNull;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,8 @@ public class NewNotificationRequest {
     @NotNull
     private String typeDescription;
     @NotNull
-    private String userIdentifier;
+    private String userSenderIdentifier;
+    @NotNull
+    private String userReceiverIdentifier;
 
 }

@@ -30,7 +30,10 @@ public class SecurityConfiguration {
             "/v3/api-docs",
             "/v3/api-docs/swagger-config",
             "/swagger-ui.html",
-            "/swagger-ui/*"
+            "/swagger-ui/*",
+            // Server-Sent Event (SSE) Endpoint
+            "/v1/sse/**",
+            "/notifications/v1/sse/**"
     };
 
     @Bean
