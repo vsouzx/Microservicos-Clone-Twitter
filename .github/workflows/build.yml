@@ -20,6 +20,5 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t my-image-name .
-          docker tag my-image-name vsouzx/twitter-configserver:v${VER}
-          docker push vsouzx/my-image-name:v${VER}
+          docker build -t vsouzx/twitter-configserver --file .\configserver\Dockerfile .
+          docker push vsouzx/twitter-configserver
