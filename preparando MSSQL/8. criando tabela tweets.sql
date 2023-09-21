@@ -26,3 +26,6 @@ GO
 ALTER TABLE [tweets]  WITH CHECK ADD  CONSTRAINT [tweets_types_FK] FOREIGN KEY([type])
 REFERENCES [tweets_types] ([type_identifier])
 GO
+
+CREATE NONCLUSTERED INDEX IX_NC_tweets
+ON tweets ([user_identifier]); 

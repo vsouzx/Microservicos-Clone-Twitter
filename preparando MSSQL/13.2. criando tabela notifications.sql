@@ -1,7 +1,8 @@
 CREATE TABLE [notifications](
 	[identifier] uniqueidentifier NOT NULL,
 	[tweet_identifier] uniqueidentifier,
-	[user_identifier] uniqueidentifier NOT NULL,
+	[user_sender_identifier] uniqueidentifier NOT NULL,
+	[user_receiver_identifier] uniqueidentifier NOT NULL,
 	[type_identifier] uniqueidentifier NOT NULL,
 	[visualized] [bit] NOT NULL,
 	[creation_date] [datetime] NOT NULL
@@ -20,6 +21,13 @@ ALTER TABLE [notifications]  WITH CHECK ADD  CONSTRAINT [notifications_tweets_FK
 REFERENCES [notifications_types] ([type_identifier])
 GO
 
-ALTER TABLE [notifications]  WITH CHECK ADD  CONSTRAINT [notifications_tweets_FK3] FOREIGN KEY([user_identifier])
+ALTER TABLE [notifications]  WITH CHECK ADD  CONSTRAINT [notifications_tweets_FK3] FOREIGN KEY([user_sender_identifier])
 REFERENCES [users] ([identifier])
 GO
+
+ALTER TABLE [notifications]  WITH CHECK ADD  CONSTRAINT [notifications_tweets_FK4] FOREIGN KEY([user_receiver_identifier])
+REFERENCES [users] ([identifier])
+GO
+
+CREATE NONCLUSTERED INDEX IX_NC_notifications
+ON notifications ([user_receiver_identifier]); 
