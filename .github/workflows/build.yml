@@ -12,5 +12,5 @@ jobs:
       - name: Checkout code
         run: |
           echo "Vs368797@" | docker login -u "vtsoliveira2001@gmail.com" --password-stdin
-          docker build -t vsouzx/twitter-configserver:1.0.2 --file .\configserver\Dockerfile .
+          docker build -t vsouzx/twitter-configserver:1.0.2 --file /configserver/Dockerfile .
           docker push vsouzx/twitter-configserver:1.0.2
