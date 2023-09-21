@@ -11,6 +11,7 @@ services:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
+    restart: always
   kafka:
     image: wurstmeister/kafka
     ports:
@@ -18,3 +19,17 @@ services:
     environment:
       KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    restart: always
+
+    #### Servico Dozzle (Logs) ##################################################
+  dozzle:
+    image: amir20/dozzle:latest
+    environment:
+      DOZZLE_USERNAME: dev
+      DOZZLE_PASSWORD: admin123
+      DOZZLE_HOSTNAME: "$DOZZLE_HOSTNAME"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 9001:8080
+    restart: always
