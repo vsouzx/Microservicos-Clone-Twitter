@@ -21,7 +21,7 @@ jobs:
       - name: Build and push register app
         uses: docker/build-push-action@v3
         with:
-          context: Microservicos-Clone-Twitter/configserver
+          context: ./
           push: true
           file: ./Dockerfile
           tags: vsouzx/twitter-configserver:1.0.2
