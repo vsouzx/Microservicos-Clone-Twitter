@@ -24,4 +24,4 @@ jobs:
           context: ./
           push: true
           file: ./configserver/Dockerfile
-          tags: vsouzx/twitter-configserver:1.0.2
+          tags: vsouzx/twitter-configserver:1.0.2, vsouzx/twitter-configserver:latest
