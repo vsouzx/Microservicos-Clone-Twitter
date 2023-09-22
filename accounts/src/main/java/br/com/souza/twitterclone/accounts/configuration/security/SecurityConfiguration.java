@@ -27,6 +27,10 @@ public class SecurityConfiguration {
             "/accounts/v1/user/search/isvaliduser",
             "/accounts/v1/user/search/isvalidusername",
             "/accounts/v1/user/search/isvalidemail",
+            "/v1/user/register/**",
+            "/v1/user/search/isvaliduser",
+            "/v1/user/search/isvalidusername",
+            "/v1/user/search/isvalidemail",
             // -- Swagger UI v3 (OpenAPI)
             "/accounts/v3/api-docs",
             "/accounts/v3/api-docs/swagger-config",
