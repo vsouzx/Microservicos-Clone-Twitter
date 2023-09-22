@@ -2,9 +2,7 @@ package br.com.souza.twitterclone.notifications.service.notifications.impl;
 
 import br.com.souza.twitterclone.notifications.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.notifications.service.notifications.ISseService;
-import br.com.souza.twitterclone.notifications.service.redis.RedisService;
 import br.com.souza.twitterclone.notifications.util.SseEmittersSingleton;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.stereotype.Service;
@@ -60,8 +58,7 @@ public class SseServiceImpl implements ISseService {
         if(emitter != null){
             try{
                 emitter.send(SseEmitter.event().name(EVENT_NAME).data(jsonMessage));
-                emitter.complete();
-            }catch (Exception e){
+            }catch (Exception e) {
                 emitter.completeWithError(e);
                 sseEmittersSingleton.remove(userToBeNotified);
             }
@@ -69,14 +66,16 @@ public class SseServiceImpl implements ISseService {
     }
 
     private SseEmitter instanciarNovoEmitter(final String identificador) {
-        SseEmitter sseEmitter = sseEmittersSingleton.get(identificador);
+        sseEmittersSingleton.remove(identificador);
+        SseEmitter sseEmitter = new SseEmitter(EXPIRATION);
+        sseEmittersSingleton.put(identificador, sseEmitter);
 
-        if(sseEmitter == null){
-            sseEmitter = new SseEmitter(EXPIRATION);
+        try {
+            sseEmitter.send(SseEmitter.event().name("OK").data("ok"));
+        } catch (Exception e) {
+            sseEmitter.completeWithError(e);
             sseEmittersSingleton.remove(identificador);
-            sseEmittersSingleton.put(identificador, sseEmitter);
         }
-
         return sseEmitter;
     }
 

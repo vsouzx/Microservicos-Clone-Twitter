@@ -4,7 +4,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public interface ISseService {
 
-    SseEmitter subscribe(String token);
+    SseEmitter subscribe(String token) throws Exception;
 
     void notifyFrontend(String userToBeNotified) throws Exception;
 }
