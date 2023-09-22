@@ -18,10 +18,66 @@ jobs:
           username: vtsoliveira2001@gmail.com
           password: Vs368797@
 
-      - name: Build and push register app
+      - name: Build and push Config Server
         uses: docker/build-push-action@v3
         with:
           context: ./
           push: true
           file: ./configserver/Dockerfile
           tags: vsouzx/twitter-configserver:1.0.2, vsouzx/twitter-configserver:latest
+
+      - name: Build and push Accounts
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./accounts/Dockerfile
+          tags: vsouzx/twitter-accounts:1.0.0, vsouzx/twitter-accounts:latest
+
+      - name: Build and push Authentication
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./authentication/Dockerfile
+          tags: vsouzx/twitter-authentication:1.0.0, vsouzx/twitter-authentication:latest
+
+      - name: Build and push Discovery
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./discovery/Dockerfile
+          tags: vsouzx/twitter-discovery:1.0.0, vsouzx/twitter-discovery:latest
+
+      - name: Build and push Feed
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./feed/Dockerfile
+          tags: vsouzx/twitter-feed:1.0.0, vsouzx/twitter-feed:latest
+
+      - name: Build and push Gateway
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./gateway/Dockerfile
+          tags: vsouzx/twitter-gateway:1.0.0, vsouzx/twitter-gateway:latest
+
+      - name: Build and push Mail Sender
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./mailsender/Dockerfile
+          tags: vsouzx/twitter-mailsender:1.0.0, vsouzx/twitter-mailsender:latest
+
+      - name: Build and push Notifications
+        uses: docker/build-push-action@v3
+        with:
+          context: ./
+          push: true
+          file: ./notifications/Dockerfile
+          tags: vsouzx/twitter-notifications:1.0.0, vsouzx/twitter-notifications:latest

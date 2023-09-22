@@ -1,4 +1,4 @@
-version: '2'
+version: '3.8'
 services:
   redis:
     image: redis:latest
@@ -7,11 +7,13 @@ services:
     hostname: redis
     command: [ "--requirepass 6#3MxH432%eS9ngj" ]
     restart: always
+
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     restart: always
+
   kafka:
     image: wurstmeister/kafka
     ports:
@@ -21,7 +23,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
     restart: always
 
-    #### Servico Dozzle (Logs) ##################################################
   dozzle:
     image: amir20/dozzle:latest
     environment:
@@ -32,4 +33,125 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9001:8080
+    restart: always
+
+  configserver:
+    image: vsouzx/twitter-configserver:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    restart: always
+
+  discovery:
+    image: vsouzx/twitter-discovery:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    restart: always
+
+  gateway:
+    image: vsouzx/twitter-gateway:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+    restart: always
+
+  accounts:
+    image: vsouzx/twitter-accounts:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+      - redis
+      - kafka
+      - zookeeper
+    restart: always
+
+  authentication:
+    image: vsouzx/twitter-authentication:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+#    deploy:
+#      replicas: 1
+#      resources:
+#        limits:
+#          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+      - redis
+      - kafka
+      - zookeeper
+    restart: always
+
+  feed:
+    image: vsouzx/twitter-feed:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+      - redis
+      - kafka
+      - zookeeper
+    restart: always
+
+  mailsender:
+    image: vsouzx/twitter-mailsender:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+      - redis
+      - kafka
+      - zookeeper
+    restart: always
+
+  notifications:
+    image: vsouzx/twitter-notifications:latest
+    environment:
+      - "SPRING_PROFILES_ACTIVE=local"
+    #    deploy:
+    #      replicas: 1
+    #      resources:
+    #        limits:
+    #          memory: 800M
+    depends_on:
+      - configserver
+      - discovery
+      - redis
+      - kafka
+      - zookeeper
     restart: always
