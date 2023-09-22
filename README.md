@@ -16,3 +16,22 @@
 <p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) ✔️ </p>
 <p>Micro Serviço de <b>notificações</b> 🚧 (em andamento) (irá notificar o user em tempo real, quando tiver uma nova curtida, seguidor, retweet ou comentário)</p>
 <p>Micro Serviço de <b>DM</b> 🔜 (os usuários poderão trocar mensagens em tempo real)</p>
+
+
+# Tecnologias utilizadas
+
+<p>Java</p>
+<p>Spring Boot</p>
+<p>Spring Cloud (Arquitetura de microservicos)</p>
+<p>Server-Sent Events (Comunicação em tempo real)</p>
+<p>Mensageria com Apache Kafka</p>
+<p>Banco de dados relacional (MSSQL)</p>
+<p>Redis</p>
+<p>Docker</p>
+<p>Dozzle (Monitoramento dos containers)</p>
+<p>Integração e entrega contínua com Github Actions</p>
+
+# O que falta ser implementado
+
+<p>Deploy na AWS, rodando Docker dentro de uma instancia EC2</p>
+
