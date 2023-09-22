@@ -33,5 +33,7 @@
 
 # O que falta ser implementado
 
+<p>Finalizar o serviço de Notifications</p>
+<p>Finalizar o serviço de DM</p>
 <p>Deploy na AWS, rodando Docker dentro de uma instancia EC2</p>
 
