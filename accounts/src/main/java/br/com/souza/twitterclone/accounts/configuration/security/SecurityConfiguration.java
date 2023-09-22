@@ -24,7 +24,9 @@ public class SecurityConfiguration {
     private static final String[] AUTH_WHITELIST = {
             // URLS liberadas
             "/accounts/v1/user/register/**",
-            "/v1/user/register/**",
+            "/accounts/v1/user/search/isvaliduser",
+            "/accounts/v1/user/search/isvalidusername",
+            "/accounts/v1/user/search/isvalidemail",
             // -- Swagger UI v3 (OpenAPI)
             "/accounts/v3/api-docs",
             "/accounts/v3/api-docs/swagger-config",
