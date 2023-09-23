@@ -6,6 +6,7 @@ import br.com.souza.twitterclone.notifications.database.model.Notifications;
 import br.com.souza.twitterclone.notifications.database.model.NotificationsTypes;
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsRepository;
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsTypesRepository;
+import br.com.souza.twitterclone.notifications.dto.client.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.notifications.dto.notifications.NewNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NotificationsResponse;
 import br.com.souza.twitterclone.notifications.handler.exceptions.NotificationTypeNotFoundException;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -51,8 +53,6 @@ public class NotificationsServiceImpl implements INotificationsService {
         if (request.getTweetIdentifier() != null) {
             try {
                 iFeedClient.getTweetDetails(request.getTweetIdentifier(), authorization, false);
-            } catch (ServerSideErrorException e) {
-                throw new ServerSideErrorException();
             } catch (Exception e) {
                 throw new TweetNotFoundException();
             }
@@ -60,8 +60,6 @@ public class NotificationsServiceImpl implements INotificationsService {
 
         try {
             iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier(), authorization);
-        } catch (ServerSideErrorException e) {
-            throw new ServerSideErrorException();
         } catch (Exception e) {
             throw new UserNotFoundException();
         }
@@ -80,11 +78,11 @@ public class NotificationsServiceImpl implements INotificationsService {
     }
 
     @Override
-    public List<NotificationsResponse> getUserNotifications(PageRequest request, String authorization, String userIdentifier) throws Exception {
+    public List<NotificationsResponse> getUserNotifications(Integer page, Integer size, String authorization, String userIdentifier) throws Exception {
         List<NotificationsResponse> response = new ArrayList<>();
         NotificationsTypes notificationsType;
 
-        Page<Notifications> notificationsPage = iNotificationsRepository.findAllByUserReceiverIdentifier(userIdentifier, request);
+        Page<Notifications> notificationsPage = iNotificationsRepository.findAllByUserReceiverIdentifier(userIdentifier, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "creationDate")));
 
         for (Notifications notification : notificationsPage.getContent()) {
             notificationsType = iNotificationsTypesRepository.findById(notification.getTypeIdentifier())

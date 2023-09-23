@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,8 +31,9 @@ public class UserInteractionsControllerImpl implements IUserInteractionsControll
     }
 
     @PatchMapping(value = "/followtoggle/{identifier}")
-    public ResponseEntity<Void> followToggle(@PathVariable("identifier") String targetIdentifier) throws Exception {
-        iUsersInteractionsService.followToggle(FindUserIdentifierHelper.getIdentifier(), targetIdentifier);
+    public ResponseEntity<Void> followToggle(@PathVariable("identifier") String targetIdentifier,
+                                             @RequestHeader("Authorization") String authorization) throws Exception {
+        iUsersInteractionsService.followToggle(FindUserIdentifierHelper.getIdentifier(), targetIdentifier, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

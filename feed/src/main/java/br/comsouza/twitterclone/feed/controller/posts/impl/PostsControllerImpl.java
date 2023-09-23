@@ -24,7 +24,7 @@ public class PostsControllerImpl implements IPostsController {
         this.iPostsService = iPostsService;
     }
 
-    @PostMapping(value = "/newtweet", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/newtweet")
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
                                              @RequestPart(value = "canBeReplied", required = true) String flag,
                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment,
@@ -33,7 +33,7 @@ public class PostsControllerImpl implements IPostsController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/retweettoggle/{originalTweet}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/retweettoggle/{originalTweet}")
     public ResponseEntity<Void> retweetToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
                                               @RequestPart(value = "attachment", required = false) MultipartFile attachment,
@@ -42,7 +42,7 @@ public class PostsControllerImpl implements IPostsController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/commenttoggle/{originalTweet}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/commenttoggle/{originalTweet}")
     public ResponseEntity<Void> commentToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
                                               @RequestPart(value = "attachment", required = false) MultipartFile attachment,

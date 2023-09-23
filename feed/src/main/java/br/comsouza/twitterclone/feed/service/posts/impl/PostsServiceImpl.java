@@ -12,22 +12,25 @@ import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
 import br.comsouza.twitterclone.feed.database.repository.postdetails.PostResumeRepository;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.enums.NotificationsTypeEnum;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
 import br.comsouza.twitterclone.feed.handler.exceptions.InvalidTweetException;
 import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToCommentException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToLikeException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToRetweetException;
+import br.comsouza.twitterclone.feed.service.client.INotificationsClientService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import br.comsouza.twitterclone.feed.util.UsefulDate;
-import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class PostsServiceImpl implements IPostsService {
 
@@ -39,6 +42,7 @@ public class PostsServiceImpl implements IPostsService {
     private final IAccountsClient iAccountsClient;
     private final PostResumeRepository postResumeRepository;
     private final IPostsMessageTranslatorService messageTranslatorService;
+    private final INotificationsClientService iNotificationsClientService;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
                             ITweetTypeService iTweetTypeService,
@@ -47,7 +51,8 @@ public class PostsServiceImpl implements IPostsService {
                             ITweetsFavsRepository iTweetsFavsRepository,
                             IAccountsClient iAccountsClient,
                             PostResumeRepository postResumeRepository,
-                            IPostsMessageTranslatorService messageTranslatorService) {
+                            IPostsMessageTranslatorService messageTranslatorService,
+                            INotificationsClientService iNotificationsClientService) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
         this.iInteractionsService = iInteractionsService;
@@ -56,15 +61,16 @@ public class PostsServiceImpl implements IPostsService {
         this.iAccountsClient = iAccountsClient;
         this.postResumeRepository = postResumeRepository;
         this.messageTranslatorService = messageTranslatorService;
+        this.iNotificationsClientService = iNotificationsClientService;
     }
 
     @Override
     public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment, String flag, String authorization) throws Exception {
-        final String tweetIdentifier = UUID.randomUUID().toString();
-
         if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
             throw new InvalidTweetException();
         }
+
+        final String tweetIdentifier = UUID.randomUUID().toString();
 
         Tweets tweet = tweetsRepository.save(Tweets.builder()
                 .tweetIdentifier(tweetIdentifier)
@@ -87,7 +93,9 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-        assert tweetUserInfos != null : "User info not found";
+        if(tweetUserInfos == null){
+            throw new Exception("User info not found");
+        }
 
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe() || tweetUserInfos.getPrivateAccount()) {
             throw new UnableToRetweetException();
@@ -113,6 +121,14 @@ public class PostsServiceImpl implements IPostsService {
                                 .build());
 
                         messageTranslatorService.translateMessage(tweet, authorization);
+
+                        iNotificationsClientService.createNewNotification(
+                                sessionUserIdentifier,
+                                originalTweet.getUserIdentifier(),
+                                NotificationsTypeEnum.NEW_RETWEET.toString(),
+                                tweet.getTweetIdentifier(),
+                                authorization
+                        );
                     }catch (Exception e){
                         throw new RuntimeException();
                     }
@@ -127,17 +143,16 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-
-        assert tweetUserInfos != null : "User info not found";
+        if(tweetUserInfos == null){
+            throw new Exception("User info not found");
+        }
 
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
             throw new UnableToCommentException();
         }
-
         if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
             throw new UnableToCommentException();
         }
-
         if (!originalTweet.getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
             throw new UnableToCommentException();
         }
@@ -158,6 +173,14 @@ public class PostsServiceImpl implements IPostsService {
                                 .build());
 
                         messageTranslatorService.translateMessage(tweet, authorization);
+
+                        iNotificationsClientService.createNewNotification(
+                                sessionUserIdentifier,
+                                originalTweet.getUserIdentifier(),
+                                NotificationsTypeEnum.NEW_COMMENT.toString(),
+                                tweet.getTweetIdentifier(),
+                                authorization
+                        );
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -172,13 +195,13 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-
-        assert tweetUserInfos != null : "User info not found";
+        if(tweetUserInfos == null){
+            throw new Exception("User info not found");
+        }
 
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
             throw new UnableToLikeException();
         }
-
         if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
             throw new UnableToLikeException();
         }
@@ -191,11 +214,16 @@ public class PostsServiceImpl implements IPostsService {
                                     .userIdentifier(sessionUserIdentifier)
                                     .build())
                             .build());
+
+                    iNotificationsClientService.createNewNotification(
+                            sessionUserIdentifier,
+                            originalTweet.getUserIdentifier(),
+                            NotificationsTypeEnum.NEW_COMMENT.toString(),
+                            tweetIdentifier,
+                            authorization
+                    );
                 });
-
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
-
-        //iNotificationsClient.createNewNotification(tweetIdentifier, ENUM.NEW_LIKE.toString());
     }
 
     @Override
@@ -204,13 +232,12 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-
-        assert tweetUserInfos != null : "User info not found";
-
+        if(tweetUserInfos == null){
+            throw new Exception("User info not found");
+        }
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
             throw new UnableToLikeException();
         }
-
         if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
             throw new UnableToLikeException();
         }
@@ -225,7 +252,6 @@ public class PostsServiceImpl implements IPostsService {
                             .time(UsefulDate.now())
                             .build());
                 });
-
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 
@@ -256,6 +282,4 @@ public class PostsServiceImpl implements IPostsService {
         }
         return null;
     }
-
-
 }
