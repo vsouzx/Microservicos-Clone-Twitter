@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.service.client;
 
 import br.com.souza.twitterclone.accounts.client.INotificationsClient;
+import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.client.NewNotificationRequest;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -34,5 +35,10 @@ public class NotificationsClientServiceImpl implements INotificationsClientServi
                 }
             }
         }.start();
+    }
+
+    @Override
+    public void deleteNotification(DeleteNotificationRequest request, String authorization) {
+        iNotificationsClient.deleteNotification(request, authorization);
     }
 }

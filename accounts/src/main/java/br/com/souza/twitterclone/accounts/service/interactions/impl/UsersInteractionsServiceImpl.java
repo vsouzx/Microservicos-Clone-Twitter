@@ -16,6 +16,7 @@ import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepos
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
+import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.client.NewNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -79,7 +80,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
             verifyIfIsFollowing(targetUserIdentifier, sessionUserIdentifier)
                     .ifPresent(usersFollowsRepository::delete);
-            ;
 
             verifyIfIsPendingFollowing(targetUserIdentifier, sessionUserIdentifier)
                     .ifPresent(usersPendingFollowsRepository::delete);
@@ -113,6 +113,16 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
         //se o sessionUserIdentifier estiver seguindo o targetUserIdentifier, vai dar unfollow
         if (targetUserIsFollowed.isPresent()) {
+            iNotificationsClientService.deleteNotification(
+                    DeleteNotificationRequest.builder()
+                            .tweetIdentifier(null)
+                            .userSenderIdentifier(sessionUserIdentifier)
+                            .userReceiverIdentifier(targetUserIdentifier)
+                            .typeDescription(NotificationsTypeEnum.NEW_FOLLOWER.toString())
+                            .build(),
+                    authorization
+            );
+
             usersFollowsRepository.delete(targetUserIsFollowed.get());
         } //se o sessionUserIdentifier estiver com solicitação pendente para o targetUserIdentifier, vai cancelar solicitação
         else if (targetUserIsPendingFollowed.isPresent()) {
@@ -254,7 +264,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         List<UserPreviewResponse> response = new ArrayList<>();
 
         if (!followers.isEmpty()) {
-            for(User follower : followers){
+            for (User follower : followers) {
                 response.add(UserPreviewResponse.builder()
                         .username(follower.getUsername())
                         .firstName(follower.getFirstName())

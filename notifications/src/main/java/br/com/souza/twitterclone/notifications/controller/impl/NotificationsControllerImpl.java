@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.notifications.controller.impl;
 
 import br.com.souza.twitterclone.notifications.controller.INotificationsController;
+import br.com.souza.twitterclone.notifications.dto.notifications.DeleteNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NewNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NotificationsResponse;
 import br.com.souza.twitterclone.notifications.service.notifications.INotificationsService;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,5 +45,11 @@ public class NotificationsControllerImpl implements INotificationsController {
                                                                             @RequestParam("page") Integer page,
                                                                             @RequestParam("size") Integer size) throws Exception {
         return new ResponseEntity<>(iNotificationsService.getUserNotifications(page, size, authorization, FindUserIdentifierHelper.getIdentifier()), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteNotification(@RequestBody DeleteNotificationRequest request) throws Exception {
+        iNotificationsService.deleteNotification(request);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

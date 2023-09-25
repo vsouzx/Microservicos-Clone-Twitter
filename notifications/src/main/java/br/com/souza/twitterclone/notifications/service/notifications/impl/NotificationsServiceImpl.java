@@ -7,6 +7,7 @@ import br.com.souza.twitterclone.notifications.database.model.NotificationsTypes
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsRepository;
 import br.com.souza.twitterclone.notifications.database.repository.INotificationsTypesRepository;
 import br.com.souza.twitterclone.notifications.dto.client.UserDetailsByIdentifierResponse;
+import br.com.souza.twitterclone.notifications.dto.notifications.DeleteNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NewNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NotificationsResponse;
 import br.com.souza.twitterclone.notifications.handler.exceptions.NotificationTypeNotFoundException;
@@ -98,5 +99,20 @@ public class NotificationsServiceImpl implements INotificationsService {
                     .build());
         }
         return response;
+    }
+
+    @Override
+    public void deleteNotification(DeleteNotificationRequest request) throws Exception {
+        NotificationsTypes notificationType = iNotificationsTypesRepository.findByDescription(request.getTypeDescription())
+                .orElseThrow(NotificationTypeNotFoundException::new);
+
+        List<Notifications> notifications = iNotificationsRepository.findByUserSenderIdentifierAndUserReceiverIdentifierAndTypeIdentifierAndTweetIdentifier(
+                request.getUserSenderIdentifier(),
+                request.getUserReceiverIdentifier(),
+                notificationType.getTypeIdentifier(),
+                request.getTweetIdentifier()
+        );
+
+        notifications.stream().forEach(iNotificationsRepository::delete);
     }
 }
