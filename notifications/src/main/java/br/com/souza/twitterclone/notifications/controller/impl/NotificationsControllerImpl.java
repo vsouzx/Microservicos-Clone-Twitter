@@ -42,6 +42,6 @@ public class NotificationsControllerImpl implements INotificationsController {
     public ResponseEntity<List<NotificationsResponse>> getUserNotifications(@RequestHeader("Authorization") String authorization,
                                                                             @RequestParam("page") Integer page,
                                                                             @RequestParam("size") Integer size) throws Exception {
-        return new ResponseEntity<>(iNotificationsService.getUserNotifications(PageRequest.of(page, size), authorization, FindUserIdentifierHelper.getIdentifier()), HttpStatus.CREATED);
+        return new ResponseEntity<>(iNotificationsService.getUserNotifications(page, size, authorization, FindUserIdentifierHelper.getIdentifier()), HttpStatus.CREATED);
     }
 }

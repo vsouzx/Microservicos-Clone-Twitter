@@ -1,5 +1,6 @@
 package br.comsouza.twitterclone.feed.dto.client;
 
+import br.comsouza.twitterclone.feed.dto.posts.ProfilePhotoResponse;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,6 @@ public class UserDetailsResponse {
     private LocalDateTime registrationTime;
     private Boolean privateAccount;
     private String languagePreference;
-    private byte[] profilePhoto;
+    private ProfilePhotoResponse profilePhoto;
 
 }

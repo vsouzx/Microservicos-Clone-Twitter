@@ -1,4 +1,4 @@
-package br.com.souza.twitterclone.notifications.enums;
+package br.com.souza.twitterclone.accounts.enums;
 
 public enum NotificationsTypeEnum {
 

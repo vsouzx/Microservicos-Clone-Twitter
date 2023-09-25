@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.accounts.service.interactions.impl;
 
+import br.com.souza.twitterclone.accounts.client.INotificationsClient;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.SilencedUsers;
@@ -15,18 +16,23 @@ import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepos
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
+import br.com.souza.twitterclone.accounts.dto.client.NewNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.enums.NotificationsTypeEnum;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToSilenceException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
+import br.com.souza.twitterclone.accounts.service.client.INotificationsClientService;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
@@ -36,19 +42,22 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final UsersPendingFollowsRepository usersPendingFollowsRepository;
     private final SilencedUsersRepository silencedUsersRepository;
     private final IImagesRepository iImagesRepository;
+    private final INotificationsClientService iNotificationsClientService;
 
     public UsersInteractionsServiceImpl(UserRepository userRepository,
                                         BlockedUsersRepository blockedUsersRepository,
                                         UsersFollowsRepository usersFollowsRepository,
                                         UsersPendingFollowsRepository usersPendingFollowsRepository,
                                         SilencedUsersRepository silencedUsersRepository,
-                                        IImagesRepository iImagesRepository) {
+                                        IImagesRepository iImagesRepository,
+                                        INotificationsClientService iNotificationsClientService) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
         this.usersFollowsRepository = usersFollowsRepository;
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
         this.silencedUsersRepository = silencedUsersRepository;
         this.iImagesRepository = iImagesRepository;
+        this.iNotificationsClientService = iNotificationsClientService;
     }
 
     @Override
@@ -85,7 +94,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public void followToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+    public void followToggle(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
         User targetUser = userRepository.findById(targetUserIdentifier)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -124,6 +133,14 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                 .followedIdentifier(targetUserIdentifier)
                                 .build())
                         .build());
+
+                iNotificationsClientService.createNewNotification(
+                        sessionUserIdentifier,
+                        targetUserIdentifier,
+                        NotificationsTypeEnum.NEW_FOLLOWER.toString(),
+                        null,
+                        authorization
+                );
             }
         }
     }

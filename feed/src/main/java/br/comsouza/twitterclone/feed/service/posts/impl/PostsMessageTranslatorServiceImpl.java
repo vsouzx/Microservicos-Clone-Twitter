@@ -40,15 +40,15 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
     @Override
     public void translateMessage(Tweets tweet, String authorization) throws Exception {
 
-        UserDetailsResponse sessionUser = iAccountsClient.getUserDetails(authorization);
-        if (sessionUser == null) {
-            throw new Exception("User not found");
-        }
-
         new Thread() {
             @SneakyThrows
             @Override
             public void run() {
+                UserDetailsResponse sessionUser = iAccountsClient.getUserDetails(authorization);
+                if (sessionUser == null) {
+                    throw new Exception("User not found");
+                }
+
                 GPTResponse response;
                 try{
                     CoreConfig key = iCoreConfigRepository.findByKeyName(KEY)

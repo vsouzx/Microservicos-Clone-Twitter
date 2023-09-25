@@ -8,5 +8,5 @@ import org.springframework.data.domain.PageRequest;
 public interface INotificationsService {
 
     void createNewNotification(NewNotificationRequest request, String authorization) throws Exception;
-    List<NotificationsResponse> getUserNotifications(PageRequest request, String authorization, String userIdentifier) throws Exception;
+    List<NotificationsResponse> getUserNotifications(Integer page, Integer size, String authorization, String userIdentifier) throws Exception;
 }

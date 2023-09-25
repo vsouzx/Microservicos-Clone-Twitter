@@ -76,8 +76,6 @@ public class PostDetailsRepository {
                     .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build();
-        } catch (ServerSideErrorException e) {
-            throw new ServerSideErrorException();
         } catch (Exception e) {
             return null;
         }
