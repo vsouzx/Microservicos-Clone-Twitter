@@ -218,7 +218,7 @@ public class PostsServiceImpl implements IPostsService {
                     iNotificationsClientService.createNewNotification(
                             sessionUserIdentifier,
                             originalTweet.getUserIdentifier(),
-                            NotificationsTypeEnum.NEW_COMMENT.toString(),
+                            NotificationsTypeEnum.NEW_LIKE.toString(),
                             tweetIdentifier,
                             authorization
                     );

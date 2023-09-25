@@ -1,5 +1,6 @@
 package br.comsouza.twitterclone.feed.dto.client;
 
+import br.comsouza.twitterclone.feed.dto.posts.ProfilePhotoResponse;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,6 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isPendingFollowedByMe;
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
-    private byte[] profilePhoto;
+    private ProfilePhotoResponse profilePhoto;
 
 }

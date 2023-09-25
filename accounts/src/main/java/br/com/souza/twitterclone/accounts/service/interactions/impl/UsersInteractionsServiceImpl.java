@@ -134,7 +134,13 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                 .build())
                         .build());
 
-                iNotificationsClientService.createNewNotification(sessionUserIdentifier, targetUserIdentifier, NotificationsTypeEnum.NEW_FOLLOWER.toString(), null, authorization);
+                iNotificationsClientService.createNewNotification(
+                        sessionUserIdentifier,
+                        targetUserIdentifier,
+                        NotificationsTypeEnum.NEW_FOLLOWER.toString(),
+                        null,
+                        authorization
+                );
             }
         }
     }
