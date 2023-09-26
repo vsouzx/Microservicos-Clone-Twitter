@@ -1,8 +1,9 @@
-package br.com.souza.twitterclone.accounts.service.client;
+package br.com.souza.twitterclone.accounts.service.client.impl;
 
 import br.com.souza.twitterclone.accounts.client.INotificationsClient;
 import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.client.NewNotificationRequest;
+import br.com.souza.twitterclone.accounts.service.client.INotificationsClientService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

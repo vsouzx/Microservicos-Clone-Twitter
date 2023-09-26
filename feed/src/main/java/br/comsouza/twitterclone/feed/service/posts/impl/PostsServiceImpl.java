@@ -10,6 +10,7 @@ import br.comsouza.twitterclone.feed.database.repository.ITweetsFavsRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsLikesRepository;
 import br.comsouza.twitterclone.feed.database.repository.ITweetsRepository;
 import br.comsouza.twitterclone.feed.database.repository.postdetails.PostResumeRepository;
+import br.comsouza.twitterclone.feed.dto.client.DeleteNotificationRequest;
 import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.enums.NotificationsTypeEnum;
@@ -25,6 +26,7 @@ import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorServic
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import br.comsouza.twitterclone.feed.util.UsefulDate;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -93,7 +95,7 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-        if(tweetUserInfos == null){
+        if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
 
@@ -105,35 +107,44 @@ public class PostsServiceImpl implements IPostsService {
                 ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
                 : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
-        iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier)
-                .ifPresentOrElse(tweetsRepository::delete, () -> {
-                    try{
-                        Tweets tweet = tweetsRepository.save(Tweets.builder()
-                                .tweetIdentifier(UUID.randomUUID().toString())
-                                .userIdentifier(sessionUserIdentifier)
-                                .originalTweetIdentifier(originalTweetIdentifier)
-                                .message(message)
-                                .messageTranslations(null)
-                                .type(type)
-                                .publicationTime(UsefulDate.now())
-                                .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
-                                .canBeRepliedByNotFollowedUser(true)
-                                .build());
+        Optional<Tweets> tweetsOptional = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
 
-                        messageTranslatorService.translateMessage(tweet, authorization);
+        if (tweetsOptional.isPresent()) {
+            iNotificationsClientService.deleteNotification(
+                    DeleteNotificationRequest.builder()
+                            .tweetIdentifier(tweetsOptional.get().getTweetIdentifier())
+                            .userSenderIdentifier(sessionUserIdentifier)
+                            .userReceiverIdentifier(originalTweet.getUserIdentifier())
+                            .typeDescription(NotificationsTypeEnum.NEW_RETWEET.toString())
+                            .build(),
+                    authorization
+            );
+            tweetsRepository.delete(tweetsOptional.get());
+        }
 
-                        iNotificationsClientService.createNewNotification(
-                                sessionUserIdentifier,
-                                originalTweet.getUserIdentifier(),
-                                NotificationsTypeEnum.NEW_RETWEET.toString(),
-                                tweet.getTweetIdentifier(),
-                                authorization
-                        );
-                    }catch (Exception e){
-                        throw new RuntimeException();
-                    }
-                });
+        if (tweetsOptional.isEmpty()) {
+            Tweets tweet = tweetsRepository.save(Tweets.builder()
+                    .tweetIdentifier(UUID.randomUUID().toString())
+                    .userIdentifier(sessionUserIdentifier)
+                    .originalTweetIdentifier(originalTweetIdentifier)
+                    .message(message)
+                    .messageTranslations(null)
+                    .type(type)
+                    .publicationTime(UsefulDate.now())
+                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                    .canBeRepliedByNotFollowedUser(true)
+                    .build());
 
+            messageTranslatorService.translateMessage(tweet, authorization);
+
+            iNotificationsClientService.createNewNotification(
+                    sessionUserIdentifier,
+                    originalTweet.getUserIdentifier(),
+                    NotificationsTypeEnum.NEW_RETWEET.toString(),
+                    tweet.getTweetIdentifier(),
+                    authorization
+            );
+        }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
@@ -143,7 +154,7 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-        if(tweetUserInfos == null){
+        if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
 
@@ -157,35 +168,43 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToCommentException();
         }
 
-        iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier)
-                .ifPresentOrElse(tweetsRepository::delete, () -> {
-                    try {
-                        Tweets tweet = tweetsRepository.save(Tweets.builder()
-                                .tweetIdentifier(UUID.randomUUID().toString())
-                                .userIdentifier(sessionUserIdentifier)
-                                .originalTweetIdentifier(originalTweetIdentifier)
-                                .message(message)
-                                .messageTranslations(null)
-                                .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
-                                .publicationTime(UsefulDate.now())
-                                .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
-                                .canBeRepliedByNotFollowedUser(true)
-                                .build());
+        Optional<Tweets> optionalTweet = iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier);
 
-                        messageTranslatorService.translateMessage(tweet, authorization);
+        if (optionalTweet.isPresent()) {
+            iNotificationsClientService.deleteNotification(
+                    DeleteNotificationRequest.builder()
+                            .tweetIdentifier(optionalTweet.get().getTweetIdentifier())
+                            .userSenderIdentifier(sessionUserIdentifier)
+                            .userReceiverIdentifier(optionalTweet.get().getUserIdentifier())
+                            .typeDescription(NotificationsTypeEnum.NEW_COMMENT.toString())
+                            .build(),
+                    authorization);
+            tweetsRepository.delete(optionalTweet.get());
+        }
 
-                        iNotificationsClientService.createNewNotification(
-                                sessionUserIdentifier,
-                                originalTweet.getUserIdentifier(),
-                                NotificationsTypeEnum.NEW_COMMENT.toString(),
-                                tweet.getTweetIdentifier(),
-                                authorization
-                        );
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+        if (optionalTweet.isPresent()) {
+            Tweets tweet = tweetsRepository.save(Tweets.builder()
+                    .tweetIdentifier(UUID.randomUUID().toString())
+                    .userIdentifier(sessionUserIdentifier)
+                    .originalTweetIdentifier(originalTweetIdentifier)
+                    .message(message)
+                    .messageTranslations(null)
+                    .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
+                    .publicationTime(UsefulDate.now())
+                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
+                    .canBeRepliedByNotFollowedUser(true)
+                    .build());
 
+            messageTranslatorService.translateMessage(tweet, authorization);
+
+            iNotificationsClientService.createNewNotification(
+                    sessionUserIdentifier,
+                    originalTweet.getUserIdentifier(),
+                    NotificationsTypeEnum.NEW_COMMENT.toString(),
+                    tweet.getTweetIdentifier(),
+                    authorization
+            );
+        }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
@@ -195,7 +214,7 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-        if(tweetUserInfos == null){
+        if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
 
@@ -206,23 +225,36 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToLikeException();
         }
 
-        iInteractionsService.verifyIsLiked(tweetIdentifier, sessionUserIdentifier)
-                .ifPresentOrElse(iTweetsLikesRepository::delete, () -> {
-                    iTweetsLikesRepository.save(TweetsLikes.builder()
-                            .id(TweetsLikesId.builder()
-                                    .tweetIdentifier(tweetIdentifier)
-                                    .userIdentifier(sessionUserIdentifier)
-                                    .build())
-                            .build());
+        Optional<TweetsLikes> optionalTweetLike = iInteractionsService.verifyIsLiked(tweetIdentifier, sessionUserIdentifier);
 
-                    iNotificationsClientService.createNewNotification(
-                            sessionUserIdentifier,
-                            originalTweet.getUserIdentifier(),
-                            NotificationsTypeEnum.NEW_LIKE.toString(),
-                            tweetIdentifier,
-                            authorization
-                    );
-                });
+        if (optionalTweetLike.isPresent()) {
+            iNotificationsClientService.deleteNotification(
+                    DeleteNotificationRequest.builder()
+                            .tweetIdentifier(tweetIdentifier)
+                            .userSenderIdentifier(sessionUserIdentifier)
+                            .userReceiverIdentifier(originalTweet.getUserIdentifier())
+                            .typeDescription(NotificationsTypeEnum.NEW_LIKE.toString())
+                            .build(),
+                    authorization);
+            iTweetsLikesRepository.delete(optionalTweetLike.get());
+        }
+
+        if(optionalTweetLike.isEmpty()){
+            iTweetsLikesRepository.save(TweetsLikes.builder()
+                    .id(TweetsLikesId.builder()
+                            .tweetIdentifier(tweetIdentifier)
+                            .userIdentifier(sessionUserIdentifier)
+                            .build())
+                    .build());
+
+            iNotificationsClientService.createNewNotification(
+                    sessionUserIdentifier,
+                    originalTweet.getUserIdentifier(),
+                    NotificationsTypeEnum.NEW_LIKE.toString(),
+                    tweetIdentifier,
+                    authorization
+            );
+        }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 
@@ -232,7 +264,7 @@ public class PostsServiceImpl implements IPostsService {
                 .orElseThrow(TweetNotFoundException::new);
 
         UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
-        if(tweetUserInfos == null){
+        if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
         if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
@@ -256,7 +288,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization){
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization) {
         TimelineTweetResponse originalTweet;
 
         post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false, authorization));
@@ -266,7 +298,7 @@ public class PostsServiceImpl implements IPostsService {
         }
     }
 
-    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization){
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization) {
 
         final String mainTweetType = mainTweet.getTweetTypeDescription();
         final String secondaryTweetType = secondaryTweet.getTweetTypeDescription();
