@@ -6,13 +6,18 @@ import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersReposi
 import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
-import br.com.souza.twitterclone.accounts.dto.user.*;
+import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
+import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
+import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
+import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
+import br.com.souza.twitterclone.accounts.dto.user.ValidUserResponse;
+import br.com.souza.twitterclone.accounts.dto.user.ValidUsernameResponse;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import java.util.List;
 import java.util.Optional;
-
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -38,15 +43,15 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public UserDetailsResponse searchUserInfos(String sessionUserIdentifier) throws Exception {
+    public UserDetailsResponse searchUserInfos(String sessionUserIdentifier, String authorization) throws Exception {
         User user = userRepository.findById(sessionUserIdentifier)
                 .orElseThrow(UserNotFoundException::new);
 
         return UserDetailsResponse.builder()
                 .firstName(user.getFirstName())
                 .username(user.getUsername())
-                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, user.getIdentifier()))
-                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, user.getIdentifier()))
+                .following(iUsersInteractionsService.getUserFollowsCount(user.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(user.getIdentifier()))
                 .biography(user.getBiography())
                 .location(user.getLocation())
                 .site(user.getSite())
@@ -54,11 +59,12 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(user.getPrivateAccount())
                 .languagePreference(user.getLanguagePreference())
                 .profilePhoto(user.getProfilePhotoIdentifier() != null ? loadProfilePhoto(user.getProfilePhotoIdentifier()) : null)
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier(), authorization))
                 .build();
     }
 
     @Override
-    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
         User targetUser = userRepository.findById(targetUserIdentifier)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -73,13 +79,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .build()).isPresent();
 
         if (isSessionUserIdentifierBlocked) {
-            return responseSessionUserIdentifierBlocked(sessionUserIdentifier, targetUser, targetUserIdentifierBlocked);
+            return responseSessionUserIdentifierBlocked(targetUser, targetUserIdentifierBlocked, authorization);
         }
         if (targetUserIdentifierBlocked) {
-            return responseTargetUserIdentifierBlocked(sessionUserIdentifier, targetUser);
+            return responseTargetUserIdentifierBlocked(targetUser, authorization);
         }
 
-        return fullResponse(targetUser, sessionUserIdentifier);
+        return fullResponse(targetUser, sessionUserIdentifier, authorization);
     }
 
     @Override
@@ -164,13 +170,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         return null;
     }
 
-    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(String sessionUserIdentifier, User targetUser, boolean isBlockedByMe) throws Exception {
+    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
-                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
+                .following(iUsersInteractionsService.getUserFollowsCount(targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -184,16 +190,17 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(String sessionUserIdentifier, User targetUser) throws Exception {
+    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(User targetUser, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollowsCount(sessionUserIdentifier, targetUser.getIdentifier()))
-                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUserIdentifier, targetUser.getIdentifier()))
+                .following(iUsersInteractionsService.getUserFollowsCount(targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(targetUser.getIdentifier()))
                 .biography(null)
                 .location(null)
                 .site(null)
@@ -207,16 +214,17 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser) throws Exception {
+    private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
                 .username(targetUser.getUsername())
-                .following(iUsersInteractionsService.getUserFollowsCount(sessionUser, targetUser.getIdentifier()))
-                .followers(iUsersInteractionsService.getUserFollowersCount(sessionUser, targetUser.getIdentifier()))
+                .following(iUsersInteractionsService.getUserFollowsCount(targetUser.getIdentifier()))
+                .followers(iUsersInteractionsService.getUserFollowersCount(targetUser.getIdentifier()))
                 .biography(targetUser.getBiography())
                 .location(targetUser.getLocation())
                 .site(targetUser.getSite())
@@ -230,6 +238,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
 }

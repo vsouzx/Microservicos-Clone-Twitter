@@ -22,7 +22,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<UserDetailsResponse> getUserInfos() throws Exception;
+    ResponseEntity<UserDetailsResponse> getUserInfos(String authorization) throws Exception;
 
     @Operation(summary = "Retorna as informações de um usuário pesquisado")
     @ApiResponses(value = {
@@ -31,7 +31,8 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier) throws Exception;
+    ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier,
+                                                                             String authorization) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {

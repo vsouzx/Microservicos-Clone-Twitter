@@ -4,8 +4,8 @@ import br.comsouza.twitterclone.feed.controller.posts.IPostsController;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -63,5 +63,10 @@ public class PostsControllerImpl implements IPostsController {
                                           @RequestHeader("Authorization") String authorization) throws Exception {
         iPostsService.favToggle(tweet, FindUserIdentifierHelper.getIdentifier(), authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/count/{userIdentifier}")
+    public ResponseEntity<Integer> getTweetsCount(@PathVariable(value = "userIdentifier") String userIdentifier){
+        return new ResponseEntity<>(iPostsService.getTweetsCount(userIdentifier), HttpStatus.CREATED);
     }
 }

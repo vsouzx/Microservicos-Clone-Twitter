@@ -55,4 +55,13 @@ public interface IPostsController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<Void> favToggle(String tweet, String authorization) throws Exception;
+
+    @Operation(summary = "Get users tweets count.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Sucesso"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Integer> getTweetsCount(String userIdentifier) throws Exception;
 }

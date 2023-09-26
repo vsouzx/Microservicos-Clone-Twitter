@@ -11,4 +11,5 @@ public interface IPostsService {
     void likeToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception;
     void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception;
     void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization);
+    Integer getTweetsCount(String sessionUserIdentifier);
 }

@@ -1,6 +1,6 @@
 package br.com.souza.twitterclone.accounts.service.interactions.impl;
 
-import br.com.souza.twitterclone.accounts.client.INotificationsClient;
+import br.com.souza.twitterclone.accounts.client.IFeedClient;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.SilencedUsers;
@@ -17,7 +17,6 @@ import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
 import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
-import br.com.souza.twitterclone.accounts.dto.client.NewNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.enums.NotificationsTypeEnum;
@@ -44,6 +43,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final SilencedUsersRepository silencedUsersRepository;
     private final IImagesRepository iImagesRepository;
     private final INotificationsClientService iNotificationsClientService;
+    private final IFeedClient iFeedClient;
 
     public UsersInteractionsServiceImpl(UserRepository userRepository,
                                         BlockedUsersRepository blockedUsersRepository,
@@ -51,7 +51,8 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                         UsersPendingFollowsRepository usersPendingFollowsRepository,
                                         SilencedUsersRepository silencedUsersRepository,
                                         IImagesRepository iImagesRepository,
-                                        INotificationsClientService iNotificationsClientService) {
+                                        INotificationsClientService iNotificationsClientService,
+                                        IFeedClient iFeedClient) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
         this.usersFollowsRepository = usersFollowsRepository;
@@ -59,6 +60,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.silencedUsersRepository = silencedUsersRepository;
         this.iImagesRepository = iImagesRepository;
         this.iNotificationsClientService = iNotificationsClientService;
+        this.iFeedClient = iFeedClient;
     }
 
     @Override
@@ -243,13 +245,13 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public Integer getUserFollowersCount(String sessionUserIdentifier, String targetUserIdentifier) {
+    public Integer getUserFollowersCount(String targetUserIdentifier) {
         List<User> followers = userRepository.findUserFollowers(targetUserIdentifier);
         return followers.size();
     }
 
     @Override
-    public Integer getUserFollowsCount(String sessionUserIdentifier, String user) {
+    public Integer getUserFollowsCount(String user) {
         List<User> followers = userRepository.findUserFollows(user);
         return followers.size();
     }
@@ -258,6 +260,11 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception {
         List<User> followers = userRepository.findSessionUserCommonFollowsWithTargerUser(sessionUser, targetUser);
         return rowMapper(followers, sessionUser);
+    }
+
+    @Override
+    public Integer getTweetsCount(String targetUserIdentifier, String authorization) {
+        return iFeedClient.getTweetsCount(targetUserIdentifier, authorization);
     }
 
     private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier) throws Exception {

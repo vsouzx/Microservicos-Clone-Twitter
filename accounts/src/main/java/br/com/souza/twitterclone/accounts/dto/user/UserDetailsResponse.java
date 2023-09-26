@@ -22,6 +22,7 @@ public class UserDetailsResponse {
     private LocalDateTime registrationTime;
     private Boolean privateAccount;
     private String languagePreference;
+    private Integer tweetsCount;
     private ProfilePhotoResponse profilePhoto;
 
 }

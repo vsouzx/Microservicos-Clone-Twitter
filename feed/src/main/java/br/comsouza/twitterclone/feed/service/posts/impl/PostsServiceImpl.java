@@ -302,6 +302,11 @@ public class PostsServiceImpl implements IPostsService {
         }
     }
 
+    @Override
+    public Integer getTweetsCount(String sessionUserIdentifier) {
+        return tweetsRepository.findAllByUserIdentifier(sessionUserIdentifier).size();
+    }
+
     private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization) {
 
         final String mainTweetType = mainTweet.getTweetTypeDescription();

@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface IUsersSearchService {
 
-    UserDetailsResponse searchUserInfos(String userIdentifier) throws Exception;
-    UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String userIdentifier, String targetUserIdentifier) throws Exception;
+    UserDetailsResponse searchUserInfos(String userIdentifier, String authorization) throws Exception;
+    UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String userIdentifier, String targetUserIdentifier, String authorization) throws Exception;
     List<UserPreviewResponse> getUsersByUsername(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception;
     List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;
     List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception;

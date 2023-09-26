@@ -28,11 +28,12 @@ public interface IUsersInteractionsService {
 
     Optional<SilencedUsers> verifyIfIsSilenced(String silencer, String silenced);
 
-    Integer getUserFollowersCount(String sessionUserIdentifier, String targetUserIdentifier);
+    Integer getUserFollowersCount(String targetUserIdentifier);
 
-    Integer getUserFollowsCount(String sessionUserIdentifier, String targetUserIdentifier);
+    Integer getUserFollowsCount(String targetUserIdentifier);
 
     List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception;
 
+    Integer getTweetsCount(String targetUserIdentifier, String authorization);
 
 }

@@ -30,6 +30,7 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isPendingFollowedByMe;
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
+    private Integer tweetsCount;
     private List<UserPreviewResponse> followersInCommon;
     private ProfilePhotoResponse profilePhoto;
 
