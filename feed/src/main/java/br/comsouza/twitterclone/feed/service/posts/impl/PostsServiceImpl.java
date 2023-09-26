@@ -150,6 +150,10 @@ public class PostsServiceImpl implements IPostsService {
 
     @Override
     public void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
+        if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
+            throw new InvalidTweetException();
+        }
+
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -175,14 +179,14 @@ public class PostsServiceImpl implements IPostsService {
                     DeleteNotificationRequest.builder()
                             .tweetIdentifier(optionalTweet.get().getTweetIdentifier())
                             .userSenderIdentifier(sessionUserIdentifier)
-                            .userReceiverIdentifier(optionalTweet.get().getUserIdentifier())
+                            .userReceiverIdentifier(originalTweet.getUserIdentifier())
                             .typeDescription(NotificationsTypeEnum.NEW_COMMENT.toString())
                             .build(),
                     authorization);
             tweetsRepository.delete(optionalTweet.get());
         }
 
-        if (optionalTweet.isPresent()) {
+        if (optionalTweet.isEmpty()) {
             Tweets tweet = tweetsRepository.save(Tweets.builder()
                     .tweetIdentifier(UUID.randomUUID().toString())
                     .userIdentifier(sessionUserIdentifier)
