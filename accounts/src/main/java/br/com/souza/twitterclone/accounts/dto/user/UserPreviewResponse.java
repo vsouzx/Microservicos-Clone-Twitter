@@ -32,7 +32,7 @@ public class UserPreviewResponse {
         this.isFollowedByMe = false;
         this.isFollowingMe = false;
         this.profilePhoto = user.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier()) : null;
-        this.profilePhoto = user.getBackgroundPhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getBackgroundPhotoIdentifier()) : null;
+        this.backgroundPhoto = user.getBackgroundPhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getBackgroundPhotoIdentifier()) : null;
     }
 
 }
