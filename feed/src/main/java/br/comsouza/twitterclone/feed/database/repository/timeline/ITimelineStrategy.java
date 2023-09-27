@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ITimelineStrategy {
 
-    List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization) throws Exception;
+    List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization, String targetUser);
 }

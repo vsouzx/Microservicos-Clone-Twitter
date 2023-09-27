@@ -21,11 +21,12 @@ public class TimelineControllerImpl implements ITimelineController {
     }
 
     @GetMapping(value = "/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@PathVariable("type") String type,
+    public ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@PathVariable(value = "type", required = true) String type,
+                                                                            @RequestParam(value = "targetUserIdentifier", required = false) String targetUserIdentifier,
                                                                             @RequestParam(value = "page", required = true) Integer page,
                                                                             @RequestParam(value = "size", required = true) Integer size,
                                                                             @RequestHeader("Authorization") String authorization) throws Exception{
-        return new ResponseEntity<>(iTimelineService.getTimeline(FindUserIdentifierHelper.getIdentifier(), page, size, type, authorization), HttpStatus.OK);
+        return new ResponseEntity<>(iTimelineService.getTimeline(FindUserIdentifierHelper.getIdentifier(), page, size, type, authorization, targetUserIdentifier), HttpStatus.OK);
     }
 
 }

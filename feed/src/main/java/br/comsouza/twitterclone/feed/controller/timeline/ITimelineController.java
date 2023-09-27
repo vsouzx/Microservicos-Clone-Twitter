@@ -20,7 +20,8 @@ public interface ITimelineController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@Parameter(description = "Timeline types: 'foryou' or 'following'") String type,
+    ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@Parameter(description = "Timeline types: 'foryou', 'following', 'posts', 'medias', 'replies', 'likes'") String type,
+                                                                     @Parameter(description = "Target user identifier") String targetUserIdentifier,
                                                                      Integer page,
                                                                      Integer size,
                                                                      String authorization) throws Exception;

@@ -21,14 +21,15 @@ public class ForyouTimelineRepository implements ITimelineStrategy {
     private final IAccountsClient iAccountsClient;
 
     public ForyouTimelineRepository(EntityManager em,
-                                    IInteractionsService iInteractionsService, IAccountsClient iAccountsClient) {
+                                    IInteractionsService iInteractionsService,
+                                    IAccountsClient iAccountsClient) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
         this.iAccountsClient = iAccountsClient;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization) throws Exception {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization, String targetUserIdentifier) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier VARCHAR(MAX)  = ? ");
