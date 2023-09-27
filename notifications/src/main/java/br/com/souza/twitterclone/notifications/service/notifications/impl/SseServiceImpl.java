@@ -47,10 +47,11 @@ public class SseServiceImpl implements ISseService {
     }
 
     @Override
-    public void notifyFrontend(String userToBeNotified) throws Exception {
+    public void notifyFrontend(String userToBeNotified, String notificationType, String username) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
-        objectNode.put("status", EVENT_NAME);
+        objectNode.put("type", notificationType);
+        objectNode.put("username", username);
 
         String jsonMessage = objectMapper.writeValueAsString(objectNode);
 

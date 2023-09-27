@@ -6,5 +6,5 @@ public interface ISseService {
 
     SseEmitter subscribe(String token) throws Exception;
 
-    void notifyFrontend(String userToBeNotified) throws Exception;
+    void notifyFrontend(String userToBeNotified, String notificationType, String username) throws Exception;
 }

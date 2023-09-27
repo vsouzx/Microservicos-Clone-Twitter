@@ -59,8 +59,9 @@ public class NotificationsServiceImpl implements INotificationsService {
             }
         }
 
+        UserDetailsByIdentifierResponse user;
         try {
-            iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier(), authorization);
+            user = iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier(), authorization);
         } catch (Exception e) {
             throw new UserNotFoundException();
         }
@@ -75,7 +76,7 @@ public class NotificationsServiceImpl implements INotificationsService {
                 .creationDate(UsefulDate.now())
                 .build());
 
-        iSseService.notifyFrontend(request.getUserReceiverIdentifier());
+        iSseService.notifyFrontend(request.getUserReceiverIdentifier(), request.getTypeDescription(), user.getUsername());
     }
 
     @Override
