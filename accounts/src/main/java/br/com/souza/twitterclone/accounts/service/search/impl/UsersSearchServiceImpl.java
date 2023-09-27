@@ -59,6 +59,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(user.getPrivateAccount())
                 .languagePreference(user.getLanguagePreference())
                 .profilePhoto(user.getProfilePhotoIdentifier() != null ? loadProfilePhoto(user.getProfilePhotoIdentifier()) : null)
+                .backgroundPhoto(user.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(user.getBackgroundPhotoIdentifier()) : null)
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier(), authorization))
                 .build();
     }
@@ -190,6 +191,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
@@ -214,6 +216,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
@@ -238,6 +241,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
+                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }

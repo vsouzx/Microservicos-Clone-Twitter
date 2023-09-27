@@ -21,6 +21,7 @@ public class UserPreviewResponse {
     private Boolean isFollowedByMe;
     private Boolean isFollowingMe;
     private ProfilePhotoResponse profilePhoto;
+    private ProfilePhotoResponse backgroundPhoto;
 
     public UserPreviewResponse(User user, IImagesRepository iImagesRepository) throws Exception {
         this.userIdentifier = user.getIdentifier();
@@ -31,6 +32,7 @@ public class UserPreviewResponse {
         this.isFollowedByMe = false;
         this.isFollowingMe = false;
         this.profilePhoto = user.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier()) : null;
+        this.profilePhoto = user.getBackgroundPhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getBackgroundPhotoIdentifier()) : null;
     }
 
 }

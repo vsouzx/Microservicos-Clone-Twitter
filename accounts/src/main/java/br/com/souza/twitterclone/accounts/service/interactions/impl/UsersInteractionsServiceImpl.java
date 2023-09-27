@@ -269,19 +269,16 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier) throws Exception {
         List<UserPreviewResponse> response = new ArrayList<>();
-
-        if (!followers.isEmpty()) {
-            for (User follower : followers) {
-                response.add(UserPreviewResponse.builder()
-                        .username(follower.getUsername())
-                        .firstName(follower.getFirstName())
-                        .biography(follower.getBiography())
-                        .privateAccount(follower.getPrivateAccount())
-                        .profilePhoto(follower.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, follower.getProfilePhotoIdentifier()) : null)
-                        .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, follower.getIdentifier()).isPresent())
-                        .isFollowingMe(verifyIfIsFollowing(follower.getIdentifier(), sessionUserIdentifier).isPresent())
-                        .build());
-            }
+        for (User follower : followers) {
+            response.add(UserPreviewResponse.builder()
+                    .username(follower.getUsername())
+                    .firstName(follower.getFirstName())
+                    .biography(follower.getBiography())
+                    .privateAccount(follower.getPrivateAccount())
+                    .profilePhoto(follower.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, follower.getProfilePhotoIdentifier()) : null)
+                    .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, follower.getIdentifier()).isPresent())
+                    .isFollowingMe(verifyIfIsFollowing(follower.getIdentifier(), sessionUserIdentifier).isPresent())
+                    .build());
         }
         return response;
     }

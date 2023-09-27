@@ -33,5 +33,5 @@ public class UserDetailsByIdentifierResponse {
     private Integer tweetsCount;
     private List<UserPreviewResponse> followersInCommon;
     private ProfilePhotoResponse profilePhoto;
-
+    private ProfilePhotoResponse backgroundPhoto;
 }

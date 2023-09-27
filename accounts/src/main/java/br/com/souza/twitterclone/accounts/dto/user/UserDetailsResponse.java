@@ -24,5 +24,6 @@ public class UserDetailsResponse {
     private String languagePreference;
     private Integer tweetsCount;
     private ProfilePhotoResponse profilePhoto;
+    private ProfilePhotoResponse backgroundPhoto;
 
 }
