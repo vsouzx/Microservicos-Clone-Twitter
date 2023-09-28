@@ -2,6 +2,7 @@ package br.com.souza.twitterclone.accounts.service.search.impl;
 
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
+import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
@@ -29,17 +30,20 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final BlockedUsersRepository blockedUsersRepository;
     private final IUsersInteractionsService iUsersInteractionsService;
     private final IImagesRepository iImagesRepository;
+    private final AlertedUsersRepository alertedUsersRepository;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
                                   BlockedUsersRepository blockedUsersRepository,
                                   IUsersInteractionsService iUsersInteractionsService,
-                                  IImagesRepository iImagesRepository) {
+                                  IImagesRepository iImagesRepository,
+                                  AlertedUsersRepository alertedUsersRepository) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
         this.iUsersInteractionsService = iUsersInteractionsService;
         this.iImagesRepository = iImagesRepository;
+        this.alertedUsersRepository = alertedUsersRepository;
     }
 
     @Override
@@ -171,6 +175,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         return null;
     }
 
+    @Override
+    public List<String> getAlertedUsers(String sessionUserIdentifier){
+        return alertedUsersRepository.findAllByIdAlertedIdentifier(sessionUserIdentifier).stream()
+                .map(user -> user.getId().getAlerterIdentifier())
+                .toList();
+    }
+
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
@@ -240,6 +251,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(iUsersInteractionsService.verifyIfIsPendingFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
+                .isNotificationsAlertedByMe(iUsersInteractionsService.verifyIfIsAlerted(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
                 .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))

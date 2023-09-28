@@ -50,6 +50,12 @@ public class UserInteractionsControllerImpl implements IUserInteractionsControll
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PatchMapping(value = "/alerttoggle/{identifier}")
+    public ResponseEntity<Void> alertToggle(@PathVariable("identifier") String targetIdentifier) throws Exception {
+        iUsersInteractionsService.alertToggle(FindUserIdentifierHelper.getIdentifier(), targetIdentifier);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @GetMapping(value = "/anyoneisblocked/{identifier}")
     public ResponseEntity<Boolean> anyoneIsBlocked(@PathVariable("identifier") String targetIdentifier) throws Exception {
         return new ResponseEntity<>(iUsersInteractionsService.anyoneIsBlocked(FindUserIdentifierHelper.getIdentifier(), targetIdentifier), HttpStatus.CREATED);

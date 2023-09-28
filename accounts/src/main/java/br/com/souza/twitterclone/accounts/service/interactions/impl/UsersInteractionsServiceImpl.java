@@ -1,6 +1,8 @@
 package br.com.souza.twitterclone.accounts.service.interactions.impl;
 
 import br.com.souza.twitterclone.accounts.client.IFeedClient;
+import br.com.souza.twitterclone.accounts.database.model.AlertedUsers;
+import br.com.souza.twitterclone.accounts.database.model.AlertedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.SilencedUsers;
@@ -10,6 +12,7 @@ import br.com.souza.twitterclone.accounts.database.model.UsersFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersFollowsId;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollowsId;
+import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepository;
@@ -21,6 +24,7 @@ import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.enums.NotificationsTypeEnum;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
+import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToAlertException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToFollowException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToSilenceException;
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
@@ -41,6 +45,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final UsersFollowsRepository usersFollowsRepository;
     private final UsersPendingFollowsRepository usersPendingFollowsRepository;
     private final SilencedUsersRepository silencedUsersRepository;
+    private final AlertedUsersRepository alertedUsersRepository;
     private final IImagesRepository iImagesRepository;
     private final INotificationsClientService iNotificationsClientService;
     private final IFeedClient iFeedClient;
@@ -50,6 +55,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                         UsersFollowsRepository usersFollowsRepository,
                                         UsersPendingFollowsRepository usersPendingFollowsRepository,
                                         SilencedUsersRepository silencedUsersRepository,
+                                        AlertedUsersRepository alertedUsersRepository,
                                         IImagesRepository iImagesRepository,
                                         INotificationsClientService iNotificationsClientService,
                                         IFeedClient iFeedClient) {
@@ -58,6 +64,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.usersFollowsRepository = usersFollowsRepository;
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
         this.silencedUsersRepository = silencedUsersRepository;
+        this.alertedUsersRepository = alertedUsersRepository;
         this.iImagesRepository = iImagesRepository;
         this.iNotificationsClientService = iNotificationsClientService;
         this.iFeedClient = iFeedClient;
@@ -202,6 +209,38 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
+    public void alertToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+        userRepository.findById(targetUserIdentifier)
+                .orElseThrow(UserNotFoundException::new);
+
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        if (targetUserIsBlocked.isPresent()) {
+            throw new UnableToFollowException();
+        }
+
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        if (sessionUserIsBlocked.isPresent()) {
+            throw new UnableToFollowException();
+        }
+
+        verifyIfIsFollowing(sessionUserIdentifier, targetUserIdentifier)
+                .orElseThrow(UnableToAlertException::new);
+
+        Optional<AlertedUsers> targetUserIsAlerted = verifyIfIsAlerted(sessionUserIdentifier, targetUserIdentifier);
+
+        if (targetUserIsAlerted.isPresent()) {
+            alertedUsersRepository.delete(targetUserIsAlerted.get());
+        } else {
+            alertedUsersRepository.save(AlertedUsers.builder()
+                    .id(AlertedUsersId.builder()
+                            .alerterIdentifier(sessionUserIdentifier)
+                            .alertedIdentifier(targetUserIdentifier)
+                            .build())
+                    .build());
+        }
+    }
+
+    @Override
     public Boolean anyoneIsBlocked(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         userRepository.findById(targetUserIdentifier)
                 .orElseThrow(UserNotFoundException::new);
@@ -241,6 +280,14 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         return silencedUsersRepository.findById(SilencedUsersId.builder()
                 .silencerIdentifier(silencer)
                 .silencedIdentifier(silenced)
+                .build());
+    }
+
+    @Override
+    public Optional<AlertedUsers> verifyIfIsAlerted(String follower, String followed) {
+        return alertedUsersRepository.findById(AlertedUsersId.builder()
+                .alerterIdentifier(follower)
+                .alertedIdentifier(followed)
                 .build());
     }
 

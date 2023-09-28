@@ -87,6 +87,8 @@ public class PostsServiceImpl implements IPostsService {
                 .build());
 
         messageTranslatorService.translateMessage(tweet, authorization);
+
+        iNotificationsClientService.notifyAlerters(sessionUserIdentifier, NotificationsTypeEnum.NEW_POST.toString(), tweet.getTweetIdentifier(), authorization);
     }
 
     @Override

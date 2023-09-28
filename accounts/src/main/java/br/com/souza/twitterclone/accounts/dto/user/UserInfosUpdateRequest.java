@@ -20,5 +20,4 @@ public class UserInfosUpdateRequest {
     private String location;
     private String site;
 
-
 }

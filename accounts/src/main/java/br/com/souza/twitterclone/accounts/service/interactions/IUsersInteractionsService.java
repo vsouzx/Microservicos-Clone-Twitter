@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.accounts.service.interactions;
 
+import br.com.souza.twitterclone.accounts.database.model.AlertedUsers;
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsers;
 import br.com.souza.twitterclone.accounts.database.model.SilencedUsers;
 import br.com.souza.twitterclone.accounts.database.model.UsersFollows;
@@ -18,6 +19,8 @@ public interface IUsersInteractionsService {
 
     void silencetoggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
 
+    void alertToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
+
     Boolean anyoneIsBlocked(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
 
     Optional<UsersFollows> verifyIfIsFollowing(String follower, String followed);
@@ -27,6 +30,8 @@ public interface IUsersInteractionsService {
     Optional<BlockedUsers> verifyIfIsBlocked(String blocker, String blocked);
 
     Optional<SilencedUsers> verifyIfIsSilenced(String silencer, String silenced);
+
+    Optional<AlertedUsers> verifyIfIsAlerted(String silencer, String silenced);
 
     Integer getUserFollowersCount(String targetUserIdentifier);
 

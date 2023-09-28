@@ -17,4 +17,5 @@ public interface IUsersSearchService {
     ValidUserResponse isValidUser(String username);
     List<UserPreviewResponse> getVerified();
     ProfilePhotoResponse loadProfilePhoto(String photoIdentifier) throws Exception;
+    List<String> getAlertedUsers(String sessionUserIdentifier) throws Exception;
 }

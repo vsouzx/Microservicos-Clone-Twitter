@@ -90,4 +90,8 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.loadProfilePhoto(profilePhotoIdentifier), HttpStatus.OK);
     }
 
+    @GetMapping(value = "/alertedusers", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> getAlertedUsers() throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getAlertedUsers(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
+    }
 }

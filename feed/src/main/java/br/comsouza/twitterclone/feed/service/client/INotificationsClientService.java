@@ -7,4 +7,5 @@ public interface INotificationsClientService {
     void createNewNotification(String userSender, String userReceiver, String tweetType, String tweetIdentifier, String authorization);
 
     void deleteNotification(DeleteNotificationRequest request, String authorization);
+    void notifyAlerters(String userSender, String tweetType, String tweetIdentifier, String authorization);
 }

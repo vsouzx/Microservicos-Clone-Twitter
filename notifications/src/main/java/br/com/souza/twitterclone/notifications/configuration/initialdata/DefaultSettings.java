@@ -53,6 +53,14 @@ public class DefaultSettings {
                     .description(NotificationsTypeEnum.NEW_RETWEET.toString())
                     .build());
         }
+
+        Optional<NotificationsTypes> newPostType = iNotificationsTypesRepository.findByDescription(NotificationsTypeEnum.NEW_POST.toString());
+        if(newPostType.isEmpty()){
+            iNotificationsTypesRepository.save(NotificationsTypes.builder()
+                    .typeIdentifier(UUID.randomUUID().toString())
+                    .description(NotificationsTypeEnum.NEW_POST.toString())
+                    .build());
+        }
     }
 
 }
