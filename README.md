@@ -14,16 +14,16 @@
 <p>Micro Serviço de <b>gerenciamento de contas</b> (Criar conta, seguir/bloquear/silenciar outra conta, deixar a conta privada)✔️</p>
 <p>Micro Serviço de <b>email </b>(sendo um Consumer Kafka) ✔️</p>
 <p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) ✔️ </p>
-<p>Micro Serviço de <b>notificações</b> 🚧 (em andamento) (irá notificar o user em tempo real, quando tiver uma nova curtida, seguidor, retweet ou comentário)</p>
-<p>Micro Serviço de <b>DM</b> 🔜 (os usuários poderão trocar mensagens em tempo real)</p>
-
+<p>Micro Serviço de <b>notificações</b> ✔️ (Server-Sent Events)</p>
+<p>Micro Serviço de <b>DM (Chat)</b> 🔜 (Websocket)</p>
 
 # Tecnologias utilizadas
 
 <p>Java</p>
 <p>Spring Boot</p>
 <p>Spring Cloud (Arquitetura de microservicos)</p>
-<p>Server-Sent Events (Comunicação em tempo real)</p>
+<p>Server-Sent Events (Notificações em tempo real)</p>
+<p>Websockets (Chat em tempo real)</p>
 <p>Mensageria com Apache Kafka</p>
 <p>Banco de dados relacional (MSSQL)</p>
 <p>Redis</p>
@@ -33,7 +33,6 @@
 
 # O que falta ser implementado
 
-<p>Finalizar o serviço de Notifications</p>
 <p>Finalizar o serviço de DM</p>
 <p>Deploy na AWS, rodando Docker dentro de uma instancia EC2</p>
 

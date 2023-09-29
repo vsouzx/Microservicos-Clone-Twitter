@@ -59,6 +59,7 @@ public class SseServiceImpl implements ISseService {
         if(emitter != null){
             try{
                 emitter.send(SseEmitter.event().name(EVENT_NAME).data(jsonMessage));
+                emitter.complete();
             }catch (Exception e) {
                 emitter.completeWithError(e);
                 sseEmittersSingleton.remove(userToBeNotified);
