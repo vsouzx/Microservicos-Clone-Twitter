@@ -34,7 +34,7 @@ public class NotificationsControllerImpl implements INotificationsController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createNewNotification(@Valid @RequestBody NewNotificationRequest request,
+    public ResponseEntity<Void> createNewNotification(@RequestBody NewNotificationRequest request,
                                                       @RequestHeader("Authorization") String authorization) throws Exception {
         iNotificationsService.createNewNotification(request, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
