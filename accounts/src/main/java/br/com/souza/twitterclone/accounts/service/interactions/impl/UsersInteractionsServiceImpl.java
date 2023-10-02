@@ -14,13 +14,11 @@ import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollows;
 import br.com.souza.twitterclone.accounts.database.model.UsersPendingFollowsId;
 import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
-import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
 import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
-import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.enums.NotificationsTypeEnum;
 import br.com.souza.twitterclone.accounts.handler.exceptions.NonexistentPendingFollowException;
@@ -46,7 +44,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final UsersPendingFollowsRepository usersPendingFollowsRepository;
     private final SilencedUsersRepository silencedUsersRepository;
     private final AlertedUsersRepository alertedUsersRepository;
-    private final IImagesRepository iImagesRepository;
     private final INotificationsClientService iNotificationsClientService;
     private final IFeedClient iFeedClient;
 
@@ -56,7 +53,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                         UsersPendingFollowsRepository usersPendingFollowsRepository,
                                         SilencedUsersRepository silencedUsersRepository,
                                         AlertedUsersRepository alertedUsersRepository,
-                                        IImagesRepository iImagesRepository,
                                         INotificationsClientService iNotificationsClientService,
                                         IFeedClient iFeedClient) {
         this.userRepository = userRepository;
@@ -65,7 +61,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.usersPendingFollowsRepository = usersPendingFollowsRepository;
         this.silencedUsersRepository = silencedUsersRepository;
         this.alertedUsersRepository = alertedUsersRepository;
-        this.iImagesRepository = iImagesRepository;
         this.iNotificationsClientService = iNotificationsClientService;
         this.iFeedClient = iFeedClient;
     }
@@ -322,7 +317,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                     .firstName(follower.getFirstName())
                     .biography(follower.getBiography())
                     .privateAccount(follower.getPrivateAccount())
-                    .profilePhoto(follower.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, follower.getProfilePhotoIdentifier()) : null)
+                    .profilePhotoUrl(follower.getProfilePhotoUrl())
                     .isFollowedByMe(verifyIfIsFollowing(sessionUserIdentifier, follower.getIdentifier()).isPresent())
                     .isFollowingMe(verifyIfIsFollowing(follower.getIdentifier(), sessionUserIdentifier).isPresent())
                     .build());

@@ -15,8 +15,8 @@ CREATE TABLE users(
 	[registration_time] [datetime] NOT NULL,
 	[private_account] [bit] NOT NULL,
 	[language_preference] [varchar](10),
-	[profile_photo_identifier] [uniqueidentifier],
-	[background_photo_identifier] [uniqueidentifier],
+	[profile_photo_url] [varchar](MAX),
+	[background_photo_url] [varchar](MAX),
 	[first_access] [BIT] NOT NULL,
 	[verified] [BIT] NOT NULL
 PRIMARY KEY CLUSTERED 
@@ -26,14 +26,6 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [users]  WITH CHECK ADD  CONSTRAINT [users_images_FK] FOREIGN KEY([profile_photo_identifier])
-REFERENCES [images] ([identifier])
-GO
-
-ALTER TABLE [users]  WITH CHECK ADD  CONSTRAINT [users_images_FK2] FOREIGN KEY([background_photo_identifier])
-REFERENCES [images] ([identifier])
-GO
-
 INSERT users
 SELECT NEWID() -- identifier
 	  ,'Vinicius' -- First Name
@@ -41,7 +33,7 @@ SELECT NEWID() -- identifier
 	  ,'vnsoliveira2512@gmail.com' -- email
 	  ,'vincius123' -- username
 	  ,'FRONTEND DEV' --biography
-	  ,'São Paulo, Brazil' --location
+	  ,'Sï¿½o Paulo, Brazil' --location
 	  ,'https://youtube.com.br' --site
 	  ,'$2a$10$hMD0AWnJ.Vu0NrGZXkudDepOJxCCmRoxJQOQg6uvGuAz50J9pYZ92' --password
 	  ,1 --confirmed email  (true false)

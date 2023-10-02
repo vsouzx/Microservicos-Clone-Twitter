@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.accounts.service.infos;
 
+import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserEmailUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserInfosUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPasswordUpdateRequest;
@@ -19,9 +20,9 @@ public interface IUsersInfosService {
 
     void updateUserPrivacy(UserPrivacyUpdateRequest request, String identifier) throws Exception;
 
-    void updateProfilePhoto(MultipartFile file, String identifier, Integer xPosition, Integer yPosition) throws Exception;
+    void updateProfilePhoto(ImageUpdateRequest request, String identifier) throws Exception;
 
-    void updateBackgroundPhoto(MultipartFile file, String identifier, Integer xPosition, Integer yPosition) throws Exception;
+    void updateBackgroundPhoto(ImageUpdateRequest request, String identifier) throws Exception;
 
     void updateFirstAccessFlag(String identifier) throws Exception;
 }

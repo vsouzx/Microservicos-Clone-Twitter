@@ -33,6 +33,6 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isNotificationsAlertedByMe;
     private Integer tweetsCount;
     private List<UserPreviewResponse> followersInCommon;
-    private ProfilePhotoResponse profilePhoto;
-    private ProfilePhotoResponse backgroundPhoto;
+    private String profilePhotoUrl;
+    private String backgroundPhotoUrl;
 }

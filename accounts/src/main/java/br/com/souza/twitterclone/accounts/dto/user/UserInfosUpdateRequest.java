@@ -14,10 +14,10 @@ public class UserInfosUpdateRequest {
 
     @NotNull
     private String firstName;
-    @NotNull
-    private String lastName;
     private String biography;
     private String location;
     private String site;
+    private String profilePhotoUrl;
+    private String backgroundPhotoUrl;
 
 }

@@ -13,6 +13,7 @@
         <module name="discovery" />
         <module name="configserver" />
         <module name="accounts" />
+        <module name="Microservicos-Clone-Twitter" />
         <module name="gateway" />
         <module name="notifications" />
         <module name="authentication" />
@@ -26,6 +27,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Microservicos-Clone-Twitter" options="-parameters" />
       <module name="accounts" options="-parameters" />
       <module name="authentication" options="-parameters" />
       <module name="configserver" options="-parameters" />

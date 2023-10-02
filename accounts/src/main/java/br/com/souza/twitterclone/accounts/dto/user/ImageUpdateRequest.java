@@ -12,10 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ImageUpdateRequest {
 
-    @NotNull
-    private String xPosition;
-
-    @NotNull
-    private String yPosition;
+    private String imageUrl;
 
 }

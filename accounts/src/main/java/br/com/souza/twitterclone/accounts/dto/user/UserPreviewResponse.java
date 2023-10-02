@@ -1,7 +1,6 @@
 package br.com.souza.twitterclone.accounts.dto.user;
 
 import br.com.souza.twitterclone.accounts.database.model.User;
-import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +19,10 @@ public class UserPreviewResponse {
     private Boolean privateAccount;
     private Boolean isFollowedByMe;
     private Boolean isFollowingMe;
-    private ProfilePhotoResponse profilePhoto;
-    private ProfilePhotoResponse backgroundPhoto;
+    private String profilePhotoUrl;
+    private String backgroundPhotoUrl;
 
-    public UserPreviewResponse(User user, IImagesRepository iImagesRepository) throws Exception {
+    public UserPreviewResponse(User user) throws Exception {
         this.userIdentifier = user.getIdentifier();
         this.firstName = user.getFirstName();
         this.username = user.getUsername();
@@ -31,8 +30,8 @@ public class UserPreviewResponse {
         this.privateAccount = user.getPrivateAccount();
         this.isFollowedByMe = false;
         this.isFollowingMe = false;
-        this.profilePhoto = user.getProfilePhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getProfilePhotoIdentifier()) : null;
-        this.backgroundPhoto = user.getBackgroundPhotoIdentifier() != null ? new ProfilePhotoResponse(iImagesRepository, user.getBackgroundPhotoIdentifier()) : null;
+        this.profilePhotoUrl = user.getProfilePhotoUrl();
+        this.backgroundPhotoUrl = user.getBackgroundPhotoUrl();
     }
 
 }

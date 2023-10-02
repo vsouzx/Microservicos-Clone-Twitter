@@ -1,7 +1,5 @@
 package br.com.souza.twitterclone.accounts.database.repository.impl;
 
-import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
-import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,13 +11,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UsersRepositoryImpl {
 
-    private final IImagesRepository iImagesRepository;
     @PersistenceContext
     private final EntityManager em;
 
-    public UsersRepositoryImpl(IImagesRepository iImagesRepository,
-                               EntityManager em) {
-        this.iImagesRepository = iImagesRepository;
+    public UsersRepositoryImpl(EntityManager em) {
         this.em = em;
     }
 
@@ -37,7 +32,7 @@ public class UsersRepositoryImpl {
         sb.append("	  ,u.private_account ");
         sb.append("   ,CONVERT(BIT, IIF(f.followed_identifier IS NOT NULL, 1, 0)) isFollowedBySessionUser ");
         sb.append("   ,CONVERT(BIT, IIF(f2.followed_identifier IS NOT NULL, 1, 0)) isFollowingSessionUser ");
-        sb.append("	  ,u.profile_photo_identifier ");
+        sb.append("	  ,u.profile_photo_url ");
         sb.append("FROM Users u  ");
         sb.append("LEFT JOIN users_follows f  ");
         sb.append("  ON f.follower_identifier = @sessionUser ");
@@ -72,7 +67,7 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
+                    .profilePhotoUrl((String) result[6])
                     .build());
         }
 
@@ -93,7 +88,7 @@ public class UsersRepositoryImpl {
         sb.append("				,u.private_account  ");
         sb.append("				,CONVERT(BIT, IIF(uf.followed_identifier IS NOT NULL, 1, 0))	isFollowedBySessionUser  ");
         sb.append("				,CONVERT(BIT, IIF(uf2.followed_identifier IS NOT NULL, 1, 0))	isFollowingSessionUser   ");
-        sb.append("				,profile_photo  ");
+        sb.append("				,u.profile_photo_url  ");
         sb.append("FROM users u    ");
         sb.append("INNER JOIN users_follows f    ");
         sb.append("	ON f.followed_identifier = @targetUser   ");
@@ -128,7 +123,7 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
+                    .profilePhotoUrl((String) result[6])
                     .build());
         }
 
@@ -149,7 +144,7 @@ public class UsersRepositoryImpl {
         sb.append("				,u.private_account  ");
         sb.append("				,IIF(uf.followed_identifier IS NOT NULL, 1, 0)	isFollowedBySessionUser  ");
         sb.append("				,IIF(uf2.followed_identifier IS NOT NULL, 1, 0) isFollowingSessionUser   ");
-        sb.append("				,profile_photo  ");
+        sb.append("				,u.profile_photo_url  ");
         sb.append("FROM users u    ");
         sb.append("INNER JOIN users_follows f    ");
         sb.append("	ON f.followed_identifier = u.identifier    ");
@@ -184,7 +179,7 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
+                    .profilePhotoUrl((String) result[6])
                     .build());
         }
 
@@ -203,7 +198,7 @@ public class UsersRepositoryImpl {
         sb.append("				,u.biography   ");
         sb.append("				,u.private_account   ");
         sb.append("				,IIF(uf.followed_identifier IS NOT NULL, 1, 0)	isFollowedBySessionUser   ");
-        sb.append("				,profile_photo   ");
+        sb.append("				,u.profile_photo_url   ");
         sb.append("FROM users u     ");
         sb.append("INNER JOIN users_pending_follows f     ");
         sb.append("	ON f.pending_followed_identifier = @sessionUser ");
@@ -234,7 +229,7 @@ public class UsersRepositoryImpl {
                     .privateAccount((Boolean) result[3])
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
-                    .profilePhoto(result[6] != null ? new ProfilePhotoResponse(iImagesRepository, (String) result[6]) : null)
+                    .profilePhotoUrl((String) result[6])
                     .build());
         }
 

@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.controller.infos.impl;
 
 import br.com.souza.twitterclone.accounts.controller.infos.IUserInfosController;
+import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserEmailUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserInfosUpdateRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPasswordUpdateRequest;
@@ -61,19 +62,15 @@ public class UserInfosControllerImpl implements IUserInfosController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/profilephoto/{xposition}/{yposition}", consumes = {"multipart/form-data"})
-    public ResponseEntity<Void> updateProfilePhoto(@RequestPart("profilePhoto") MultipartFile file,
-                                                   @PathVariable("xposition") Integer xPosition,
-                                                   @PathVariable("yposition") Integer yPosition) throws Exception {
-        iUsersInfosService.updateProfilePhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
+    @PatchMapping(value = "/profilephoto", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateProfilePhoto(@RequestBody ImageUpdateRequest request) throws Exception {
+        iUsersInfosService.updateProfilePhoto(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PatchMapping(value = "/backgroundphoto/{xposition}/{yposition}", consumes = {"multipart/form-data"})
-    public ResponseEntity<Void> updateBackgroundPhoto(@RequestPart("backgroundPhoto") MultipartFile file,
-                                                      @PathVariable("xposition") Integer xPosition,
-                                                      @PathVariable("yposition") Integer yPosition) throws Exception {
-        iUsersInfosService.updateBackgroundPhoto(file, FindUserIdentifierHelper.getIdentifier(), xPosition, yPosition);
+    @PatchMapping(value = "/backgroundphoto", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> updateBackgroundPhoto(@RequestBody ImageUpdateRequest request) throws Exception {
+        iUsersInfosService.updateBackgroundPhoto(request, FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

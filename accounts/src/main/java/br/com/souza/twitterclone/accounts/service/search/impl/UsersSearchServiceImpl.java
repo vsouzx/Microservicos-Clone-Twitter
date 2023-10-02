@@ -4,10 +4,8 @@ import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
-import br.com.souza.twitterclone.accounts.database.repository.IImagesRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
-import br.com.souza.twitterclone.accounts.dto.user.ProfilePhotoResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -29,20 +27,17 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final UsersRepositoryImpl usersRepositoryImpl;
     private final BlockedUsersRepository blockedUsersRepository;
     private final IUsersInteractionsService iUsersInteractionsService;
-    private final IImagesRepository iImagesRepository;
     private final AlertedUsersRepository alertedUsersRepository;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
                                   BlockedUsersRepository blockedUsersRepository,
                                   IUsersInteractionsService iUsersInteractionsService,
-                                  IImagesRepository iImagesRepository,
                                   AlertedUsersRepository alertedUsersRepository) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
         this.iUsersInteractionsService = iUsersInteractionsService;
-        this.iImagesRepository = iImagesRepository;
         this.alertedUsersRepository = alertedUsersRepository;
     }
 
@@ -62,8 +57,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .registrationTime(user.getRegistrationTime())
                 .privateAccount(user.getPrivateAccount())
                 .languagePreference(user.getLanguagePreference())
-                .profilePhoto(user.getProfilePhotoIdentifier() != null ? loadProfilePhoto(user.getProfilePhotoIdentifier()) : null)
-                .backgroundPhoto(user.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(user.getBackgroundPhotoIdentifier()) : null)
+                .profilePhotoUrl(user.getProfilePhotoUrl())
+                .backgroundPhotoUrl(user.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier(), authorization))
                 .build();
     }
@@ -159,20 +154,12 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         return userRepository.findAllByVerified(true).stream()
                 .map(u -> {
                     try {
-                        return new UserPreviewResponse(u, iImagesRepository);
+                        return new UserPreviewResponse(u);
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 })
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public ProfilePhotoResponse loadProfilePhoto(String photoIdentifier) throws Exception {
-        if (photoIdentifier != null){
-            return new ProfilePhotoResponse(iImagesRepository, photoIdentifier);
-        }
-        return null;
     }
 
     @Override
@@ -201,8 +188,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
-                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
+                .profilePhotoUrl(targetUser.getProfilePhotoUrl())
+                .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
@@ -226,8 +213,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
                 .isSilencedByMe(false)
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
-                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
+                .profilePhotoUrl(targetUser.getProfilePhotoUrl())
+                .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
@@ -252,8 +239,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())
                 .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUser, targetUser.getIdentifier()).isPresent())
                 .isNotificationsAlertedByMe(iUsersInteractionsService.verifyIfIsAlerted(sessionUser, targetUser.getIdentifier()).isPresent())
-                .profilePhoto(targetUser.getProfilePhotoIdentifier() != null ? loadProfilePhoto(targetUser.getProfilePhotoIdentifier()) : null)
-                .backgroundPhoto(targetUser.getBackgroundPhotoIdentifier() != null ? loadProfilePhoto(targetUser.getBackgroundPhotoIdentifier()) : null)
+                .profilePhotoUrl(targetUser.getProfilePhotoUrl())
+                .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .build();
     }
