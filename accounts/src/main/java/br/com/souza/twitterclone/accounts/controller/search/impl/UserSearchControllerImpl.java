@@ -64,24 +64,28 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/isvalidemail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email) throws Exception {
+    public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email){
         return new ResponseEntity<>(iUsersSearchService.isValidEmail(email), HttpStatus.OK);
     }
 
     @GetMapping(value = "/isvalidusername", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidUsernameResponse> isValidUsername(@RequestParam(value = "username", required = true) String username) throws Exception {
+    public ResponseEntity<ValidUsernameResponse> isValidUsername(@RequestParam(value = "username", required = true) String username) {
         return new ResponseEntity<>(iUsersSearchService.isValidUsername(username), HttpStatus.OK);
     }
 
     @GetMapping(value = "/isvaliduser", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidUserResponse> isValidUser(@RequestParam(value = "username", required = true) String username) throws Exception {
+    public ResponseEntity<ValidUserResponse> isValidUser(@RequestParam(value = "username", required = true) String username){
         return new ResponseEntity<>(iUsersSearchService.isValidUser(username), HttpStatus.OK);
     }
 
-    //TODO: Procurar 3 usuários aleatórios para seguir
+    @GetMapping(value = "/whotofollow", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
+                                                            @RequestParam(value = "size", required = true) Integer size){
+        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
+    }
 
     @GetMapping(value = "/verified", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getVerified(){
+    public ResponseEntity<List<UserPreviewResponse>> getVerified() {
         return new ResponseEntity<>(iUsersSearchService.getVerified(), HttpStatus.OK);
     }
 

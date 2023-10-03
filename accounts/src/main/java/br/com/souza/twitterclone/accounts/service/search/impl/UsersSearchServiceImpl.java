@@ -6,6 +6,7 @@ import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersReposi
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
+import br.com.souza.twitterclone.accounts.database.repository.impl.WhoToFollowRepositoryImpl;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -28,17 +29,20 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final BlockedUsersRepository blockedUsersRepository;
     private final IUsersInteractionsService iUsersInteractionsService;
     private final AlertedUsersRepository alertedUsersRepository;
+    private final WhoToFollowRepositoryImpl whoToFollowRepository;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
                                   BlockedUsersRepository blockedUsersRepository,
                                   IUsersInteractionsService iUsersInteractionsService,
-                                  AlertedUsersRepository alertedUsersRepository) {
+                                  AlertedUsersRepository alertedUsersRepository,
+                                  WhoToFollowRepositoryImpl whoToFollowRepository) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
         this.iUsersInteractionsService = iUsersInteractionsService;
         this.alertedUsersRepository = alertedUsersRepository;
+        this.whoToFollowRepository = whoToFollowRepository;
     }
 
     @Override
@@ -147,6 +151,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         return ValidUserResponse.builder()
                 .isValidUser(false)
                 .build();
+    }
+
+    @Override
+    public List<UserPreviewResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size) {
+        return whoToFollowRepository.find(sessionUserIdentifier, page, size);
     }
 
     @Override

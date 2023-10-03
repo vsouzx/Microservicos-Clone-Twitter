@@ -15,6 +15,7 @@ public interface IUsersSearchService {
     ValidEmailResponse isValidEmail(String email);
     ValidUsernameResponse isValidUsername(String username);
     ValidUserResponse isValidUser(String username);
+    List<UserPreviewResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size);
     List<UserPreviewResponse> getVerified();
     List<String> getAlertedUsers(String sessionUserIdentifier) throws Exception;
 }

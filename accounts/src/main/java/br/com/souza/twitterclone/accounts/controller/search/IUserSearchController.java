@@ -41,7 +41,9 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier, Integer page, Integer size) throws Exception;
+    ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier,
+                                                                 @Parameter(description = "Numero da pagina") Integer page,
+                                                                 @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {
@@ -96,6 +98,16 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<ValidUserResponse> isValidUser(@Parameter(description = "User a ser validado") String username) throws Exception;
+
+    @Operation(summary = "Lista usuários aleatórios para seguir")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@Parameter(description = "Numero da pagina") Integer page,
+                                                             @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
 
     @Operation(summary = "Lista os usuários verificados")
     @ApiResponses(value = {
