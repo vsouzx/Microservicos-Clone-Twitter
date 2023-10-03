@@ -18,7 +18,7 @@ public class WhoToFollowRepositoryImpl {
         this.em = em;
     }
 
-    public List<UserPreviewResponse> find(String sessionUserIdentifier, Integer page, Integer size){
+    public List<UserPreviewResponse> find(String sessionUserIdentifier, Integer page, Integer size) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -26,12 +26,13 @@ public class WhoToFollowRepositoryImpl {
         sb.append("       ,@RowsOfPage		    INT = ? ");
         sb.append("  ");
         sb.append("SELECT u.first_name  ");
-        sb.append("	  ,u.username  ");
-        sb.append("	  ,u.biography  ");
-        sb.append("	  ,u.private_account ");
-        sb.append("	  ,CONVERT(BIT, 0) isFollowedBySessionUser ");
+        sb.append("	     ,u.biography  ");
+        sb.append("	     ,u.private_account ");
+        sb.append("	     ,CONVERT(BIT, 0) isFollowedBySessionUser ");
         sb.append("      ,CONVERT(BIT, IIF(f2.followed_identifier IS NOT NULL, 1, 0)) isFollowingSessionUser  ");
-        sb.append("	  ,u.profile_photo_url profile_photo_url ");
+        sb.append("	     ,u.profile_photo_url profile_photo_url ");
+        sb.append("	     ,u.verified ");
+        sb.append("	     ,u.identifier ");
         sb.append("FROM Users u   ");
         sb.append("LEFT JOIN users_follows f   ");
         sb.append("  ON f.follower_identifier = @sessionUser  ");
@@ -42,7 +43,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("WHERE f.follower_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("ORDER BY NEWID() ");
-        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS  ");
+        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
 
         Query query = em.createNativeQuery(sb.toString());
@@ -64,6 +65,8 @@ public class WhoToFollowRepositoryImpl {
                     .isFollowedByMe((Boolean) result[4])
                     .isFollowingMe((Boolean) result[5])
                     .profilePhotoUrl((String) result[6])
+                    .isVerified((Boolean) result[7])
+                    .userIdentifier((String) result[8])
                     .build());
         }
 

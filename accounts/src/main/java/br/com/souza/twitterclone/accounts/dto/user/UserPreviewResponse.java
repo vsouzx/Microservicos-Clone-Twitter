@@ -20,7 +20,7 @@ public class UserPreviewResponse {
     private Boolean isFollowedByMe;
     private Boolean isFollowingMe;
     private String profilePhotoUrl;
-    private String backgroundPhotoUrl;
+    private boolean isVerified;
 
     public UserPreviewResponse(User user) throws Exception {
         this.userIdentifier = user.getIdentifier();
@@ -31,7 +31,7 @@ public class UserPreviewResponse {
         this.isFollowedByMe = false;
         this.isFollowingMe = false;
         this.profilePhotoUrl = user.getProfilePhotoUrl();
-        this.backgroundPhotoUrl = user.getBackgroundPhotoUrl();
+        this.isVerified = user.getVerified();
     }
 
 }

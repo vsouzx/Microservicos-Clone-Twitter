@@ -30,6 +30,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.searchUserInfos(FindUserIdentifierHelper.getIdentifier(), authorization), HttpStatus.OK);
     }
 
+    //TODO: trocar para username
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
                                                                                     @RequestHeader("Authorization") String authorization) throws Exception {
@@ -80,7 +81,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     @GetMapping(value = "/whotofollow", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
-                                                            @RequestParam(value = "size", required = true) Integer size){
+                                                                    @RequestParam(value = "size", required = true) Integer size){
         return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
     }
 
