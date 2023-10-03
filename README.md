@@ -16,23 +16,3 @@
 <p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) ✔️ </p>
 <p>Micro Serviço de <b>notificações</b> ✔️ (Server-Sent Events)</p>
 <p>Micro Serviço de <b>DM (Chat)</b> 🔜 (Websocket)</p>
-
-# Tecnologias utilizadas
-
-<p>Java</p>
-<p>Spring Boot</p>
-<p>Spring Cloud (Arquitetura de microservicos)</p>
-<p>Server-Sent Events (Notificações em tempo real)</p>
-<p>Websockets (Chat em tempo real)</p>
-<p>Mensageria com Apache Kafka</p>
-<p>Banco de dados relacional (MSSQL)</p>
-<p>Redis</p>
-<p>Docker</p>
-<p>Dozzle (Monitoramento dos containers)</p>
-<p>Integração e entrega contínua com Github Actions</p>
-
-# O que falta ser implementado
-
-<p>Finalizar o serviço de DM</p>
-<p>Deploy na AWS, rodando Docker dentro de uma instancia EC2</p>
-
