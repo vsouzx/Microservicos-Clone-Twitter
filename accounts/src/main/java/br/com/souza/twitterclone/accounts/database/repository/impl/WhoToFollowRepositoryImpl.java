@@ -26,6 +26,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("       ,@RowsOfPage		    INT = ? ");
         sb.append("  ");
         sb.append("SELECT u.first_name  ");
+        sb.append("      ,u.username  ");
         sb.append("	     ,u.biography  ");
         sb.append("	     ,u.private_account ");
         sb.append("	     ,CONVERT(BIT, 0) isFollowedBySessionUser ");
