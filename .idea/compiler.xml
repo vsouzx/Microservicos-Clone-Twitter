@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="feed" />
         <module name="twitterclone" />
+        <module name="directmessages" />
         <module name="mailsender" />
         <module name="discovery" />
         <module name="configserver" />
@@ -33,6 +34,7 @@
       <module name="configserver" options="-parameters" />
       <module name="configserver (1)" options="-parameters" />
       <module name="configserver (2)" options="-parameters" />
+      <module name="directmessages" options="-parameters" />
       <module name="discovery" options="-parameters" />
       <module name="feed" options="-parameters" />
       <module name="gateway" options="-parameters" />
