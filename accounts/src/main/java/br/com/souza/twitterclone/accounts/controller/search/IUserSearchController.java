@@ -107,7 +107,8 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@Parameter(description = "Numero da pagina") Integer page,
-                                                             @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
+                                                             @Parameter(description = "Tamanho da pagina") Integer size,
+                                                             @Parameter(description = "Usuário que não é para aparecer") String userOnScreen) throws Exception;
 
     @Operation(summary = "Lista os usuários verificados")
     @ApiResponses(value = {
