@@ -32,7 +32,6 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     //TODO: trocar para username
-    //TODO: não trazer quem ta bloqueado/bloqueou sessionUser
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
                                                                                     @RequestHeader("Authorization") String authorization) throws Exception {

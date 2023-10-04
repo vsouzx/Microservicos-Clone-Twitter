@@ -37,12 +37,15 @@ public class WhoToFollowRepositoryImpl {
         sb.append("	     ,u.biography ");
         sb.append("	     ,u.location  ");
         sb.append("	     ,u.site  ");
-        sb.append("	     ,u.registrationTime  ");
-        sb.append("	     ,u.privateAccount  ");
+        sb.append("	     ,u.registration_time  ");
+        sb.append("	     ,u.private_account  ");
         sb.append("	     ,u.profile_photo_url  ");
         sb.append("	     ,u.background_photo_url ");
         sb.append("	     ,u.verified ");
         sb.append("FROM Users u   ");
+        sb.append("LEFT JOIN users_follows f   ");
+        sb.append("  ON f.follower_identifier = @sessionUser  ");
+        sb.append("  AND f.followed_identifier = u.identifier   ");
         sb.append("LEFT JOIN blocked_users b   ");
         sb.append("	ON b.blocked_identifier = @sessionUser   ");
         sb.append("	AND b.blocker_identifier = u.identifier ");
@@ -51,6 +54,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("	AND b2.blocked_identifier = u.identifier ");
         sb.append("WHERE b.blocker_identifier is null ");
         sb.append("	AND b2.blocker_identifier is null ");
+        sb.append("	AND f.follower_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("	AND (@userOnScreen IS NULL OR u.identifier <> @userOnScreen) ");
         sb.append("ORDER BY NEWID() ");
