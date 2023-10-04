@@ -66,7 +66,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/isvalidemail", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email){
+    public ResponseEntity<ValidEmailResponse> isValidEmail(@RequestParam(value = "email", required = true) String email) {
         return new ResponseEntity<>(iUsersSearchService.isValidEmail(email), HttpStatus.OK);
     }
 
@@ -76,16 +76,16 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/isvaliduser", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ValidUserResponse> isValidUser(@RequestParam(value = "username", required = true) String username){
+    public ResponseEntity<ValidUserResponse> isValidUser(@RequestParam(value = "username", required = true) String username) {
         return new ResponseEntity<>(iUsersSearchService.isValidUser(username), HttpStatus.OK);
     }
 
-    //TODO: não trazer quem ta bloqueado/bloqueou sessionUser
     @GetMapping(value = "/whotofollow", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
-                                                                    @RequestParam(value = "size", required = true) Integer size,
-                                                                    @RequestParam(value = "userOnScreen", required = false) String userOnScreen){
-        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size, userOnScreen), HttpStatus.OK);
+    public ResponseEntity<List<UserDetailsByIdentifierResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
+                                                                                @RequestParam(value = "size", required = true) Integer size,
+                                                                                @RequestParam(value = "userOnScreen", required = false) String userOnScreen,
+                                                                                @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size, userOnScreen, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/verified", produces = MediaType.APPLICATION_JSON_VALUE)

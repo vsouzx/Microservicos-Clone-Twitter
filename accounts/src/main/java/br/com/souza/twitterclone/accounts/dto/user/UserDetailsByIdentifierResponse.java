@@ -15,7 +15,6 @@ public class UserDetailsByIdentifierResponse {
 
     private String userIdentifier;
     private String firstName;
-    private String lastName;
     private String username;
     private Integer following;
     private Integer followers;
