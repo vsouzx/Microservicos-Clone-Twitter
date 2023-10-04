@@ -91,7 +91,6 @@ public class WhoToFollowRepositoryImpl {
                     .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUserIdentifier, (String) result[0]).isPresent())
                     .isNotificationsAlertedByMe(iUsersInteractionsService.verifyIfIsAlerted(sessionUserIdentifier, (String) result[0]).isPresent())
                     .tweetsCount(iUsersInteractionsService.getTweetsCount((String) result[0], authorization))
-                    .followersInCommon(iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, (String) result[0]))
                     .build());
         }
 

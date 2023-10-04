@@ -178,6 +178,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .toList();
     }
 
+    @Override
+    public List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
+        return iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, targetUserIdentifier);
+    }
+
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
@@ -192,7 +197,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(targetUser.getPrivateAccount())
                 .isBlockedByMe(isBlockedByMe)
                 .hasBlockedMe(true)
-                .followersInCommon(null)
                 .isFollowedByMe(false)
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
@@ -217,7 +221,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(targetUser.getPrivateAccount())
                 .isBlockedByMe(true)
                 .hasBlockedMe(false)
-                .followersInCommon(null)
                 .isFollowedByMe(false)
                 .isPendingFollowedByMe(false)
                 .isFollowingMe(false)
@@ -242,7 +245,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .privateAccount(targetUser.getPrivateAccount())
                 .isBlockedByMe(false)
                 .hasBlockedMe(false)
-                .followersInCommon(iUsersInteractionsService.getCommonFollowers(sessionUser, targetUser.getIdentifier()))
                 .isFollowedByMe(iUsersInteractionsService.verifyIfIsFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
                 .isPendingFollowedByMe(iUsersInteractionsService.verifyIfIsPendingFollowing(sessionUser, targetUser.getIdentifier()).isPresent())
                 .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing(targetUser.getIdentifier(), sessionUser).isPresent())

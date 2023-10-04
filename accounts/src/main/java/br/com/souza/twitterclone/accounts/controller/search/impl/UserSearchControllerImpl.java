@@ -5,6 +5,7 @@ import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import java.util.List;
+import javax.print.attribute.standard.Media;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -96,5 +97,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     @GetMapping(value = "/alertedusers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<String>> getAlertedUsers() throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getAlertedUsers(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/commonfollows", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserPreviewResponse>> getCommonFollows(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getCommonFollows(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifer), HttpStatus.OK);
     }
 }

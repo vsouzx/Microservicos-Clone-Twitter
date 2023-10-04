@@ -31,7 +31,6 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isSilencedByMe;
     private Boolean isNotificationsAlertedByMe;
     private Integer tweetsCount;
-    private List<UserPreviewResponse> followersInCommon;
     private String profilePhotoUrl;
     private String backgroundPhotoUrl;
     private Boolean isVerified;
