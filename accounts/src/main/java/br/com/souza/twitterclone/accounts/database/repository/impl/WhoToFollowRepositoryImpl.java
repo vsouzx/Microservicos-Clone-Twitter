@@ -18,10 +18,11 @@ public class WhoToFollowRepositoryImpl {
         this.em = em;
     }
 
-    public List<UserPreviewResponse> find(String sessionUserIdentifier, Integer page, Integer size) {
+    public List<UserPreviewResponse> find(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
+        sb.append("	      ,@userOnScreen		VARCHAR(MAX) = ? ");
         sb.append("	      ,@PageNumber		    INT = ? ");
         sb.append("       ,@RowsOfPage		    INT = ? ");
         sb.append("  ");
@@ -43,6 +44,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("	AND f2.follower_identifier = u.identifier ");
         sb.append("WHERE f.follower_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
+        sb.append("	AND (@userOnScreen IS NULL OR u.identifier <> @userOnScreen) ");
         sb.append("ORDER BY NEWID() ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
@@ -50,8 +52,9 @@ public class WhoToFollowRepositoryImpl {
         Query query = em.createNativeQuery(sb.toString());
 
         query.setParameter(1, sessionUserIdentifier);
-        query.setParameter(2, page);
-        query.setParameter(3, size);
+        query.setParameter(2, userOnScreen);
+        query.setParameter(3, page);
+        query.setParameter(4, size);
 
         List<Object[]> lista = query.getResultList();
 

@@ -154,8 +154,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size) {
-        return whoToFollowRepository.find(sessionUserIdentifier, page, size);
+    public List<UserPreviewResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen) {
+        return whoToFollowRepository.find(sessionUserIdentifier, page, size, userOnScreen);
     }
 
     @Override

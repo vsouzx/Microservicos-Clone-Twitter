@@ -81,8 +81,9 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     @GetMapping(value = "/whotofollow", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
-                                                                    @RequestParam(value = "size", required = true) Integer size){
-        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size), HttpStatus.OK);
+                                                                    @RequestParam(value = "size", required = true) Integer size,
+                                                                    @RequestParam(value = "userOnScreen", required = false) String userOnScreen){
+        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size, userOnScreen), HttpStatus.OK);
     }
 
     @GetMapping(value = "/verified", produces = MediaType.APPLICATION_JSON_VALUE)
