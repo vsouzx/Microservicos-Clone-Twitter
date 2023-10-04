@@ -31,6 +31,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     //TODO: trocar para username
+    //TODO: não trazer quem ta bloqueado/bloqueou sessionUser
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
                                                                                     @RequestHeader("Authorization") String authorization) throws Exception {
@@ -79,6 +80,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.isValidUser(username), HttpStatus.OK);
     }
 
+    //TODO: não trazer quem ta bloqueado/bloqueou sessionUser
     @GetMapping(value = "/whotofollow", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
                                                                     @RequestParam(value = "size", required = true) Integer size,

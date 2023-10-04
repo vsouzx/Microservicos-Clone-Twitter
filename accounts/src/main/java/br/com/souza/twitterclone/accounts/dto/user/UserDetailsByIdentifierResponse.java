@@ -35,4 +35,5 @@ public class UserDetailsByIdentifierResponse {
     private List<UserPreviewResponse> followersInCommon;
     private String profilePhotoUrl;
     private String backgroundPhotoUrl;
+    private Boolean isVerified;
 }

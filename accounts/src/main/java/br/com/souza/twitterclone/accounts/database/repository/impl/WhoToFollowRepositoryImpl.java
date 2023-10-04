@@ -42,7 +42,15 @@ public class WhoToFollowRepositoryImpl {
         sb.append("LEFT JOIN users_follows f2   ");
         sb.append("	ON f2.followed_identifier = @sessionUser   ");
         sb.append("	AND f2.follower_identifier = u.identifier ");
+        sb.append("LEFT JOIN blocked_users b   ");
+        sb.append("	ON b.blocked_identifier = @sessionUser   ");
+        sb.append("	AND b.blocker_identifier = u.identifier ");
+        sb.append("LEFT JOIN blocked_users b2   ");
+        sb.append("	ON b2.blocker_identifier = @sessionUser   ");
+        sb.append("	AND b2.blocked_identifier = u.identifier ");
         sb.append("WHERE f.follower_identifier is null ");
+        sb.append("	AND b.blocker_identifier is null ");
+        sb.append("	AND b2.blocker_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("	AND (@userOnScreen IS NULL OR u.identifier <> @userOnScreen) ");
         sb.append("ORDER BY NEWID() ");
