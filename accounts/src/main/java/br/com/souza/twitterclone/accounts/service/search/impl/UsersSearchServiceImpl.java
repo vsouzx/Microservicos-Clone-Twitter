@@ -253,6 +253,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .profilePhotoUrl(targetUser.getProfilePhotoUrl())
                 .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
+                .isVerified(targetUser.getVerified())
                 .build();
     }
 }
