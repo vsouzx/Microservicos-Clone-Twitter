@@ -29,6 +29,6 @@ public class TimelineTweetResponse {
     private int tweetFavsCount;
     private boolean isLikedByMe;
     private boolean isRetweetedByMe;
-    private ProfilePhotoResponse userProfilePhoto;
+    private String userProfilePhotoUrl;
     private byte[] tweetAttachment;
 }

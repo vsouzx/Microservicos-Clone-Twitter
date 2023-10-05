@@ -99,13 +99,15 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
-        return usersRepositoryImpl.getFollowers(sessionUserIdentifier, targetUsername, page, size);
+    public List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
+        User user = findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        return usersRepositoryImpl.getFollowers(sessionUserIdentifier, user.getIdentifier(), page, size);
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
-        return usersRepositoryImpl.getUserFollows(sessionUserIdentifier, targetUsername, page, size);
+    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
+        User user = findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        return usersRepositoryImpl.getUserFollows(sessionUserIdentifier, user.getIdentifier(), page, size);
     }
 
     @Override
@@ -264,5 +266,12 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .isVerified(targetUser.getVerified())
                 .build();
+    }
+
+    private User findUserByUsernameOrEmailOrIdentifier(String targetUserIdentifier) throws UserNotFoundException {
+        return userRepository.findByUsername(targetUserIdentifier)
+            .orElse(userRepository.findByEmail(targetUserIdentifier)
+                        .orElse(userRepository.findById(targetUserIdentifier)
+                                .orElseThrow(UserNotFoundException::new)));
     }
 }
