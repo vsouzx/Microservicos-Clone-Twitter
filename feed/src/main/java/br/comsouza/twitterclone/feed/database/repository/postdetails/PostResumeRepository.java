@@ -14,14 +14,11 @@ public class PostResumeRepository {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
-    private final IAccountsClient iAccountsClient;
 
     public PostResumeRepository(EntityManager em,
-                                IInteractionsService iInteractionsService,
-                                IAccountsClient iAccountsClient) {
+                                IInteractionsService iInteractionsService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
-        this.iAccountsClient = iAccountsClient;
     }
 
     public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier, String authorization) {
@@ -59,7 +56,7 @@ public class PostResumeRepository {
                     .userIdentifier((String) result[3])
                     .userUsername((String) result[4])
                     .userFirstName((String) result[5])
-                    .userProfilePhoto(iAccountsClient.loadProfilePhoto((String) result[6], authorization))
+                    .userProfilePhotoUrl((String) result[6])
                     .tweetMessage((String) result[7])
                     .tweetAttachment((byte[]) result[8])
                     .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
