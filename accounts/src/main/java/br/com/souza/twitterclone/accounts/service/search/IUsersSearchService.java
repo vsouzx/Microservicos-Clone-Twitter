@@ -19,4 +19,5 @@ public interface IUsersSearchService {
     List<UserPreviewResponse> getVerified();
     List<String> getAlertedUsers(String sessionUserIdentifier) throws Exception;
     List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
+    FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier);
 }

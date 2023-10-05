@@ -102,4 +102,9 @@ public class UserSearchControllerImpl implements IUserSearchController {
     public ResponseEntity<List<UserPreviewResponse>> getCommonFollows(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getCommonFollows(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifer), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/followsandfollowers", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FollowsAndFollowersResponse> getFollowsAndFollowers(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer){
+        return new ResponseEntity<>(iUsersSearchService.getFollowsAndFollowers(targetUserIdentifer), HttpStatus.OK);
+    }
 }

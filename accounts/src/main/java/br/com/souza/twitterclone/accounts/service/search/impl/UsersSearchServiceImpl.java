@@ -7,6 +7,7 @@ import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersReposi
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
 import br.com.souza.twitterclone.accounts.database.repository.impl.WhoToFollowRepositoryImpl;
+import br.com.souza.twitterclone.accounts.dto.user.FollowsAndFollowersResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -181,6 +182,14 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     @Override
     public List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         return iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, targetUserIdentifier);
+    }
+
+    @Override
+    public FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier){
+        return FollowsAndFollowersResponse.builder()
+                .followers(iUsersInteractionsService.getUserFollowersCount(targetUserIdentifier))
+                .follows(iUsersInteractionsService.getUserFollowsCount(targetUserIdentifier))
+                .build();
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
