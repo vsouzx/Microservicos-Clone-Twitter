@@ -75,13 +75,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
-                .blockerIdentifier(targetUserIdentifier)
+                .blockerIdentifier(targetUser.getIdentifier())
                 .blockedIdentifier(sessionUserIdentifier)
                 .build()).isPresent();
 
         boolean targetUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(sessionUserIdentifier)
-                .blockedIdentifier(targetUserIdentifier)
+                .blockedIdentifier(targetUser.getIdentifier())
                 .build()).isPresent();
 
         if (isSessionUserIdentifierBlocked) {
