@@ -45,18 +45,12 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername, page, size), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/followers/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getUserFollowers(@PathVariable("identifier") String targetUserIdentifier,
-                                                                      @RequestParam(value = "page", required = true) Integer page,
-                                                                      @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getUserFollowers(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, page, size), HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/follows/{identifier}/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getUserFollows(@PathVariable("identifier") String targetUserIdentifier,
-                                                                    @RequestParam(value = "page", required = true) Integer page,
-                                                                    @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getUserFollows(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, page, size), HttpStatus.OK);
+    @GetMapping(value = "/followsdetails/{identifier}/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserPreviewResponse>> getUserFollowsDetails(@PathVariable("identifier") String targetUserIdentifier,
+                                                                                @PathVariable("type") String type,
+                                                                                @RequestParam(value = "page", required = true) Integer page,
+                                                                                @RequestParam(value = "size", required = true) Integer size) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getUserFollowsDetails(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, type, page, size), HttpStatus.OK);
     }
 
     @GetMapping(value = "/pendingfollowers", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,7 +98,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/followsandfollowers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<FollowsAndFollowersResponse> getFollowsAndFollowers(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer){
+    public ResponseEntity<FollowsAndFollowersResponse> getFollowsAndFollowers(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer) {
         return new ResponseEntity<>(iUsersSearchService.getFollowsAndFollowers(targetUserIdentifer), HttpStatus.OK);
     }
 }

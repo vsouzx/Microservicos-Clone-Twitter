@@ -34,13 +34,13 @@ public class FollowingTimelineStrategyFactory {
     }
 
     public ITimelineStrategy getStrategy(String type) throws Exception {
-        return switch (type) {
-            case "foryou" -> foryouTimelineRepository;
-            case "following" -> followingTimelineRepository;
-            case "posts" -> postsTimelineRepository;
-            case "replies" -> repliesTimelineRepository;
-            case "medias" -> mediasTimelineRepository;
-            case "likes " -> likesTimelineRepository;
+        return switch (type.toUpperCase()) {
+            case "FORYOU" -> foryouTimelineRepository;
+            case "FOLLOWING" -> followingTimelineRepository;
+            case "POSTS" -> postsTimelineRepository;
+            case "REPLIES" -> repliesTimelineRepository;
+            case "MEDIAS" -> mediasTimelineRepository;
+            case "LIKES" -> likesTimelineRepository;
             default -> throw new Exception("Type not supported: " + type);
         };
     }

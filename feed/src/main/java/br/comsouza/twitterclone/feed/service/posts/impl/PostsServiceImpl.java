@@ -317,10 +317,10 @@ public class PostsServiceImpl implements IPostsService {
         if (!mainTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondaryTweetType.equals(TweetTypeEnum.TWEET.toString())) {
 
             if (mainTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
-                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier(), authorization);
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
             }
             if (mainTweetType.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString()) || mainTweetType.equals(TweetTypeEnum.COMMENT.toString()) || secondaryTweet.getTweetTypeDescription().equals(TweetTypeEnum.COMMENT.toString())) {
-                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier(), authorization);
+                return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
             }
         }
         return null;

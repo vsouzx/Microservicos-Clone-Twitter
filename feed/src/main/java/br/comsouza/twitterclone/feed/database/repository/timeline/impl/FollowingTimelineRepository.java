@@ -18,18 +18,15 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
-    private final IAccountsClient iAccountsClient;
 
     public FollowingTimelineRepository(EntityManager em,
-                                       IInteractionsService iInteractionsService,
-                                       IAccountsClient iAccountsClient) {
+                                       IInteractionsService iInteractionsService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
-        this.iAccountsClient = iAccountsClient;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization, String targetUserIdentifier) {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier VARCHAR(MAX) = ? ");
@@ -58,7 +55,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         sb.append("	AND s.silencer_identifier = f.follower_identifier ");
         sb.append("WHERE s.silenced_identifier IS NULL ");
         sb.append("ORDER BY t.publication_time desc ");
-        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS   ");
+        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS   ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
 
         Query query = em.createNativeQuery(sb.toString());

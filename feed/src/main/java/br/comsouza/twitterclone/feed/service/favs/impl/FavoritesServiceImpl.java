@@ -21,7 +21,7 @@ public class FavoritesServiceImpl implements IFavoritesService {
 
     @Override
     public List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size, String authorization) throws Exception {
-        List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size, authorization);
+        List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size);
 
         for(TimelineTweetResponse fav : favs){
             iPostsService.loadTweetResponses(fav, userIdentifier, authorization);

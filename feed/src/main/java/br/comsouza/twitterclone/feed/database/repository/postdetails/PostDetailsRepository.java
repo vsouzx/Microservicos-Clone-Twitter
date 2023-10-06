@@ -16,19 +16,16 @@ public class PostDetailsRepository {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
-    private final IAccountsClient iAccountsClient;
     private static final Integer CUSTOM_PAGE = 0;
     private static final Integer CUSTOM_PAGE_SIZE = 10;
 
     public PostDetailsRepository(EntityManager em,
-                                 IInteractionsService iInteractionsService,
-                                 IAccountsClient iAccountsClient) {
+                                 IInteractionsService iInteractionsService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
-        this.iAccountsClient = iAccountsClient;
     }
 
-    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier, String authorization) throws ServerSideErrorException {
+    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier){
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");

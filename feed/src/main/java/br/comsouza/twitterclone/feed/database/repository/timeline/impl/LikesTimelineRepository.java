@@ -17,18 +17,15 @@ public class LikesTimelineRepository implements ITimelineStrategy {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
-    private final IAccountsClient iAccountsClient;
 
     public LikesTimelineRepository(EntityManager em,
-                                   IInteractionsService iInteractionsService,
-                                   IAccountsClient iAccountsClient) {
+                                   IInteractionsService iInteractionsService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
-        this.iAccountsClient = iAccountsClient;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String authorization, String targetUserIdentifier) {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetUserIdentifier    VARCHAR(MAX) = ? ");

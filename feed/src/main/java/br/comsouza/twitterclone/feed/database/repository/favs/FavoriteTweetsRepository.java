@@ -17,17 +17,14 @@ public class FavoriteTweetsRepository {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
-    private final IAccountsClient iAccountsClient;
 
     public FavoriteTweetsRepository(EntityManager em,
-                                    IInteractionsService iInteractionsService,
-                                    IAccountsClient iAccountsClient) {
+                                    IInteractionsService iInteractionsService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
-        this.iAccountsClient = iAccountsClient;
     }
 
-    public List<TimelineTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size, String authorization) throws Exception {
+    public List<TimelineTweetResponse> find(String sessionUserIdentifier, Integer page, Integer size) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserId VARCHAR(MAX) = ? ");

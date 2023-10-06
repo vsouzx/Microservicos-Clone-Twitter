@@ -45,24 +45,6 @@ public interface IUserSearchController {
                                                                  @Parameter(description = "Numero da pagina") Integer page,
                                                                  @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
 
-    @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
-            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
-    })
-    ResponseEntity<List<UserPreviewResponse>> getUserFollowers(String targetUserIdentifier, Integer page, Integer size) throws Exception;
-
-    @Operation(summary = "Retorna uma lista quem o usuário segue")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
-            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
-    })
-    ResponseEntity<List<UserPreviewResponse>> getUserFollows(String targetUserIdentifier, Integer page, Integer size) throws Exception;
-
     @Operation(summary = "Retorna uma lista quem o usuário segue")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna uma lista"),

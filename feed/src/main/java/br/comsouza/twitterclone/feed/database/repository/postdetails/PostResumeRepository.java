@@ -21,7 +21,7 @@ public class PostResumeRepository {
         this.iInteractionsService = iInteractionsService;
     }
 
-    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier, String authorization) {
+    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");

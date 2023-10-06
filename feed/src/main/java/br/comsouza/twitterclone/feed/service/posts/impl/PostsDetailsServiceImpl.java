@@ -46,7 +46,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        TimelineTweetResponse tweet = postDetailsRepository.find(sessionUserIdentifier, tweetIdentifier, authorization);
+        TimelineTweetResponse tweet = postDetailsRepository.find(sessionUserIdentifier, tweetIdentifier);
 
         if(load != null && !load){
             return tweet;
@@ -66,7 +66,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
         List<TimelineTweetResponse> response = new ArrayList<>();
         List<Tweets> comments = iInteractionsService.getTweetCommentsPageable(tweetIdentifier, page, size).getContent();
         for (Tweets comment : comments) {
-            response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier(), authorization));
+            response.add(postResumeRepository.find(sessionUserIdentifier, comment.getTweetIdentifier()));
         }
         return response;
     }
@@ -92,7 +92,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
         List<TimelineTweetResponse> response = new ArrayList<>();
         List<Tweets> retweets = iInteractionsService.getTweetOnlyValuedRetweetsPageable(tweetIdentifier, page, size).getContent();
         for (Tweets retweet : retweets) {
-            response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier(), authorization));
+            response.add(postResumeRepository.find(sessionUserIdentifier, retweet.getTweetIdentifier()));
         }
 
         for (TimelineTweetResponse post : response) {

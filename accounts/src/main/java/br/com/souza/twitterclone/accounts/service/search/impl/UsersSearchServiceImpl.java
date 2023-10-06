@@ -5,6 +5,8 @@ import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.database.repository.followsdetails.IFollowsDetailsStrategy;
+import br.com.souza.twitterclone.accounts.database.repository.followsdetails.factory.FollowsDetailsStrategyFactory;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
 import br.com.souza.twitterclone.accounts.database.repository.impl.WhoToFollowRepositoryImpl;
 import br.com.souza.twitterclone.accounts.dto.user.FollowsAndFollowersResponse;
@@ -32,6 +34,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final AlertedUsersRepository alertedUsersRepository;
     private final WhoToFollowRepositoryImpl whoToFollowRepository;
     private final IUserService iUserService;
+    private final FollowsDetailsStrategyFactory followsDetailsStrategyFactory;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
@@ -39,7 +42,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                                   IUsersInteractionsService iUsersInteractionsService,
                                   AlertedUsersRepository alertedUsersRepository,
                                   WhoToFollowRepositoryImpl whoToFollowRepository,
-                                  IUserService iUserService) {
+                                  IUserService iUserService,
+                                  FollowsDetailsStrategyFactory followsDetailsStrategyFactory) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
@@ -47,6 +51,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         this.alertedUsersRepository = alertedUsersRepository;
         this.whoToFollowRepository = whoToFollowRepository;
         this.iUserService = iUserService;
+        this.followsDetailsStrategyFactory = followsDetailsStrategyFactory;
     }
 
     @Override
@@ -90,7 +95,6 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         if (targetUserIdentifierBlocked) {
             return responseTargetUserIdentifierBlocked(targetUser, authorization);
         }
-
         return fullResponse(targetUser, sessionUserIdentifier, authorization);
     }
 
@@ -100,15 +104,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
+    public List<UserPreviewResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
-        return usersRepositoryImpl.getFollowers(sessionUserIdentifier, user.getIdentifier(), page, size);
-    }
-
-    @Override
-    public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
-        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
-        return usersRepositoryImpl.getUserFollows(sessionUserIdentifier, user.getIdentifier(), page, size);
+        IFollowsDetailsStrategy strategy = followsDetailsStrategyFactory.getStrategy(type);
+        List<UserPreviewResponse> response = strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size);
+        return response;
     }
 
     @Override
