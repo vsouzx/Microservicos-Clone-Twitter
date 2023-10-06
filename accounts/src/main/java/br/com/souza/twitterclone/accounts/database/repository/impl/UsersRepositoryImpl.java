@@ -142,8 +142,8 @@ public class UsersRepositoryImpl {
         sb.append("			    ,u.username  ");
         sb.append("				,u.biography  ");
         sb.append("				,u.private_account  ");
-        sb.append("				,IIF(uf.followed_identifier IS NOT NULL, 1, 0)	isFollowedBySessionUser  ");
-        sb.append("				,IIF(uf2.followed_identifier IS NOT NULL, 1, 0) isFollowingSessionUser   ");
+        sb.append("				,IIF(uf.followed_identifier IS NOT NULL, CONVERT(BIT, 1), CONVERT(BIT, 0))	isFollowedBySessionUser  ");
+        sb.append("				,IIF(uf2.followed_identifier IS NOT NULL, CONVERT(BIT, 1), CONVERT(BIT, 0)) isFollowingSessionUser   ");
         sb.append("				,u.profile_photo_url  ");
         sb.append("FROM users u    ");
         sb.append("INNER JOIN users_follows f    ");
