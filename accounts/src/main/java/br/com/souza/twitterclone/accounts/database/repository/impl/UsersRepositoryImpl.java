@@ -99,7 +99,6 @@ public class UsersRepositoryImpl {
         sb.append("LEFT JOIN users_follows uf2  ");
         sb.append("	ON uf2.followed_identifier = f.follower_identifier  ");
         sb.append("	AND uf2.follower_identifier = @sessionUser   ");
-        sb.append("WHERE u.identifier <> @sessionUser  ");
         sb.append("ORDER BY isFollowedBySessionUser  ");
         sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY  ");
@@ -155,7 +154,6 @@ public class UsersRepositoryImpl {
         sb.append("LEFT JOIN users_follows uf2  ");
         sb.append("	ON uf2.followed_identifier = @sessionUser   ");
         sb.append("	AND uf2.follower_identifier = f.followed_identifier  ");
-        sb.append("WHERE u.identifier <> @sessionUser  ");
         sb.append("ORDER BY isFollowedBySessionUser  ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY  ");
