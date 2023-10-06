@@ -159,7 +159,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, String authorization) throws Exception {
-        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(userOnScreen);
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(userOnScreen != null || !userOnScreen.isBlank() ? userOnScreen : sessionUserIdentifier);
         return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), authorization);
     }
 
