@@ -269,9 +269,18 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     private User findUserByUsernameOrEmailOrIdentifier(String targetUserIdentifier) throws UserNotFoundException {
-        return userRepository.findByUsername(targetUserIdentifier)
-            .orElse(userRepository.findByEmail(targetUserIdentifier)
-                        .orElse(userRepository.findById(targetUserIdentifier)
-                                .orElseThrow(UserNotFoundException::new)));
+        Optional<User> user;
+
+        user = userRepository.findByUsername(targetUserIdentifier);
+        if(user.isEmpty()){
+            user = userRepository.findByEmail(targetUserIdentifier);
+        }
+        if(user.isEmpty()){
+            user = userRepository.findById(targetUserIdentifier);
+        }
+        if(user.isEmpty()){
+            throw new UserNotFoundException();
+        }
+        return user.get();
     }
 }
