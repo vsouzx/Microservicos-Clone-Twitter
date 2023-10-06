@@ -25,8 +25,8 @@ public class UserInteractionsControllerImpl implements IUserInteractionsControll
     }
 
     @PatchMapping(value = "/blocktoggle/{identifier}")
-    public ResponseEntity<Void> blockToggle(@PathVariable("identifier") String targetIdentifier) throws Exception {
-        iUsersInteractionsService.blockToggle(FindUserIdentifierHelper.getIdentifier(), targetIdentifier);
+    public ResponseEntity<Void> blockToggle(@PathVariable("identifier") String targetUserIdentifier) throws Exception {
+        iUsersInteractionsService.blockToggle(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

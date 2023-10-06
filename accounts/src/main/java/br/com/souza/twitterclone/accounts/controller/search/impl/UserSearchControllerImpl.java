@@ -52,7 +52,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.getUserFollowers(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, page, size), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/follows/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/follows/{identifier}/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserPreviewResponse>> getUserFollows(@PathVariable("identifier") String targetUserIdentifier,
                                                                     @RequestParam(value = "page", required = true) Integer page,
                                                                     @RequestParam(value = "size", required = true) Integer size) throws Exception {

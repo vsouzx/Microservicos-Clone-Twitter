@@ -14,9 +14,9 @@ import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUserResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUsernameResponse;
-import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
+import br.com.souza.twitterclone.accounts.service.user.IUserService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,25 +31,27 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final IUsersInteractionsService iUsersInteractionsService;
     private final AlertedUsersRepository alertedUsersRepository;
     private final WhoToFollowRepositoryImpl whoToFollowRepository;
+    private final IUserService iUserService;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
                                   BlockedUsersRepository blockedUsersRepository,
                                   IUsersInteractionsService iUsersInteractionsService,
                                   AlertedUsersRepository alertedUsersRepository,
-                                  WhoToFollowRepositoryImpl whoToFollowRepository) {
+                                  WhoToFollowRepositoryImpl whoToFollowRepository,
+                                  IUserService iUserService) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
         this.iUsersInteractionsService = iUsersInteractionsService;
         this.alertedUsersRepository = alertedUsersRepository;
         this.whoToFollowRepository = whoToFollowRepository;
+        this.iUserService = iUserService;
     }
 
     @Override
     public UserDetailsResponse searchUserInfos(String sessionUserIdentifier, String authorization) throws Exception {
-        User user = userRepository.findById(sessionUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(sessionUserIdentifier);
 
         return UserDetailsResponse.builder()
                 .firstName(user.getFirstName())
@@ -70,8 +72,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
-        User targetUser = userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(targetUserIdentifier)
@@ -100,13 +101,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<UserPreviewResponse> getUserFollowers(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
-        User user = findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         return usersRepositoryImpl.getFollowers(sessionUserIdentifier, user.getIdentifier(), page, size);
     }
 
     @Override
     public List<UserPreviewResponse> getUserFollows(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size) throws Exception {
-        User user = findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         return usersRepositoryImpl.getUserFollows(sessionUserIdentifier, user.getIdentifier(), page, size);
     }
 
@@ -158,7 +159,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, String authorization) throws Exception {
-        return whoToFollowRepository.find(sessionUserIdentifier, page, size, userOnScreen, authorization);
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(userOnScreen);
+        return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), authorization);
     }
 
     @Override
@@ -183,7 +185,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        return iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, targetUserIdentifier);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        return iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, targetUser.getIdentifier());
     }
 
     @Override
@@ -266,21 +269,5 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
                 .isVerified(targetUser.getVerified())
                 .build();
-    }
-
-    private User findUserByUsernameOrEmailOrIdentifier(String targetUserIdentifier) throws UserNotFoundException {
-        Optional<User> user;
-
-        user = userRepository.findByUsername(targetUserIdentifier);
-        if(user.isEmpty()){
-            user = userRepository.findByEmail(targetUserIdentifier);
-        }
-        if(user.isEmpty()){
-            user = userRepository.findById(targetUserIdentifier);
-        }
-        if(user.isEmpty()){
-            throw new UserNotFoundException();
-        }
-        return user.get();
     }
 }

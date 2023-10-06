@@ -28,6 +28,7 @@ import br.com.souza.twitterclone.accounts.handler.exceptions.UnableToSilenceExce
 import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.client.INotificationsClientService;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
+import br.com.souza.twitterclone.accounts.service.user.IUserService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     private final AlertedUsersRepository alertedUsersRepository;
     private final INotificationsClientService iNotificationsClientService;
     private final IFeedClient iFeedClient;
+    private final IUserService iUserService;
 
     public UsersInteractionsServiceImpl(UserRepository userRepository,
                                         BlockedUsersRepository blockedUsersRepository,
@@ -54,7 +56,8 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                                         SilencedUsersRepository silencedUsersRepository,
                                         AlertedUsersRepository alertedUsersRepository,
                                         INotificationsClientService iNotificationsClientService,
-                                        IFeedClient iFeedClient) {
+                                        IFeedClient iFeedClient,
+                                        IUserService iUserService) {
         this.userRepository = userRepository;
         this.blockedUsersRepository = blockedUsersRepository;
         this.usersFollowsRepository = usersFollowsRepository;
@@ -63,35 +66,35 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
         this.alertedUsersRepository = alertedUsersRepository;
         this.iNotificationsClientService = iNotificationsClientService;
         this.iFeedClient = iFeedClient;
+        this.iUserService = iUserService;
     }
 
     @Override
     public void blockToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
-        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
 
         if (targetUserIsBlocked.isPresent()) {
             blockedUsersRepository.delete(targetUserIsBlocked.get());
         } else {
             //Verificando se ambos usuarios se seguem/tem solicitacao pendente. Caso sim, é necessário remover antes de bloquear
-            verifyIfIsFollowing(sessionUserIdentifier, targetUserIdentifier)
+            verifyIfIsFollowing(sessionUserIdentifier, targetUser.getIdentifier())
                     .ifPresent(usersFollowsRepository::delete);
 
-            verifyIfIsPendingFollowing(sessionUserIdentifier, targetUserIdentifier)
+            verifyIfIsPendingFollowing(sessionUserIdentifier, targetUser.getIdentifier())
                     .ifPresent(usersPendingFollowsRepository::delete);
 
-            verifyIfIsFollowing(targetUserIdentifier, sessionUserIdentifier)
+            verifyIfIsFollowing(targetUser.getIdentifier(), sessionUserIdentifier)
                     .ifPresent(usersFollowsRepository::delete);
 
-            verifyIfIsPendingFollowing(targetUserIdentifier, sessionUserIdentifier)
+            verifyIfIsPendingFollowing(targetUser.getIdentifier(), sessionUserIdentifier)
                     .ifPresent(usersPendingFollowsRepository::delete);
 
             blockedUsersRepository.save(BlockedUsers.builder()
                     .id(BlockedUsersId.builder()
                             .blockerIdentifier(sessionUserIdentifier)
-                            .blockedIdentifier(targetUserIdentifier)
+                            .blockedIdentifier(targetUser.getIdentifier())
                             .build())
                     .build());
         }
@@ -99,21 +102,20 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     @Override
     public void followToggle(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
-        User targetUser = userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
-        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
         if (targetUserIsBlocked.isPresent()) {
             throw new UnableToFollowException();
         }
 
-        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUser.getIdentifier(), sessionUserIdentifier);
         if (sessionUserIsBlocked.isPresent()) {
             throw new UnableToFollowException();
         }
 
-        Optional<UsersFollows> targetUserIsFollowed = verifyIfIsFollowing(sessionUserIdentifier, targetUserIdentifier);
-        Optional<UsersPendingFollows> targetUserIsPendingFollowed = verifyIfIsPendingFollowing(sessionUserIdentifier, targetUserIdentifier);
+        Optional<UsersFollows> targetUserIsFollowed = verifyIfIsFollowing(sessionUserIdentifier, targetUser.getIdentifier());
+        Optional<UsersPendingFollows> targetUserIsPendingFollowed = verifyIfIsPendingFollowing(sessionUserIdentifier, targetUser.getIdentifier());
 
         //se o sessionUserIdentifier estiver seguindo o targetUserIdentifier, vai dar unfollow
         if (targetUserIsFollowed.isPresent()) {
@@ -121,7 +123,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                     DeleteNotificationRequest.builder()
                             .tweetIdentifier(null)
                             .userSenderIdentifier(sessionUserIdentifier)
-                            .userReceiverIdentifier(targetUserIdentifier)
+                            .userReceiverIdentifier(targetUser.getIdentifier())
                             .typeDescription(NotificationsTypeEnum.NEW_FOLLOWER.toString())
                             .build(),
                     authorization
@@ -137,20 +139,20 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                 usersPendingFollowsRepository.save(UsersPendingFollows.builder()
                         .id(UsersPendingFollowsId.builder()
                                 .pendingFollowerIdentifier(sessionUserIdentifier)
-                                .pendingFollowedIdentifier(targetUserIdentifier)
+                                .pendingFollowedIdentifier(targetUser.getIdentifier())
                                 .build())
                         .build());
             } else {
                 usersFollowsRepository.save(UsersFollows.builder()
                         .id(UsersFollowsId.builder()
                                 .followerIdentifier(sessionUserIdentifier)
-                                .followedIdentifier(targetUserIdentifier)
+                                .followedIdentifier(targetUser.getIdentifier())
                                 .build())
                         .build());
 
                 iNotificationsClientService.createNewNotification(
                         sessionUserIdentifier,
-                        targetUserIdentifier,
+                        targetUser.getIdentifier(),
                         NotificationsTypeEnum.NEW_FOLLOWER.toString(),
                         null,
                         authorization
@@ -161,14 +163,16 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     @Override
     public void pendingFollowAcceptDecline(String sessionUserIdentifier, String targetIdentifier, boolean isAccept) throws Exception {
-        UsersPendingFollows pendingFollowRequest = verifyIfIsPendingFollowing(targetIdentifier, sessionUserIdentifier)
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetIdentifier);
+
+        UsersPendingFollows pendingFollowRequest = verifyIfIsPendingFollowing(targetUser.getIdentifier(), sessionUserIdentifier)
                 .orElseThrow(NonexistentPendingFollowException::new);
 
         if (isAccept) {
             usersPendingFollowsRepository.delete(pendingFollowRequest);
             usersFollowsRepository.save(UsersFollows.builder()
                     .id(UsersFollowsId.builder()
-                            .followerIdentifier(targetIdentifier)
+                            .followerIdentifier(targetUser.getIdentifier())
                             .followedIdentifier(sessionUserIdentifier)
                             .build())
                     .build());
@@ -179,25 +183,24 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     @Override
     public void silencetoggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
-        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
         if (targetUserIsBlocked.isPresent()) {
             throw new UnableToSilenceException();
         }
 
-        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUser.getIdentifier(), sessionUserIdentifier);
         if (sessionUserIsBlocked.isPresent()) {
             throw new UnableToSilenceException();
         }
 
-        verifyIfIsSilenced(sessionUserIdentifier, targetUserIdentifier)
+        verifyIfIsSilenced(sessionUserIdentifier, targetUser.getIdentifier())
                 .ifPresentOrElse(silencedUsersRepository::delete, () -> {
                     silencedUsersRepository.save(SilencedUsers.builder()
                             .id(SilencedUsersId.builder()
                                     .silencerIdentifier(sessionUserIdentifier)
-                                    .silencedIdentifier(targetUserIdentifier)
+                                    .silencedIdentifier(targetUser.getIdentifier())
                                     .build())
                             .build());
                 });
@@ -205,23 +208,22 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     @Override
     public void alertToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
-        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
         if (targetUserIsBlocked.isPresent()) {
             throw new UnableToFollowException();
         }
 
-        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUser.getIdentifier(), sessionUserIdentifier);
         if (sessionUserIsBlocked.isPresent()) {
             throw new UnableToFollowException();
         }
 
-        verifyIfIsFollowing(sessionUserIdentifier, targetUserIdentifier)
+        verifyIfIsFollowing(sessionUserIdentifier, targetUser.getIdentifier())
                 .orElseThrow(UnableToAlertException::new);
 
-        Optional<AlertedUsers> targetUserIsAlerted = verifyIfIsAlerted(sessionUserIdentifier, targetUserIdentifier);
+        Optional<AlertedUsers> targetUserIsAlerted = verifyIfIsAlerted(sessionUserIdentifier, targetUser.getIdentifier());
 
         if (targetUserIsAlerted.isPresent()) {
             alertedUsersRepository.delete(targetUserIsAlerted.get());
@@ -229,7 +231,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
             alertedUsersRepository.save(AlertedUsers.builder()
                     .id(AlertedUsersId.builder()
                             .alerterIdentifier(sessionUserIdentifier)
-                            .alertedIdentifier(targetUserIdentifier)
+                            .alertedIdentifier(targetUser.getIdentifier())
                             .build())
                     .build());
         }
@@ -237,11 +239,10 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
 
     @Override
     public Boolean anyoneIsBlocked(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        userRepository.findById(targetUserIdentifier)
-                .orElseThrow(UserNotFoundException::new);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
-        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUserIdentifier);
-        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUserIdentifier, sessionUserIdentifier);
+        Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
+        Optional<BlockedUsers> sessionUserIsBlocked = verifyIfIsBlocked(targetUser.getIdentifier(), sessionUserIdentifier);
 
         return targetUserIsBlocked.isPresent() || sessionUserIsBlocked.isPresent();
     }
