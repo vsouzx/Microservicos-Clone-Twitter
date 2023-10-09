@@ -108,8 +108,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     public List<UserDetailsByIdentifierResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size, String authorization) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         IFollowsDetailsStrategy strategy = followsDetailsStrategyFactory.getStrategy(type);
-        List<UserDetailsByIdentifierResponse> response = strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size, authorization);
-        return response;
+        return strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size, authorization);
     }
 
     @Override
