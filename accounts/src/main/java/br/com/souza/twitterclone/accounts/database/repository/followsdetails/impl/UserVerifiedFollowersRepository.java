@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.database.repository.followsdetails.impl;
 
 import br.com.souza.twitterclone.accounts.database.repository.followsdetails.IFollowsDetailsStrategy;
+import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -21,7 +22,7 @@ public class UserVerifiedFollowersRepository implements IFollowsDetailsStrategy 
 
     //TODO: Finalizar query
     @Override
-    public List<UserPreviewResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size){
+    public List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -59,10 +60,10 @@ public class UserVerifiedFollowersRepository implements IFollowsDetailsStrategy 
 
         List<Object[]> lista = query.getResultList();
 
-        List<UserPreviewResponse> response = new ArrayList<>();
+        List<UserDetailsByIdentifierResponse> response = new ArrayList<>();
 
         for (Object[] result : lista) {
-            response.add(UserPreviewResponse.builder()
+            response.add(UserDetailsByIdentifierResponse.builder()
                     .firstName((String) result[0])
                     .username((String) result[1])
                     .biography((String) result[2])

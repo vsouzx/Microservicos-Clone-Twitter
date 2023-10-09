@@ -72,6 +72,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .profilePhotoUrl(user.getProfilePhotoUrl())
                 .backgroundPhotoUrl(user.getBackgroundPhotoUrl())
                 .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier(), authorization))
+                .isVerified(user.getVerified())
                 .build();
     }
 
@@ -104,10 +105,10 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size, String authorization) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         IFollowsDetailsStrategy strategy = followsDetailsStrategyFactory.getStrategy(type);
-        List<UserPreviewResponse> response = strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size);
+        List<UserDetailsByIdentifierResponse> response = strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size, authorization);
         return response;
     }
 

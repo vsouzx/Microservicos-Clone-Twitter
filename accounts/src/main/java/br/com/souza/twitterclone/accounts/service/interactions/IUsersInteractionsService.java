@@ -31,7 +31,7 @@ public interface IUsersInteractionsService {
 
     Optional<SilencedUsers> verifyIfIsSilenced(String silencer, String silenced);
 
-    Optional<AlertedUsers> verifyIfIsAlerted(String silencer, String silenced);
+    Optional<AlertedUsers> verifyIfIsAlerted(String alerter, String alerted);
 
     Integer getUserFollowersCount(String targetUserIdentifier);
 

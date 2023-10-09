@@ -46,11 +46,12 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/followsdetails/{identifier}/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getUserFollowsDetails(@PathVariable("identifier") String targetUserIdentifier,
-                                                                                @PathVariable("type") String type,
-                                                                                @RequestParam(value = "page", required = true) Integer page,
-                                                                                @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getUserFollowsDetails(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, type, page, size), HttpStatus.OK);
+    public ResponseEntity<List<UserDetailsByIdentifierResponse>> getUserFollowsDetails(@PathVariable("identifier") String targetUserIdentifier,
+                                                                                       @PathVariable("type") String type,
+                                                                                       @RequestParam(value = "page", required = true) Integer page,
+                                                                                       @RequestParam(value = "size", required = true) Integer size,
+                                                                                       @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getUserFollowsDetails(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, type, page, size, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/pendingfollowers", produces = MediaType.APPLICATION_JSON_VALUE)

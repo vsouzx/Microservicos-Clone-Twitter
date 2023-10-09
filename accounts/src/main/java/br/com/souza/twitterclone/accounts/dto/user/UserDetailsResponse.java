@@ -25,5 +25,6 @@ public class UserDetailsResponse {
     private Integer tweetsCount;
     private String profilePhotoUrl;
     private String backgroundPhotoUrl;
+    private Boolean isVerified;
 
 }
