@@ -28,16 +28,21 @@ public class ChatsMessageResponse {
     private Boolean isMine;
 
     public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String sessionUserIdentifier){
-        this.identifier = message.getIdentifier();
-        this.chatIdentifier = message.getChatIdentifier();
-        this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
-        this.text = message.getText();
-        this.creationDate = message.getCreationDate();
-        this.emoji = message.getEmoji();
-        this.seen = message.getSeen();
-        if(message.getTweetIdentifier() != null){
-            this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+        try{
+            this.identifier = message.getIdentifier();
+            this.chatIdentifier = message.getChatIdentifier();
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.text = message.getText();
+            this.creationDate = message.getCreationDate();
+            this.emoji = message.getEmoji();
+            this.seen = message.getSeen();
+            if(message.getTweetIdentifier() != null){
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+            }
+            this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
         }
-        this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
     }
 }

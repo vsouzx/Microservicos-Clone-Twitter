@@ -1,13 +1,18 @@
 package br.com.souza.twitterclone.directmessages.handler.websocket;
 
+import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
+import br.com.souza.twitterclone.directmessages.client.IFeedClient;
 import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
 import br.com.souza.twitterclone.directmessages.database.model.DmChats;
 import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.IDmChatsRepository;
+import br.com.souza.twitterclone.directmessages.dto.ChatsMessageResponse;
 import br.com.souza.twitterclone.directmessages.util.SingletonChatMessagesConnections;
 import br.com.souza.twitterclone.directmessages.util.SingletonDmChatsConnections;
 import br.com.souza.twitterclone.directmessages.util.UsefulDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -27,12 +32,21 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
     private final TokenProvider tokenProvider;
     private final IDmChatsRepository iDmChatsRepository;
     private final IChatMessagesRepository iChatMessagesRepository;
+    private final IAccountsClient iAccountsClient;
+    private final IFeedClient iFeedClient;
+    private final ObjectMapper mapper;
 
     public ChatMessagesHandler(TokenProvider tokenProvider,
                                IDmChatsRepository iDmChatsRepository,
-                               IChatMessagesRepository iChatMessagesRepository) {
+                               IChatMessagesRepository iChatMessagesRepository,
+                               IAccountsClient iAccountsClient,
+                               IFeedClient iFeedClient,
+                               ObjectMapper mapper) {
         this.iDmChatsRepository = iDmChatsRepository;
         this.iChatMessagesRepository = iChatMessagesRepository;
+        this.iAccountsClient = iAccountsClient;
+        this.iFeedClient = iFeedClient;
+        this.mapper = mapper;
         this.singletonChatMessagesConnections = SingletonChatMessagesConnections.getInstance();
         this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
         this.tokenProvider = tokenProvider;
@@ -60,10 +74,10 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        System.out.printf("mensagem recebida");
         Optional<String> sessionToken = sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String userIdentifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
+
             Optional<String> chatIdentifier = getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
                 Optional<DmChats> chat = iDmChatsRepository.findById(chatIdentifier.get());
@@ -72,11 +86,13 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                     return;
                 }
 
+                String receiverIdentifier = getReceiverIdentifier(chat.get(), userIdentifier);
+
                 Set<WebSocketSession> chatMessagesSessions = singletonChatMessagesConnections.get(chatIdentifier.get());
                 Set<WebSocketSession> sessionUserSessions = singletonDmChatsConnections.get(userIdentifier);
-                Set<WebSocketSession> userIdentifier2Sessions = singletonDmChatsConnections.get(chat.get().getUserIdentifier2());
+                Set<WebSocketSession> userIdentifier2Sessions = singletonDmChatsConnections.get(receiverIdentifier);
 
-                iChatMessagesRepository.save(ChatMessages.builder()
+                ChatMessages chatMessage = iChatMessagesRepository.save(ChatMessages.builder()
                         .identifier(UUID.randomUUID().toString())
                         .chatIdentifier(chatIdentifier.get())
                         .userIdentifier(userIdentifier)
@@ -85,21 +101,19 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                         .seen(userIdentifier2Sessions != null && !userIdentifier2Sessions.isEmpty())
                         .build());
 
-                System.out.println("Mensagem salva no banco");
-
                 if(chatMessagesSessions != null){
                     for (WebSocketSession s : chatMessagesSessions) {
-                        s.sendMessage(message);
+                        s.sendMessage(montarMensagem(s, sessionToken.get(), chatMessage));
                     }
                 }
                 if(sessionUserSessions != null) {
                     for (WebSocketSession s : sessionUserSessions) {
-                        s.sendMessage(message);
+                        s.sendMessage(new TextMessage("Nova mensagem"));
                     }
                 }
                 if(userIdentifier2Sessions != null) {
                     for (WebSocketSession s : userIdentifier2Sessions) {
-                        s.sendMessage(message);
+                        s.sendMessage(new TextMessage("Nova mensagem"));
                     }
                 }
             } else {
@@ -124,6 +138,16 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
         System.out.println("Conexão FECHADA");
     }
 
+    private String getSessionUserIdentifier(WebSocketSession session) throws IOException {
+        Optional<String> sessionToken = sessionToken(session);
+        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
+            return tokenProvider.getIdentifierFromToken(sessionToken.get());
+        }else{
+            session.close(CloseStatus.BAD_DATA);
+            return null;
+        }
+    }
+
     private Optional<String> sessionToken(WebSocketSession session) {
         return Optional
                 .ofNullable(session.getUri())
@@ -144,5 +168,16 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                 .map(it -> it.get("chatIdentifier"))
                 .flatMap(it -> it.stream().findFirst())
                 .map(String::trim);
+    }
+
+    private String getReceiverIdentifier(DmChats chat, String sessionUserIdentifier){
+        return chat.getUserIdentifier1().equals(sessionUserIdentifier) ? chat.getUserIdentifier2() : chat.getUserIdentifier1();
+    }
+
+    public TextMessage montarMensagem(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
+        String chatMessagesSessionsUserIdentifier = getSessionUserIdentifier(session);
+        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier);
+        String sessionUserResponse = mapper.writeValueAsString(sessionUserChatResponse);
+        return new TextMessage(sessionUserResponse);
     }
 }

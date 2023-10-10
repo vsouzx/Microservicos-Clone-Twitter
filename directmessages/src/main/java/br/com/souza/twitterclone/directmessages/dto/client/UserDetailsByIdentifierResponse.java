@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UserDetailsByIdentifierResponse {
 
+    private String userIdentifier;
     private String firstName;
-    private String lastName;
     private String username;
     private Integer following;
     private Integer followers;
@@ -28,5 +28,10 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isPendingFollowedByMe;
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
+    private Boolean isNotificationsAlertedByMe;
+    private Integer tweetsCount;
+    private String profilePhotoUrl;
+    private String backgroundPhotoUrl;
+    private Boolean isVerified;
 
 }
