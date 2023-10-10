@@ -14,16 +14,25 @@
         <module name="discovery" />
         <module name="configserver" />
         <module name="accounts" />
-        <module name="Microservicos-Clone-Twitter" />
         <module name="gateway" />
         <module name="notifications" />
         <module name="authentication" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="accounts" target="17" />
+      <module name="authentication" target="17" />
+      <module name="configserver" target="17" />
       <module name="configserver (1)" target="17" />
       <module name="configserver (2)" target="17" />
+      <module name="directmessages" target="17" />
+      <module name="discovery" target="17" />
+      <module name="feed" target="17" />
+      <module name="gateway" target="17" />
+      <module name="mailsender" target="17" />
+      <module name="notifications" target="17" />
       <module name="TwitterClone" target="17" />
+      <module name="twitterclone" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

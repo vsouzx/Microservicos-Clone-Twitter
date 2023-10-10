@@ -22,14 +22,13 @@ public class SecurityConfiguration {
     private final TokenProvider tokenProvider;
 
     private static final String[] AUTH_WHITELIST = {
-            // URLS liberadas
-            "/feed/v1/user/register/**",
-            "/v1/user/register/**",
+            // WebSockets liberados
+            "/ws/*",
             // -- Swagger UI v3 (OpenAPI)
-            "/feed/v3/api-docs",
-            "/feed/v3/api-docs/swagger-config",
-            "/feed/swagger-ui.html",
-            "/feed/swagger-ui/*",
+            "/directmessages/v3/api-docs",
+            "/directmessages/v3/api-docs/swagger-config",
+            "/directmessages/swagger-ui.html",
+            "/directmessages/swagger-ui/*",
             "/v3/api-docs",
             "/v3/api-docs/swagger-config",
             "/swagger-ui.html",
