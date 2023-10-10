@@ -98,7 +98,7 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                         .userIdentifier(userIdentifier)
                         .text(message.getPayload())
                         .creationDate(UsefulDate.now())
-                        .seen(userIdentifier2Sessions != null && !userIdentifier2Sessions.isEmpty())
+                        .seen(validarSeUser2EstaLogadoNoChat(chatMessagesSessions, receiverIdentifier))
                         .build());
 
                 if(chatMessagesSessions != null){
@@ -179,5 +179,19 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
         ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier);
         String sessionUserResponse = mapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
+    }
+
+    private Boolean validarSeUser2EstaLogadoNoChat(Set<WebSocketSession> chatMessagesSessions, String receiverIdentifier) throws Exception {
+
+        boolean isLogado = false;
+        if(chatMessagesSessions != null){
+            for (WebSocketSession s : chatMessagesSessions) {
+                String sessionId = getSessionUserIdentifier(s);
+                if(sessionId != null && sessionId.equals(receiverIdentifier)){
+                    isLogado = true;
+                }
+            }
+        }
+        return isLogado;
     }
 }

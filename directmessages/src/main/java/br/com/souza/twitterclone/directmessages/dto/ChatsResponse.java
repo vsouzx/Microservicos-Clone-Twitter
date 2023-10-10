@@ -21,4 +21,5 @@ public class ChatsResponse {
     private String lastMessageText;
     private LocalDateTime lastMessageDate;
     private Boolean lastMessageSeen;
+    private Boolean isMine;
 }

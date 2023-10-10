@@ -24,15 +24,15 @@ public class LoadDirectMessagesRepositoryImpl {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier UNIQUEIDENTIFIER = ? ; ");
-        sb.append(" ");
-        sb.append("WITH LatestMessages AS (  ");
-        sb.append("    SELECT chat_identifier chat_identifier  ");
+        sb.append("");
+        sb.append(" WITH LatestMessages AS (  ");
+        sb.append("    SELECT c.identifier chat_identifier  ");
         sb.append("          ,MAX(creation_date) lastMessageDate  ");
-        sb.append("    FROM chat_messages d  ");
-        sb.append("	INNER JOIN dm_chats c ");
+        sb.append("    FROM dm_chats c  ");
+        sb.append("	LEFT JOIN chat_messages d ");
         sb.append("		ON c.identifier = d.chat_identifier ");
         sb.append("    WHERE (c.user_identifier_1 = @sessionUserIdentifier OR c.user_identifier_2 = @sessionUserIdentifier)  ");
-        sb.append("    GROUP BY chat_identifier  ");
+        sb.append("    GROUP BY c.identifier  ");
         sb.append(")  ");
         sb.append(" ");
         sb.append("SELECT c.identifier ");
@@ -44,10 +44,11 @@ public class LoadDirectMessagesRepositoryImpl {
         sb.append("	     ,m.text ");
         sb.append("	     ,m.creation_date ");
         sb.append("	     ,m.seen ");
+        sb.append("	     ,IIF(m.user_identifier IS NOT NULL, IIF(m.user_identifier = @sessionUserIdentifier, CONVERT(BIT, 1), CONVERT(BIT, 0)), NULL) isMine  ");
         sb.append("FROM LatestMessages l ");
         sb.append("INNER JOIN dm_chats c  ");
         sb.append("	ON c.identifier = l.chat_identifier ");
-        sb.append("INNER JOIN chat_messages m ");
+        sb.append("LEFT JOIN chat_messages m ");
         sb.append("	ON m.chat_identifier = c.identifier ");
         sb.append("	AND m.creation_date = l.lastMessageDate ");
         sb.append("INNER JOIN users u ");
@@ -67,8 +68,9 @@ public class LoadDirectMessagesRepositoryImpl {
                     .isUserVerified((Boolean) result[4])
                     .userProfilePhotoUrl((String) result[5])
                     .lastMessageText((String) result[6])
-                    .lastMessageDate(((Timestamp) result[7]).toLocalDateTime())
+                    .lastMessageDate(result[7] != null ? ((Timestamp) result[7]).toLocalDateTime() : null)
                     .lastMessageSeen((Boolean) result[8])
+                    .isMine((Boolean) result[9])
                     .build());
         });
 

@@ -26,13 +26,18 @@ public class DirectMessagesControllerImpl implements  IDirectMessageController {
     }
 
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ChatsResponse>> getAllChats(){
+    public ResponseEntity<List<ChatsResponse>> getAllChats() throws Exception {
         return new ResponseEntity<>(iDirectMessagesService.getAllChats(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{chatIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ChatsMessageResponse>> getSpecificChat(@PathVariable("chatIdentifier") String chatIdentifier,
-                                                                      @RequestHeader("Authorization") String authorization){
+                                                                      @RequestHeader("Authorization") String authorization)  throws Exception {
         return new ResponseEntity<>(iDirectMessagesService.getSpecificChat(FindUserIdentifierHelper.getIdentifier(), chatIdentifier, authorization), HttpStatus.OK);
     }
+
+//    @GetMapping(value = "/new", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<ChatsResponse>> newChat(){
+//        return new ResponseEntity<>(iDirectMessagesService.getAllChats(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
+//    }
 }
