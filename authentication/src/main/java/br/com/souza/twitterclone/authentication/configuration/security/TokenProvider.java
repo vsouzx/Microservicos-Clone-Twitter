@@ -66,6 +66,8 @@ public class TokenProvider {
                 .username(user.getUsername())
                 .expiresIn(expirationInMillis)
                 .firstAccess(user.getFirstAccess())
+                .firstName(user.getUsername())
+                .isVerified(user.getVerified())
                 .build();
     }
 
