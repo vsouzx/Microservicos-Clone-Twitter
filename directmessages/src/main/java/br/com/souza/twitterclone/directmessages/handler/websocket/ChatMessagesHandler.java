@@ -58,17 +58,14 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
         Optional<String> sessionToken = sessionToken(session);
 
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            System.out.println("Conexão validada");
             Optional<String> chatIdentifier = getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
                 singletonChatMessagesConnections.put(chatIdentifier.get(), session);
             } else {
                 session.close(CloseStatus.BAD_DATA);
-                System.out.println("BAD_DATA");
             }
         } else {
             session.close(CloseStatus.POLICY_VIOLATION);
-            System.out.println("POLICY_VIOLATION");
         }
     }
 
@@ -108,12 +105,12 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                 }
                 if(sessionUserSessions != null) {
                     for (WebSocketSession s : sessionUserSessions) {
-                        s.sendMessage(new TextMessage("Nova mensagem"));
+                        s.sendMessage(new TextMessage("New message"));
                     }
                 }
                 if(userIdentifier2Sessions != null) {
                     for (WebSocketSession s : userIdentifier2Sessions) {
-                        s.sendMessage(new TextMessage("Nova mensagem"));
+                        s.sendMessage(new TextMessage("New message"));
                     }
                 }
             } else {
@@ -129,13 +126,11 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
             Optional<String> chatIdentifier = getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
                 singletonChatMessagesConnections.remove(chatIdentifier.get(), session);
-                System.out.println("Sessão removida");
             } else {
                 session.close(CloseStatus.BAD_DATA);
             }
         }
         session.close(CloseStatus.SERVER_ERROR);
-        System.out.println("Conexão FECHADA");
     }
 
     private String getSessionUserIdentifier(WebSocketSession session) throws IOException {

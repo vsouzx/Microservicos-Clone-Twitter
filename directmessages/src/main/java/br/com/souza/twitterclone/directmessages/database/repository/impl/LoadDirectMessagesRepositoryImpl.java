@@ -42,7 +42,7 @@ public class LoadDirectMessagesRepositoryImpl {
         sb.append("	     ,u.verified ");
         sb.append("	     ,u.profile_photo_url ");
         sb.append("	     ,m.text ");
-        sb.append("	     ,m.creation_date ");
+        sb.append("	     ,ISNULL(m.creation_date, GETDATE()) ");
         sb.append("	     ,m.seen ");
         sb.append("	     ,IIF(m.user_identifier IS NOT NULL, IIF(m.user_identifier = @sessionUserIdentifier, CONVERT(BIT, 1), CONVERT(BIT, 0)), NULL) isMine  ");
         sb.append("FROM LatestMessages l ");
@@ -53,6 +53,8 @@ public class LoadDirectMessagesRepositoryImpl {
         sb.append("	AND m.creation_date = l.lastMessageDate ");
         sb.append("INNER JOIN users u ");
         sb.append("	ON u.identifier = IIF(c.user_identifier_1 = @sessionUserIdentifier, c.user_identifier_2, c.user_identifier_1) ");
+        sb.append("WHERE (c.user_identifier_1 = @sessionUserIdentifier OR m.creation_date IS NOT NULL) ");
+        sb.append("ORDER BY ISNULL(m.creation_date, GETDATE()) DESC");
 
         Query query = entityManager.createNativeQuery(sb.toString());
         query.setParameter(1, sessionUserIdentifier);
