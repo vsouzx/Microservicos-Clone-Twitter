@@ -19,20 +19,30 @@ public class User implements UserDetails {
     @Id
     @Column(name = "identifier", length = 36)
     private String identifier;
+
     @Column(name = "username", length = 255)
     private String username;
+
     @Column(name = "first_name")
     private String firstName;
+
     @Column(name = "email", length = 255)
     private String email;
+
     @Column(name = "password", length = 255)
     private String password;
+
     @Column(name = "confirmed_email")
     private Boolean confirmedEmail;
+
     @Column(name = "first_access")
     private Boolean firstAccess;
+
     @Column(name = "verified")
     private Boolean verified;
+
+    @Column(name = "profile_photo_url")
+    private String profilePhotoUrl;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -17,5 +17,6 @@ public class TokenResponse {
     private Boolean firstAccess;
     private String firstName;
     private Boolean isVerified;
+    private String profilePhotoUrl;
 
 }

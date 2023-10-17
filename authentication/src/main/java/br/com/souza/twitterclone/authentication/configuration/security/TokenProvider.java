@@ -68,6 +68,7 @@ public class TokenProvider {
                 .firstAccess(user.getFirstAccess())
                 .firstName(user.getFirstName())
                 .isVerified(user.getVerified())
+                .profilePhotoUrl(user.getProfilePhotoUrl())
                 .build();
     }
 
