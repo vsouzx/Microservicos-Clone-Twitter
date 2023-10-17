@@ -87,7 +87,7 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
 
                 Set<WebSocketSession> chatMessagesSessions = singletonChatMessagesConnections.get(chatIdentifier.get());
                 Set<WebSocketSession> sessionUserSessions = singletonDmChatsConnections.get(userIdentifier);
-                Set<WebSocketSession> userIdentifier2Sessions = singletonDmChatsConnections.get(receiverIdentifier);
+                Set<WebSocketSession> secondaryUserSessions = singletonDmChatsConnections.get(receiverIdentifier);
 
                 ChatMessages chatMessage = iChatMessagesRepository.save(ChatMessages.builder()
                         .identifier(UUID.randomUUID().toString())
@@ -95,21 +95,21 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                         .userIdentifier(userIdentifier)
                         .text(message.getPayload())
                         .creationDate(UsefulDate.now())
-                        .seen(validarSeUser2EstaLogadoNoChat(chatMessagesSessions, receiverIdentifier))
+                        .seen(isUser2LoggedIn(chatMessagesSessions, receiverIdentifier))
                         .build());
 
-                if(chatMessagesSessions != null){
+                if (chatMessagesSessions != null) {
                     for (WebSocketSession s : chatMessagesSessions) {
-                        s.sendMessage(montarMensagem(s, sessionToken.get(), chatMessage));
+                        s.sendMessage(createMessage(s, sessionToken.get(), chatMessage));
                     }
                 }
-                if(sessionUserSessions != null) {
+                if (sessionUserSessions != null) {
                     for (WebSocketSession s : sessionUserSessions) {
                         s.sendMessage(new TextMessage("New message"));
                     }
                 }
-                if(userIdentifier2Sessions != null) {
-                    for (WebSocketSession s : userIdentifier2Sessions) {
+                if (secondaryUserSessions != null) {
+                    for (WebSocketSession s : secondaryUserSessions) {
                         s.sendMessage(new TextMessage("New message"));
                     }
                 }
@@ -121,14 +121,12 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        Optional<String> sessionToken = sessionToken(session);
-        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            Optional<String> chatIdentifier = getChatIdentifier(session);
-            if (chatIdentifier.isPresent()) {
-                singletonChatMessagesConnections.remove(chatIdentifier.get(), session);
-            } else {
-                session.close(CloseStatus.BAD_DATA);
-            }
+        Optional<String> chatIdentifier = getChatIdentifier(session);
+        if (chatIdentifier.isPresent()) {
+            singletonChatMessagesConnections.remove(chatIdentifier.get(), session);
+        } else {
+            session.close(CloseStatus.BAD_DATA);
+            return;
         }
         session.close(CloseStatus.SERVER_ERROR);
     }
@@ -137,7 +135,7 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
         Optional<String> sessionToken = sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             return tokenProvider.getIdentifierFromToken(sessionToken.get());
-        }else{
+        } else {
             session.close(CloseStatus.BAD_DATA);
             return null;
         }
@@ -165,24 +163,24 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                 .map(String::trim);
     }
 
-    private String getReceiverIdentifier(DmChats chat, String sessionUserIdentifier){
+    private String getReceiverIdentifier(DmChats chat, String sessionUserIdentifier) {
         return chat.getUserIdentifier1().equals(sessionUserIdentifier) ? chat.getUserIdentifier2() : chat.getUserIdentifier1();
     }
 
-    public TextMessage montarMensagem(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
+    public TextMessage createMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
         String chatMessagesSessionsUserIdentifier = getSessionUserIdentifier(session);
         ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier);
         String sessionUserResponse = mapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
     }
 
-    private Boolean validarSeUser2EstaLogadoNoChat(Set<WebSocketSession> chatMessagesSessions, String receiverIdentifier) throws Exception {
+    private Boolean isUser2LoggedIn(Set<WebSocketSession> chatMessagesSessions, String receiverIdentifier) throws Exception {
 
         boolean isLogado = false;
-        if(chatMessagesSessions != null){
+        if (chatMessagesSessions != null) {
             for (WebSocketSession s : chatMessagesSessions) {
                 String sessionId = getSessionUserIdentifier(s);
-                if(sessionId != null && sessionId.equals(receiverIdentifier)){
+                if (sessionId != null && sessionId.equals(receiverIdentifier)) {
                     isLogado = true;
                 }
             }

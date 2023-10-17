@@ -31,7 +31,6 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.searchUserInfos(FindUserIdentifierHelper.getIdentifier(), authorization), HttpStatus.OK);
     }
 
-    //TODO: trocar para username
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
                                                                                     @RequestHeader("Authorization") String authorization) throws Exception {
@@ -79,8 +78,9 @@ public class UserSearchControllerImpl implements IUserSearchController {
     public ResponseEntity<List<UserDetailsByIdentifierResponse>> getWhoToFollow(@RequestParam(value = "page", required = true) Integer page,
                                                                                 @RequestParam(value = "size", required = true) Integer size,
                                                                                 @RequestParam(value = "userOnScreen", required = false) String userOnScreen,
+                                                                                @RequestParam(value = "isVerified", required = false) Boolean isVerified,
                                                                                 @RequestHeader("Authorization") String authorization) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size, userOnScreen, authorization), HttpStatus.OK);
+        return new ResponseEntity<>(iUsersSearchService.getWhoToFollow(FindUserIdentifierHelper.getIdentifier(), page, size, userOnScreen, isVerified, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/verified", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,13 +93,14 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.getAlertedUsers(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/commonfollows", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getCommonFollows(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getCommonFollows(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifer), HttpStatus.OK);
-    }
-
     @GetMapping(value = "/followsandfollowers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FollowsAndFollowersResponse> getFollowsAndFollowers(@RequestParam(value = "targetUserIdentifier") String targetUserIdentifer) {
         return new ResponseEntity<>(iUsersSearchService.getFollowsAndFollowers(targetUserIdentifer), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/allknownfollowers/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@PathVariable("identifier") String targetUserIdentifier,
+                                                                                       @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getAllKnownFollowers(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization), HttpStatus.OK);
     }
 }

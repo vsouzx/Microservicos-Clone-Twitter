@@ -14,9 +14,10 @@ public interface IUsersSearchService {
     ValidEmailResponse isValidEmail(String email);
     ValidUsernameResponse isValidUsername(String username);
     ValidUserResponse isValidUser(String username);
-    List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, String authorization) throws Exception;
+    List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified, String authorization) throws Exception;
     List<UserPreviewResponse> getVerified();
     List<String> getAlertedUsers(String sessionUserIdentifier) throws Exception;
-    List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
     FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier);
+    List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception;
+
 }

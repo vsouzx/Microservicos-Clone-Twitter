@@ -24,15 +24,14 @@ public class UserKnownFollowersRepository implements IFollowsDetailsStrategy {
         this.usersInteractionsService = usersInteractionsService;
     }
 
-    //TODO: Finalizar query
     @Override
     public List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	    VARCHAR(MAX) = ?  ");
         sb.append("	   ,@targetUser			VARCHAR(MAX) = ?  ");
-        sb.append("	   ,@PageNumber			INT = 0  ");
-        sb.append("       ,@RowsOfPage			INT = 20    ");
+        sb.append("	   ,@PageNumber			INT = ? ");
+        sb.append("    ,@RowsOfPage			INT = ?    ");
         sb.append("   ");
         sb.append("SELECT DISTINCT  u.identifier  ");
         sb.append("				,u.first_name    ");

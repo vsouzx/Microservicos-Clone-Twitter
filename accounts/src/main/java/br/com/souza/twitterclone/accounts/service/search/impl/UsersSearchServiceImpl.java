@@ -7,9 +7,11 @@ import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersReposi
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.followsdetails.IFollowsDetailsStrategy;
 import br.com.souza.twitterclone.accounts.database.repository.followsdetails.factory.FollowsDetailsStrategyFactory;
+import br.com.souza.twitterclone.accounts.database.repository.impl.AllUserKnownFollowersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.impl.UsersRepositoryImpl;
 import br.com.souza.twitterclone.accounts.database.repository.impl.WhoToFollowRepositoryImpl;
 import br.com.souza.twitterclone.accounts.dto.user.FollowsAndFollowersResponse;
+import br.com.souza.twitterclone.accounts.dto.user.KnownUsersResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
@@ -35,6 +37,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final WhoToFollowRepositoryImpl whoToFollowRepository;
     private final IUserService iUserService;
     private final FollowsDetailsStrategyFactory followsDetailsStrategyFactory;
+    private final AllUserKnownFollowersRepository allUserKnownFollowersRepository;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
@@ -43,7 +46,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                                   AlertedUsersRepository alertedUsersRepository,
                                   WhoToFollowRepositoryImpl whoToFollowRepository,
                                   IUserService iUserService,
-                                  FollowsDetailsStrategyFactory followsDetailsStrategyFactory) {
+                                  FollowsDetailsStrategyFactory followsDetailsStrategyFactory,
+                                  AllUserKnownFollowersRepository allUserKnownFollowersRepository) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
@@ -52,6 +56,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         this.whoToFollowRepository = whoToFollowRepository;
         this.iUserService = iUserService;
         this.followsDetailsStrategyFactory = followsDetailsStrategyFactory;
+        this.allUserKnownFollowersRepository = allUserKnownFollowersRepository;
     }
 
     @Override
@@ -158,9 +163,9 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, String authorization) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified, String authorization) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(userOnScreen == null || userOnScreen.isBlank() ? sessionUserIdentifier : userOnScreen);
-        return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), authorization);
+        return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), isVerified, authorization);
     }
 
     @Override
@@ -184,17 +189,16 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getCommonFollows(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
-        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
-        return iUsersInteractionsService.getCommonFollowers(sessionUserIdentifier, targetUser.getIdentifier());
-    }
-
-    @Override
     public FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier){
         return FollowsAndFollowersResponse.builder()
                 .followers(iUsersInteractionsService.getUserFollowersCount(targetUserIdentifier))
                 .follows(iUsersInteractionsService.getUserFollowsCount(targetUserIdentifier))
                 .build();
+    }
+
+    @Override
+    public List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
+        return allUserKnownFollowersRepository.getUserFollowsInformations(sessionUserIdentifier, targetUserIdentifier);
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {

@@ -37,8 +37,6 @@ public interface IUsersInteractionsService {
 
     Integer getUserFollowsCount(String targetUserIdentifier);
 
-    List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception;
-
     Integer getTweetsCount(String targetUserIdentifier, String authorization);
 
 }

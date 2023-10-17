@@ -104,6 +104,7 @@ public interface IUserSearchController {
     ResponseEntity<List<UserDetailsByIdentifierResponse>> getWhoToFollow(@Parameter(description = "Numero da pagina") Integer page,
                                                                          @Parameter(description = "Tamanho da pagina") Integer size,
                                                                          @Parameter(description = "Usuário que não é para aparecer") String userOnScreen,
+                                                                         @Parameter(description = "Retornar apenas verificados") Boolean isVerified,
                                                                          String authorization) throws Exception;
 
     @Operation(summary = "Lista os usuários verificados")
@@ -123,15 +124,6 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<String>> getAlertedUsers() throws Exception;
-
-    @Operation(summary = "Lista os seguidores em comum entre usuarios")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
-            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
-    })
-    ResponseEntity<List<UserPreviewResponse>> getCommonFollows(@Parameter(description = "Identificador do target useer") String targetUserIdentifier) throws Exception;
 
     @Operation(summary = "Lista os seguidores em comum entre usuarios")
     @ApiResponses(value = {

@@ -31,12 +31,10 @@ public class DmChatsHandler extends TextWebSocketHandler {
         Optional<String> sessionToken = sessionToken(session);
 
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            System.out.println("Conexão validada");
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             singletonDmChatsConnections.put(identifier, session);
         } else {
             session.close(CloseStatus.POLICY_VIOLATION);
-            System.out.println("Conexão interrompida");
         }
     }
 
@@ -58,10 +56,8 @@ public class DmChatsHandler extends TextWebSocketHandler {
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             singletonDmChatsConnections.remove(identifier, session);
-            System.out.println("Sessão removida");
         }
         session.close(CloseStatus.SERVER_ERROR);
-        System.out.println("Conexão FECHADA");
     }
 
     private Optional<String> sessionToken(WebSocketSession session) {

@@ -24,7 +24,6 @@ public class UserVerifiedFollowersRepository implements IFollowsDetailsStrategy 
         this.usersInteractionsService = usersInteractionsService;
     }
 
-    //TODO: Finalizar query
     @Override
     public List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization){
         StringBuilder sb = new StringBuilder();

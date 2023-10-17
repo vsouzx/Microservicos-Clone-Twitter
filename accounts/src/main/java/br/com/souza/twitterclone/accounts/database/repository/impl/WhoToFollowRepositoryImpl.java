@@ -23,13 +23,14 @@ public class WhoToFollowRepositoryImpl {
         this.iUsersInteractionsService = iUsersInteractionsService;
     }
 
-    public List<UserDetailsByIdentifierResponse> find(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, String authorization) throws Exception {
+    public List<UserDetailsByIdentifierResponse> find(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified, String authorization){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
         sb.append("	      ,@userOnScreen		VARCHAR(MAX) = ? ");
         sb.append("	      ,@PageNumber		    INT = ? ");
         sb.append("       ,@RowsOfPage		    INT = ? ");
+        sb.append("       ,@isVerified		    BIT = ? ");
         sb.append("  ");
         sb.append("SELECT u.identifier  ");
         sb.append("      ,u.first_name  ");
@@ -57,6 +58,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("	AND f.follower_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("	AND (@userOnScreen IS NULL OR u.identifier <> @userOnScreen) ");
+        sb.append("	AND (@isVerified IS NULL OR u.verified = @isVerified ");
         sb.append("ORDER BY NEWID() ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");

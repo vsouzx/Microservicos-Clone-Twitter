@@ -50,6 +50,7 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
     @Override
     public List<ChatsMessageResponse> getSpecificChat(String sessionUserIdentifier, String chatIdentifier, String authorization) throws Exception {
 
+        //TODO add paginacao das mensagens
         chatMessagesRepository.findAllByChatIdentifier(chatIdentifier).stream()
                 .filter(m -> !m.getUserIdentifier().equals(sessionUserIdentifier))
                 .forEach(m -> {

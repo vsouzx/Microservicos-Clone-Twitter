@@ -18,6 +18,7 @@ import br.com.souza.twitterclone.accounts.database.repository.SilencedUsersRepos
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersFollowsRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UsersPendingFollowsRepository;
+import br.com.souza.twitterclone.accounts.database.repository.followsdetails.IFollowsDetailsStrategy;
 import br.com.souza.twitterclone.accounts.dto.client.DeleteNotificationRequest;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
 import br.com.souza.twitterclone.accounts.enums.NotificationsTypeEnum;
@@ -297,12 +298,6 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     public Integer getUserFollowsCount(String user) {
         List<User> followers = userRepository.findUserFollows(user);
         return followers.size();
-    }
-
-    @Override
-    public List<UserPreviewResponse> getCommonFollowers(String sessionUser, String targetUser) throws Exception {
-        List<User> followers = userRepository.findSessionUserCommonFollowsWithTargerUser(sessionUser, targetUser);
-        return rowMapper(followers, sessionUser);
     }
 
     @Override
