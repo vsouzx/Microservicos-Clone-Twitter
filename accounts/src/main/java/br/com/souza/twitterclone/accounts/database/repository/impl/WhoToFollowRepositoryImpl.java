@@ -58,7 +58,7 @@ public class WhoToFollowRepositoryImpl {
         sb.append("	AND f.follower_identifier is null ");
         sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("	AND (@userOnScreen IS NULL OR u.identifier <> @userOnScreen) ");
-        sb.append("	AND (@isVerified IS NULL OR u.verified = @isVerified ");
+        sb.append("	AND (@isVerified IS NULL OR u.verified = @isVerified)");
         sb.append("ORDER BY NEWID() ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
