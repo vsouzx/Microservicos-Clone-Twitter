@@ -198,7 +198,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
-        return allUserKnownFollowersRepository.getUserFollowsInformations(sessionUserIdentifier, targetUserIdentifier);
+        User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+        return allUserKnownFollowersRepository.getUserFollowsInformations(sessionUserIdentifier, targetUser.getIdentifier());
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
