@@ -99,8 +99,8 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/allknownfollowers/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@PathVariable("identifier") String targetUserIdentifier,
-                                                                                       @RequestHeader("Authorization") String authorization) throws Exception {
+    public ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@PathVariable("targetUserIdentifier") String targetUserIdentifier,
+                                                                         @RequestHeader("Authorization") String authorization) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getAllKnownFollowers(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization), HttpStatus.OK);
     }
 }
