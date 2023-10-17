@@ -69,6 +69,7 @@ public class WhoToFollowRepositoryImpl {
         query.setParameter(2, userOnScreen);
         query.setParameter(3, page);
         query.setParameter(4, size);
+        query.setParameter(5, isVerified);
 
         List<Object[]> lista = query.getResultList();
 
