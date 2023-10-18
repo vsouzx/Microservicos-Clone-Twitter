@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.directmessages.handler.websocket;
 
 import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
+import br.com.souza.twitterclone.directmessages.service.commons.IHandlersCommons;
 import br.com.souza.twitterclone.directmessages.util.SingletonDmChatsConnections;
 import java.util.Optional;
 import java.util.Set;
@@ -10,8 +11,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Component
@@ -19,16 +18,19 @@ public class DmChatsHandler extends TextWebSocketHandler {
 
     private final SingletonDmChatsConnections singletonDmChatsConnections;
     private final TokenProvider tokenProvider;
+    private final IHandlersCommons iHandlersCommons;
 
-    public DmChatsHandler(TokenProvider tokenProvider) {
+    public DmChatsHandler(TokenProvider tokenProvider,
+                          IHandlersCommons iHandlersCommons) {
         this.tokenProvider = tokenProvider;
+        this.iHandlersCommons = iHandlersCommons;
         this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-        Optional<String> sessionToken = sessionToken(session);
+        Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
 
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
@@ -40,7 +42,7 @@ public class DmChatsHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        Optional<String> sessionToken = sessionToken(session);
+        Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             Set<WebSocketSession> sessions = singletonDmChatsConnections.get(identifier);
@@ -52,22 +54,11 @@ public class DmChatsHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        Optional<String> sessionToken = sessionToken(session);
+        Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             singletonDmChatsConnections.remove(identifier, session);
         }
         session.close(CloseStatus.SERVER_ERROR);
-    }
-
-    private Optional<String> sessionToken(WebSocketSession session) {
-        return Optional
-                .ofNullable(session.getUri())
-                .map(UriComponentsBuilder::fromUri)
-                .map(UriComponentsBuilder::build)
-                .map(UriComponents::getQueryParams)
-                .map(it -> it.get("token"))
-                .flatMap(it -> it.stream().findFirst())
-                .map(String::trim);
     }
 }
