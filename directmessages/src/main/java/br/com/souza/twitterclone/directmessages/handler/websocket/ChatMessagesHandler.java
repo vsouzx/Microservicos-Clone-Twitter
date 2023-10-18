@@ -1,21 +1,14 @@
 package br.com.souza.twitterclone.directmessages.handler.websocket;
 
-import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
-import br.com.souza.twitterclone.directmessages.client.IFeedClient;
 import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
-import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
 import br.com.souza.twitterclone.directmessages.database.model.DmChats;
-import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.IDmChatsRepository;
-import br.com.souza.twitterclone.directmessages.dto.ChatsMessageResponse;
+import br.com.souza.twitterclone.directmessages.dto.MessageRequest;
+import br.com.souza.twitterclone.directmessages.service.handlers.IMessageHandlerStrategy;
+import br.com.souza.twitterclone.directmessages.service.handlers.factory.MessageHandlerFactory;
 import br.com.souza.twitterclone.directmessages.util.SingletonChatMessagesConnections;
-import br.com.souza.twitterclone.directmessages.util.SingletonDmChatsConnections;
-import br.com.souza.twitterclone.directmessages.util.UsefulDate;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -28,27 +21,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class ChatMessagesHandler extends TextWebSocketHandler {
 
     private final SingletonChatMessagesConnections singletonChatMessagesConnections;
-    private final SingletonDmChatsConnections singletonDmChatsConnections;
     private final TokenProvider tokenProvider;
     private final IDmChatsRepository iDmChatsRepository;
-    private final IChatMessagesRepository iChatMessagesRepository;
-    private final IAccountsClient iAccountsClient;
-    private final IFeedClient iFeedClient;
     private final ObjectMapper mapper;
+    private final MessageHandlerFactory messageHandlerFactory;
 
     public ChatMessagesHandler(TokenProvider tokenProvider,
                                IDmChatsRepository iDmChatsRepository,
-                               IChatMessagesRepository iChatMessagesRepository,
-                               IAccountsClient iAccountsClient,
-                               IFeedClient iFeedClient,
-                               ObjectMapper mapper) {
+                               ObjectMapper mapper,
+                               MessageHandlerFactory messageHandlerFactory) {
         this.iDmChatsRepository = iDmChatsRepository;
-        this.iChatMessagesRepository = iChatMessagesRepository;
-        this.iAccountsClient = iAccountsClient;
-        this.iFeedClient = iFeedClient;
         this.mapper = mapper;
+        this.messageHandlerFactory = messageHandlerFactory;
         this.singletonChatMessagesConnections = SingletonChatMessagesConnections.getInstance();
-        this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
         this.tokenProvider = tokenProvider;
     }
 
@@ -82,37 +67,13 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                     session.close(CloseStatus.BAD_DATA);
                     return;
                 }
-
                 String receiverIdentifier = getReceiverIdentifier(chat.get(), userIdentifier);
 
-                Set<WebSocketSession> chatMessagesSessions = singletonChatMessagesConnections.get(chatIdentifier.get());
-                Set<WebSocketSession> sessionUserSessions = singletonDmChatsConnections.get(userIdentifier);
-                Set<WebSocketSession> secondaryUserSessions = singletonDmChatsConnections.get(receiverIdentifier);
+                MessageRequest messageRequest = mapper.readValue(message.getPayload(), MessageRequest.class);
 
-                ChatMessages chatMessage = iChatMessagesRepository.save(ChatMessages.builder()
-                        .identifier(UUID.randomUUID().toString())
-                        .chatIdentifier(chatIdentifier.get())
-                        .userIdentifier(userIdentifier)
-                        .text(message.getPayload())
-                        .creationDate(UsefulDate.now())
-                        .seen(isUser2LoggedIn(chatMessagesSessions, receiverIdentifier))
-                        .build());
+                IMessageHandlerStrategy strategy = messageHandlerFactory.getStrategy(messageRequest.getType());
+                strategy.processMessage(messageRequest, chatIdentifier.get(), userIdentifier, receiverIdentifier, sessionToken.get());
 
-                if (chatMessagesSessions != null) {
-                    for (WebSocketSession s : chatMessagesSessions) {
-                        s.sendMessage(createMessage(s, sessionToken.get(), chatMessage));
-                    }
-                }
-                if (sessionUserSessions != null) {
-                    for (WebSocketSession s : sessionUserSessions) {
-                        s.sendMessage(new TextMessage("New message"));
-                    }
-                }
-                if (secondaryUserSessions != null) {
-                    for (WebSocketSession s : secondaryUserSessions) {
-                        s.sendMessage(new TextMessage("New message"));
-                    }
-                }
             } else {
                 session.close(CloseStatus.BAD_DATA);
             }
@@ -129,16 +90,6 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
             return;
         }
         session.close(CloseStatus.SERVER_ERROR);
-    }
-
-    private String getSessionUserIdentifier(WebSocketSession session) throws IOException {
-        Optional<String> sessionToken = sessionToken(session);
-        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            return tokenProvider.getIdentifierFromToken(sessionToken.get());
-        } else {
-            session.close(CloseStatus.BAD_DATA);
-            return null;
-        }
     }
 
     private Optional<String> sessionToken(WebSocketSession session) {
@@ -165,26 +116,5 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
 
     private String getReceiverIdentifier(DmChats chat, String sessionUserIdentifier) {
         return chat.getUserIdentifier1().equals(sessionUserIdentifier) ? chat.getUserIdentifier2() : chat.getUserIdentifier1();
-    }
-
-    public TextMessage createMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
-        String chatMessagesSessionsUserIdentifier = getSessionUserIdentifier(session);
-        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier);
-        String sessionUserResponse = mapper.writeValueAsString(sessionUserChatResponse);
-        return new TextMessage(sessionUserResponse);
-    }
-
-    private Boolean isUser2LoggedIn(Set<WebSocketSession> chatMessagesSessions, String receiverIdentifier) throws Exception {
-
-        boolean isLogado = false;
-        if (chatMessagesSessions != null) {
-            for (WebSocketSession s : chatMessagesSessions) {
-                String sessionId = getSessionUserIdentifier(s);
-                if (sessionId != null && sessionId.equals(receiverIdentifier)) {
-                    isLogado = true;
-                }
-            }
-        }
-        return isLogado;
     }
 }

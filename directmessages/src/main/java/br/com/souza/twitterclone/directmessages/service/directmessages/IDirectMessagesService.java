@@ -10,5 +10,4 @@ public interface IDirectMessagesService {
     List<ChatsMessageResponse> getSpecificChat(String sessionUserIdentifier, String chatIdentifier, Integer page, Integer size, String authorization) throws Exception;
     String initChat(String sessionUserIdentifier, String targetUserIdentifier, String auth) throws Exception;
     void cleanNoMessageChats(String sessionUserIdentifier) throws Exception;
-    void hideMessage(String sessionUserIdentifier, String messageIdentifier) throws Exception;
 }

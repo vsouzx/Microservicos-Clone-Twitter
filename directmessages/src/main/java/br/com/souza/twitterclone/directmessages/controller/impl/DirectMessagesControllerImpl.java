@@ -53,9 +53,4 @@ public class DirectMessagesControllerImpl implements IDirectMessageController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PatchMapping(value = "/hidemessage/{messageIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> hideMessage(@PathVariable("messageIdentifier") String messageIdentifier) throws Exception {
-        iDirectMessagesService.hideMessage(FindUserIdentifierHelper.getIdentifier(), messageIdentifier);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }

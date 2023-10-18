@@ -26,8 +26,9 @@ public class ChatsMessageResponse {
     private String emoji;
     private Boolean seen;
     private Boolean isMine;
+    private String type;
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String sessionUserIdentifier){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String sessionUserIdentifier, String type){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
@@ -40,6 +41,7 @@ public class ChatsMessageResponse {
                 this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
             }
             this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
+            this.type = type;
         }catch (Exception e){
             e.printStackTrace();
             throw e;

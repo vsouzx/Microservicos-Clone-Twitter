@@ -29,7 +29,6 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
     private final LoadDirectMessagesRepositoryImpl loadDirectMessagesRepository;
     private final IChatMessagesRepository chatMessagesRepository;
     private final IDmChatsRepository iDmChatsRepository;
-    private final IChatIgnoredMessagesRepository iChatIgnoredMessagesRepository;
     private final IFeedClient iFeedClient;
     private final IAccountsClient iAccountsClient;
     private final SingletonDmChatsConnections singletonDmChatsConnections;
@@ -37,13 +36,11 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
     public DirectMessagesServiceImpl(LoadDirectMessagesRepositoryImpl loadDirectMessagesRepository,
                                      IChatMessagesRepository chatMessagesRepository,
                                      IDmChatsRepository iDmChatsRepository,
-                                     IChatIgnoredMessagesRepository iChatIgnoredMessagesRepository,
                                      IFeedClient iFeedClient,
                                      IAccountsClient iAccountsClient) {
         this.loadDirectMessagesRepository = loadDirectMessagesRepository;
         this.chatMessagesRepository = chatMessagesRepository;
         this.iDmChatsRepository = iDmChatsRepository;
-        this.iChatIgnoredMessagesRepository = iChatIgnoredMessagesRepository;
         this.iFeedClient = iFeedClient;
         this.iAccountsClient = iAccountsClient;
         this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
@@ -72,7 +69,7 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
 
         return chatMessagesRepository.findAllByChatIdentifier(chatIdentifier, sessionUserIdentifier, page, size)
                 .stream()
-                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier))
+                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier, "LOAD_MESSAGE"))
                 .sorted(Comparator.comparing(ChatsMessageResponse::getCreationDate))
                 .toList();
     }
@@ -102,19 +99,5 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
         for(ChatsResponse chat : chatsWithNoMessages){
             iDmChatsRepository.deleteById(chat.getChatIdentifier());
         }
-    }
-
-    @Override
-    public void hideMessage(String sessionUserIdentifier, String messageIdentifier) throws Exception {
-        ChatMessages message = chatMessagesRepository.findById(messageIdentifier)
-                        .orElseThrow(() -> new Exception("Message not found"));
-
-        iChatIgnoredMessagesRepository.save(ChatIgnoredMessages.builder()
-                        .id(ChatIgnoredMessagesId.builder()
-                                .messageIdentifier(message.getIdentifier())
-                                .chatIdentifier(message.getChatIdentifier())
-                                .userIdentifier(sessionUserIdentifier)
-                                .build())
-                .build());
     }
 }
