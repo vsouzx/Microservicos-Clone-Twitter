@@ -11,9 +11,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,10 +33,12 @@ public class DirectMessagesControllerImpl implements IDirectMessageController {
         return new ResponseEntity<>(iDirectMessagesService.getAllChats(FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/{chatIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/messages/{chatIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ChatsMessageResponse>> getSpecificChat(@PathVariable("chatIdentifier") String chatIdentifier,
+                                                                      @RequestParam("page") Integer page,
+                                                                      @RequestParam("size") Integer size,
                                                                       @RequestHeader("Authorization") String authorization) throws Exception {
-        return new ResponseEntity<>(iDirectMessagesService.getSpecificChat(FindUserIdentifierHelper.getIdentifier(), chatIdentifier, authorization), HttpStatus.OK);
+        return new ResponseEntity<>(iDirectMessagesService.getSpecificChat(FindUserIdentifierHelper.getIdentifier(), chatIdentifier, page, size, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/init/{targetUserIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -46,6 +50,12 @@ public class DirectMessagesControllerImpl implements IDirectMessageController {
     @DeleteMapping(value = "/clean", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> cleanNoMessageChats() throws Exception {
         iDirectMessagesService.cleanNoMessageChats(FindUserIdentifierHelper.getIdentifier());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PatchMapping(value = "/hidemessage/{messageIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> hideMessage(@PathVariable("messageIdentifier") String messageIdentifier) throws Exception {
+        iDirectMessagesService.hideMessage(FindUserIdentifierHelper.getIdentifier(), messageIdentifier);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

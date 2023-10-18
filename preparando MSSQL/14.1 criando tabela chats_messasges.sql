@@ -4,7 +4,7 @@ CREATE TABLE [chat_messages](
 	[identifier] uniqueidentifier NOT NULL,
 	[chat_identifier] uniqueidentifier NOT NULL,
 	[user_identifier] uniqueidentifier NOT NULL,
-	[text] VARCHAR(MAX),
+	[text] VARCHAR(MAX) COLLATE Latin1_General_100_CI_AI_SC_UTF8,
 	[tweet_identifier] uniqueidentifier,
 	[creation_date] [datetime] NOT NULL,
 	[emoji] VARCHAR(MAX),

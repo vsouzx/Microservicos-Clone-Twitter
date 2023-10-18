@@ -30,5 +30,7 @@ public interface IDirectMessageController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<ChatsMessageResponse>> getSpecificChat(String chatIdentifier,
+                                                               Integer page,
+                                                               Integer size,
                                                                String authorization) throws Exception;
 }

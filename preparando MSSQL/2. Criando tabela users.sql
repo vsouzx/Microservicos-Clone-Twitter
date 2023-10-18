@@ -2,11 +2,11 @@ DROP TABLE users;
 
 CREATE TABLE users(
 	[identifier] [uniqueidentifier] NOT NULL,
-	[first_name] [varchar](255) NOT NULL,
+	[first_name] [varchar](255) COLLATE Latin1_General_100_CI_AI_SC_UTF8 NOT NULL ,
 	[birth_date] [DATETIME] NULL,
 	[email] [varchar](255) NOT NULL UNIQUE,
 	[username] [varchar](30) NOT NULL UNIQUE,
-	[biography] [varchar](255),
+	[biography] [varchar](255) COLLATE Latin1_General_100_CI_AI_SC_UTF8,
 	[location][varchar](100),
 	[site][varchar](255),
 	[password] [varchar](255) NOT NULL,
