@@ -25,7 +25,7 @@ public class AllUserKnownFollowersRepository{
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	    VARCHAR(MAX) = ?  ");
-        sb.append("	      ,@targetUser			VARCHAR(MAX) = ?  ");
+        sb.append("	      ,@targetUser		VARCHAR(MAX) = ?  ");
         sb.append("   ");
         sb.append("SELECT DISTINCT u.first_name    ");
         sb.append("				  ,u.profile_photo_url  ");
@@ -37,7 +37,7 @@ public class AllUserKnownFollowersRepository{
         sb.append("	ON common.followed_identifier = f.follower_identifier  ");
         sb.append("	AND common.follower_identifier = @sessionUser  ");
         sb.append("WHERE common.follower_identifier IS NOT NULL ");
-        sb.append("ORDER BY u.identifier   ");
+        sb.append("ORDER BY u.first_name   ");
 
         Query query = em.createNativeQuery(sb.toString());
 
