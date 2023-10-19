@@ -11,12 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TokenResponse {
 
-    private String username;
     private String token;
     private Long expiresIn;
     private Boolean firstAccess;
-    private String firstName;
-    private Boolean isVerified;
-    private String profilePhotoUrl;
 
 }
