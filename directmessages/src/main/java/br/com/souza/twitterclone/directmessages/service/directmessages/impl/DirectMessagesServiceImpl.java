@@ -69,7 +69,7 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
 
         return chatMessagesRepository.findAllByChatIdentifier(chatIdentifier, sessionUserIdentifier, page, size)
                 .stream()
-                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier, "LOAD_MESSAGE"))
+                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier))
                 .sorted(Comparator.comparing(ChatsMessageResponse::getCreationDate))
                 .toList();
     }

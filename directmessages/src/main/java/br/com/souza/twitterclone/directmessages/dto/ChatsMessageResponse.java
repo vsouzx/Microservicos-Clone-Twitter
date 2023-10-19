@@ -28,7 +28,7 @@ public class ChatsMessageResponse {
     private Boolean isMine;
     private String type;
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String sessionUserIdentifier, String type){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String sessionUserIdentifier, String type){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
@@ -40,8 +40,47 @@ public class ChatsMessageResponse {
             if(message.getTweetIdentifier() != null){
                 this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
             }
-            this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
+            this.isMine = chatMessageSessionUserIdentifier.equals(sessionUserIdentifier);
             this.type = type;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String type){
+        try{
+            this.identifier = message.getIdentifier();
+            this.chatIdentifier = message.getChatIdentifier();
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.text = message.getText();
+            this.creationDate = message.getCreationDate();
+            this.emoji = message.getEmoji();
+            this.seen = message.getSeen();
+            if(message.getTweetIdentifier() != null){
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+            }
+            this.isMine = chatMessageSessionUserIdentifier.equals(message.getUserIdentifier());
+            this.type = type;
+        }catch (Exception e){
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier){
+        try{
+            this.identifier = message.getIdentifier();
+            this.chatIdentifier = message.getChatIdentifier();
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.text = message.getText();
+            this.creationDate = message.getCreationDate();
+            this.emoji = message.getEmoji();
+            this.seen = message.getSeen();
+            if(message.getTweetIdentifier() != null){
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+            }
+            this.isMine = chatMessageSessionUserIdentifier.equals(message.getUserIdentifier());
         }catch (Exception e){
             e.printStackTrace();
             throw e;

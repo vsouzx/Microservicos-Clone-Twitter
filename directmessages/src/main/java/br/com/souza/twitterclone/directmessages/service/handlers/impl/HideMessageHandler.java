@@ -57,37 +57,53 @@ public class HideMessageHandler implements IMessageHandlerStrategy {
         Set<WebSocketSession> sessionUserSessions = singletonDmChatsConnections.get(sessionUserIdentifier);
         Set<WebSocketSession> secondaryUserSessions = singletonDmChatsConnections.get(receiverIdentifier);
 
-        ChatMessages chatMessage = iChatMessagesRepository.findById(messageRequest.getMessageIdentifier())
-                .orElseThrow(() -> new Exception("Message not found"));
+        try {
+            ChatMessages chatMessage = iChatMessagesRepository.findById(messageRequest.getMessageIdentifier())
+                    .orElseThrow(() -> new Exception("Message not found"));
 
-        iChatIgnoredMessagesRepository.save(ChatIgnoredMessages.builder()
-                .id(ChatIgnoredMessagesId.builder()
-                        .messageIdentifier(chatMessage.getIdentifier())
-                        .chatIdentifier(chatMessage.getChatIdentifier())
-                        .userIdentifier(receiverIdentifier)
-                        .build())
-                .build());
+            iChatIgnoredMessagesRepository.save(ChatIgnoredMessages.builder()
+                    .id(ChatIgnoredMessagesId.builder()
+                            .messageIdentifier(chatMessage.getIdentifier())
+                            .chatIdentifier(chatMessage.getChatIdentifier())
+                            .userIdentifier(sessionUserIdentifier)
+                            .build())
+                    .build());
 
-        if (chatMessagesSessions != null) {
-            for (WebSocketSession s : chatMessagesSessions) {
-                s.sendMessage(createHideMessage(s, sessionToken, chatMessage));
+            if (chatMessagesSessions != null) {
+                for (WebSocketSession s : chatMessagesSessions) {
+                    try {
+                        s.sendMessage(createHideMessage(s, sessionToken, chatMessage, sessionUserIdentifier));
+                    } catch (Exception e) {
+                        s.close();
+                    }
+                }
             }
-        }
-        if (sessionUserSessions != null) {
-            for (WebSocketSession s : sessionUserSessions) {
-                s.sendMessage(new TextMessage("Updated"));
+            if (sessionUserSessions != null) {
+                for (WebSocketSession s : sessionUserSessions) {
+                    try {
+                        s.sendMessage(new TextMessage("Updated"));
+                    } catch (Exception e) {
+                        s.close();
+                    }
+                }
             }
-        }
-        if (secondaryUserSessions != null) {
-            for (WebSocketSession s : secondaryUserSessions) {
-                s.sendMessage(new TextMessage("Updated"));
+            if (secondaryUserSessions != null) {
+                for (WebSocketSession s : secondaryUserSessions) {
+                    try {
+                        s.sendMessage(new TextMessage("Updated"));
+                    } catch (Exception e) {
+                        s.close();
+                    }
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Erro");
         }
     }
 
-    private TextMessage createHideMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
-        String chatMessagesSessionsUserIdentifier = iHandlersCommons.getSessionUserIdentifier(session);
-        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier, "HIDE_MESSAGE");
+    private TextMessage createHideMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage, String sessionUserIdentifier) throws Exception {
+        String chatMessagesSessionUserIdentifier = iHandlersCommons.getSessionUserIdentifier(session);
+        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionUserIdentifier, sessionUserIdentifier, "HIDE_MESSAGE");
         String sessionUserResponse = objectMapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
     }
