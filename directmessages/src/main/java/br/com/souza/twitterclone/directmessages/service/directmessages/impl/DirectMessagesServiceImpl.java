@@ -2,11 +2,8 @@ package br.com.souza.twitterclone.directmessages.service.directmessages.impl;
 
 import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
 import br.com.souza.twitterclone.directmessages.client.IFeedClient;
-import br.com.souza.twitterclone.directmessages.database.model.ChatIgnoredMessages;
-import br.com.souza.twitterclone.directmessages.database.model.ChatIgnoredMessagesId;
-import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
 import br.com.souza.twitterclone.directmessages.database.model.DmChats;
-import br.com.souza.twitterclone.directmessages.database.repository.IChatIgnoredMessagesRepository;
+import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesReactionsRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.IDmChatsRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.impl.LoadDirectMessagesRepositoryImpl;
@@ -32,17 +29,19 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
     private final IFeedClient iFeedClient;
     private final IAccountsClient iAccountsClient;
     private final SingletonDmChatsConnections singletonDmChatsConnections;
+    private final IChatMessagesReactionsRepository iChatMessagesReactionsRepository;
 
     public DirectMessagesServiceImpl(LoadDirectMessagesRepositoryImpl loadDirectMessagesRepository,
                                      IChatMessagesRepository chatMessagesRepository,
                                      IDmChatsRepository iDmChatsRepository,
                                      IFeedClient iFeedClient,
-                                     IAccountsClient iAccountsClient) {
+                                     IAccountsClient iAccountsClient, IChatMessagesReactionsRepository iChatMessagesReactionsRepository) {
         this.loadDirectMessagesRepository = loadDirectMessagesRepository;
         this.chatMessagesRepository = chatMessagesRepository;
         this.iDmChatsRepository = iDmChatsRepository;
         this.iFeedClient = iFeedClient;
         this.iAccountsClient = iAccountsClient;
+        this.iChatMessagesReactionsRepository = iChatMessagesReactionsRepository;
         this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
     }
 
@@ -69,7 +68,7 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
 
         return chatMessagesRepository.findAllByChatIdentifier(chatIdentifier, sessionUserIdentifier, page, size)
                 .stream()
-                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier))
+                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier, iChatMessagesReactionsRepository))
                 .sorted(Comparator.comparing(ChatsMessageResponse::getCreationDate))
                 .toList();
     }

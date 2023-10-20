@@ -2,8 +2,8 @@ package br.com.souza.twitterclone.directmessages.service.handlers.impl;
 
 import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
 import br.com.souza.twitterclone.directmessages.client.IFeedClient;
-import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
+import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesReactionsRepository;
 import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesRepository;
 import br.com.souza.twitterclone.directmessages.dto.ChatsMessageResponse;
 import br.com.souza.twitterclone.directmessages.dto.MessageRequest;
@@ -29,17 +29,20 @@ public class NewMessageHandler implements IMessageHandlerStrategy {
     private final IFeedClient iFeedClient;
     private final ObjectMapper objectMapper;
     private final IHandlersCommons iHandlersCommons;
+    private final IChatMessagesReactionsRepository iChatMessagesReactionsRepository;
 
     public NewMessageHandler(IChatMessagesRepository iChatMessagesRepository,
                              IAccountsClient iAccountsClient,
                              IFeedClient iFeedClient,
                              ObjectMapper objectMapper,
-                             IHandlersCommons iHandlersCommons) {
+                             IHandlersCommons iHandlersCommons,
+                             IChatMessagesReactionsRepository iChatMessagesReactionsRepository) {
         this.iChatMessagesRepository = iChatMessagesRepository;
         this.iAccountsClient = iAccountsClient;
         this.iFeedClient = iFeedClient;
         this.objectMapper = objectMapper;
         this.iHandlersCommons = iHandlersCommons;
+        this.iChatMessagesReactionsRepository = iChatMessagesReactionsRepository;
         this.singletonDmChatsConnections = SingletonDmChatsConnections.getInstance();
         this.singletonChatMessagesConnections = SingletonChatMessagesConnections.getInstance();
     }
@@ -78,7 +81,7 @@ public class NewMessageHandler implements IMessageHandlerStrategy {
 
     private TextMessage createNewMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
         String chatMessagesSessionsUserIdentifier = iHandlersCommons.getSessionUserIdentifier(session);
-        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier, "NEW_MESSAGE");
+        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionsUserIdentifier, "NEW_MESSAGE", iChatMessagesReactionsRepository);
         String sessionUserResponse = objectMapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
     }

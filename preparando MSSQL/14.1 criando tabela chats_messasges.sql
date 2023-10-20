@@ -7,7 +7,6 @@ CREATE TABLE [chat_messages](
 	[text] VARCHAR(MAX) COLLATE Latin1_General_100_CI_AI_SC_UTF8,
 	[tweet_identifier] uniqueidentifier,
 	[creation_date] [datetime] NOT NULL,
-	[emoji] VARCHAR(MAX) COLLATE Latin1_General_100_CI_AI_SC_UTF8,
 	[seen] BIT
 CONSTRAINT [PK_chat_messages] PRIMARY KEY CLUSTERED 
 (

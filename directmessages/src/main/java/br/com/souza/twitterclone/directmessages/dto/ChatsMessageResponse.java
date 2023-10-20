@@ -3,9 +3,12 @@ package br.com.souza.twitterclone.directmessages.dto;
 import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
 import br.com.souza.twitterclone.directmessages.client.IFeedClient;
 import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
+import br.com.souza.twitterclone.directmessages.database.model.ChatMessagesReactions;
+import br.com.souza.twitterclone.directmessages.database.repository.IChatMessagesReactionsRepository;
 import br.com.souza.twitterclone.directmessages.dto.client.TimelineTweetResponse;
 import br.com.souza.twitterclone.directmessages.dto.client.UserDetailsByIdentifierResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,7 +26,7 @@ public class ChatsMessageResponse {
     private String text;
     private TimelineTweetResponse tweet;
     private LocalDateTime creationDate;
-    private String emoji;
+    private List<ChatMessagesReactions> reactions;
     private Boolean seen;
     private Boolean isMine;
     private String type;
@@ -35,7 +38,7 @@ public class ChatsMessageResponse {
             this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
-            this.emoji = message.getEmoji();
+            this.reactions = null;
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
                 this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
@@ -48,14 +51,14 @@ public class ChatsMessageResponse {
         }
     }
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String type){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String type, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
             this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
-            this.emoji = message.getEmoji();
+            this.reactions = iChatMessagesReactionsRepository.findAllByIdMessageIdentifier(message.getIdentifier());
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
                 this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
@@ -68,14 +71,14 @@ public class ChatsMessageResponse {
         }
     }
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
             this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
-            this.emoji = message.getEmoji();
+            this.reactions = iChatMessagesReactionsRepository.findAllByIdMessageIdentifier(message.getIdentifier());
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
                 this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);

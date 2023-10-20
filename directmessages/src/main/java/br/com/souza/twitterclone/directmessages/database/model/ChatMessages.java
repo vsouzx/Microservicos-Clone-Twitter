@@ -35,9 +35,6 @@ public class ChatMessages {
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    @Column(name = "emoji")
-    private String emoji;
-
     @Column(name = "seen")
     private Boolean seen;
 }

@@ -34,10 +34,12 @@ public class DmChatsHandler extends TextWebSocketHandler {
 
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
-            singletonDmChatsConnections.put(identifier, session);
-        } else {
-            session.close(CloseStatus.POLICY_VIOLATION);
+            if (identifier != null) {
+                singletonDmChatsConnections.put(identifier, session);
+                return;
+            }
         }
+        session.close(CloseStatus.POLICY_VIOLATION);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class DmChatsHandler extends TextWebSocketHandler {
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             Set<WebSocketSession> sessions = singletonDmChatsConnections.get(identifier);
-            for (WebSocketSession s : sessions){
+            for (WebSocketSession s : sessions) {
                 s.sendMessage(message);
             }
         }
@@ -57,7 +59,9 @@ public class DmChatsHandler extends TextWebSocketHandler {
         Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
-            singletonDmChatsConnections.remove(identifier, session);
+            if(identifier != null){
+                singletonDmChatsConnections.remove(identifier, session);
+            }
         }
         session.close(CloseStatus.SERVER_ERROR);
     }
