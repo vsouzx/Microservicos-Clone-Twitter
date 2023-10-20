@@ -2,7 +2,6 @@ package br.com.souza.twitterclone.directmessages.service.handlers.impl;
 
 import br.com.souza.twitterclone.directmessages.client.IAccountsClient;
 import br.com.souza.twitterclone.directmessages.client.IFeedClient;
-import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.directmessages.database.model.ChatIgnoredMessages;
 import br.com.souza.twitterclone.directmessages.database.model.ChatIgnoredMessagesId;
 import br.com.souza.twitterclone.directmessages.database.model.ChatMessages;
@@ -15,11 +14,8 @@ import br.com.souza.twitterclone.directmessages.service.handlers.IMessageHandler
 import br.com.souza.twitterclone.directmessages.util.SingletonChatMessagesConnections;
 import br.com.souza.twitterclone.directmessages.util.SingletonDmChatsConnections;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Service;
-import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
