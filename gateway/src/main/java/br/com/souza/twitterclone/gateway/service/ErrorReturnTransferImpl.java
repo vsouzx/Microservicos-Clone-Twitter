@@ -23,7 +23,7 @@ public class ErrorReturnTransferImpl {
         }
 
         String strResponse = "{\n" +
-                "    \"error\": \"%s\"\n" +
+                "    \"error\": \"%s\",\n" +
                 "    \"message\": \"%s\"\n" +
                 "}";
 
