@@ -14,5 +14,6 @@ public class TokenResponse {
     private String token;
     private Long expiresIn;
     private Boolean firstAccess;
+    private String username;
 
 }

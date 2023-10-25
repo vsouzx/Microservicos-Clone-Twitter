@@ -65,6 +65,7 @@ public class TokenProvider {
                 .token(auth)
                 .expiresIn(expirationInMillis)
                 .firstAccess(user.getFirstAccess())
+                .username(user.getUsername())
                 .build();
     }
 
