@@ -48,7 +48,7 @@ public class RepliesTimelineRepository implements ITimelineStrategy {
         sb.append("	ON p.type_identifier = t.type  ");
         sb.append("WHERE t.user_identifier = @targetUserIdentifier ");
         sb.append("ORDER BY t.publication_time desc  ");
-        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS    ");
+        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS    ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY    ");
 
         Query query = em.createNativeQuery(sb.toString());

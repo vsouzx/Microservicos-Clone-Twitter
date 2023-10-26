@@ -50,7 +50,6 @@ public class LikesTimelineRepository implements ITimelineStrategy {
         sb.append("	ON l.tweet_identifier = t.tweet_identifier ");
         sb.append("	AND l.user_identifier = @targetUserIdentifier ");
         sb.append("ORDER BY t.publication_time desc   ");
-        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS     ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY     ");
 
         Query query = em.createNativeQuery(sb.toString());

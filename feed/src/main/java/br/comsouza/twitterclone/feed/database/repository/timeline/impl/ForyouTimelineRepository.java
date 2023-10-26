@@ -55,7 +55,7 @@ public class ForyouTimelineRepository implements ITimelineStrategy {
         sb.append("	AND b.blocker_identifier = @sessionUserIdentifier  ");
         sb.append("WHERE s.silenced_identifier IS NULL AND b.blocked_identifier IS NULL ");
         sb.append("ORDER BY t.publication_time desc  ");
-        sb.append("OFFSET (@PageNumber - 1) * @RowsOfPage ROWS    ");
+        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS    ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY    ");
 
         Query query = em.createNativeQuery(sb.toString());
