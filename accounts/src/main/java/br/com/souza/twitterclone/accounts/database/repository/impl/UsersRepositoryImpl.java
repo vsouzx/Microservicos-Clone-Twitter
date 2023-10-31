@@ -45,8 +45,8 @@ public class UsersRepositoryImpl {
         sb.append("				,u.verified ");
         sb.append(" ");
         sb.append("FROM users u    ");
-        sb.append("WHERE (UPPER(u.username) LIKE UPPER('%'+ @targetUsername + '%') OR UPPER(u.first_name) LIKE UPPER('%'+ @targetUsername + '%'))");
-        sb.append("	AND u.identifier <> @sessionUser");
+        sb.append("WHERE (UPPER(u.username) LIKE UPPER('%'+ @targetUsername + '%') OR UPPER(u.first_name) LIKE UPPER('%'+ @targetUsername + '%')) ");
+        sb.append("	AND u.identifier <> @sessionUser ");
         sb.append("ORDER BY u.identifier  ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY  ");
