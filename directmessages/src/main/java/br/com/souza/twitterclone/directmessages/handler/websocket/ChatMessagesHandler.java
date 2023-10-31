@@ -47,6 +47,7 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
             Optional<String> chatIdentifier = iHandlersCommons.getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
                 singletonChatMessagesConnections.put(chatIdentifier.get(), session);
+                session.sendMessage(new TextMessage("pong"));
             } else {
                 session.close(CloseStatus.BAD_DATA);
             }
@@ -66,6 +67,10 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                 Optional<DmChats> chat = iDmChatsRepository.findById(chatIdentifier.get());
                 if (chat.isEmpty()) {
                     session.close(CloseStatus.BAD_DATA);
+                    return;
+                }
+                if(message.getPayload().equals("ping")){
+                    session.sendMessage(new TextMessage("pong"));
                     return;
                 }
                 String receiverIdentifier = iHandlersCommons.getReceiverIdentifier(chat.get(), userIdentifier);

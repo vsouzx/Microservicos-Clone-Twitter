@@ -36,6 +36,7 @@ public class DmChatsHandler extends TextWebSocketHandler {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
             if (identifier != null) {
                 singletonDmChatsConnections.put(identifier, session);
+                session.sendMessage(new TextMessage("pong"));
                 return;
             }
         }
@@ -47,6 +48,12 @@ public class DmChatsHandler extends TextWebSocketHandler {
         Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
         if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
             String identifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
+
+            if(message.getPayload().equals("ping")){
+                session.sendMessage(new TextMessage("pong"));
+                return;
+            }
+
             Set<WebSocketSession> sessions = singletonDmChatsConnections.get(identifier);
             for (WebSocketSession s : sessions) {
                 s.sendMessage(message);

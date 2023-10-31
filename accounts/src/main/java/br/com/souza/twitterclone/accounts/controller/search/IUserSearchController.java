@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.util.List;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 
@@ -41,9 +40,10 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(String targetUserIdentifier,
-                                                                 @Parameter(description = "Numero da pagina") Integer page,
-                                                                 @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
+    ResponseEntity<List<UserDetailsByIdentifierResponse>> getUsersByUsername(String targetUserIdentifier,
+                                                                             @Parameter(description = "Numero da pagina") Integer page,
+                                                                             @Parameter(description = "Tamanho da pagina") Integer size,
+                                                                             String authorization) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {

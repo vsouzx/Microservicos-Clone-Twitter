@@ -105,8 +105,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserPreviewResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) throws Exception {
-        return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page <= 0 ? 1 : page, size <= 0 ? 50 : size);
+    public List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size, String authorization){
+        return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page, size, authorization);
     }
 
     @Override

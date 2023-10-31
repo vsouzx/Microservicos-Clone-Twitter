@@ -5,7 +5,6 @@ import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import java.util.List;
-import javax.print.attribute.standard.Media;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +37,11 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserPreviewResponse>> getUsersByUsername(@RequestParam(value = "username", required = false) String targetUsername,
-                                                                        @RequestParam(value = "page", required = true) Integer page,
-                                                                        @RequestParam(value = "size", required = true) Integer size) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername, page, size), HttpStatus.OK);
+    public ResponseEntity<List<UserDetailsByIdentifierResponse>> getUsersByUsername(@RequestParam(value = "username", required = false) String targetUsername,
+                                                                                    @RequestParam(value = "page", required = true) Integer page,
+                                                                                    @RequestParam(value = "size", required = true) Integer size,
+                                                                                    @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getUsersByUsername(FindUserIdentifierHelper.getIdentifier(), targetUsername, page, size, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/followsdetails/{identifier}/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
