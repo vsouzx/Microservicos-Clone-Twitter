@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.accounts.controller.search.impl;
 
 import br.com.souza.twitterclone.accounts.controller.search.IUserSearchController;
+import br.com.souza.twitterclone.accounts.database.model.UsersSearchHistoric;
 import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
@@ -32,8 +33,9 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
-                                                                                    @RequestHeader("Authorization") String authorization) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.searchUserInfosByIdentifier(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization), HttpStatus.OK);
+                                                                                    @RequestHeader("Authorization") String authorization,
+                                                                                    @RequestParam(value = "savehistoric", required = false) Boolean savehistoric) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.searchUserInfosByIdentifier(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization, savehistoric), HttpStatus.OK);
     }
 
     @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -102,5 +104,10 @@ public class UserSearchControllerImpl implements IUserSearchController {
     public ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@PathVariable("targetUserIdentifier") String targetUserIdentifier,
                                                                          @RequestHeader("Authorization") String authorization) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getAllKnownFollowers(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/historic", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserSearchHistoricResponse>> getUserSearchHistoric(@RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.getUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), authorization), HttpStatus.OK);
     }
 }

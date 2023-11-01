@@ -2,9 +2,11 @@ package br.com.souza.twitterclone.accounts.service.search.impl;
 
 import br.com.souza.twitterclone.accounts.database.model.BlockedUsersId;
 import br.com.souza.twitterclone.accounts.database.model.User;
+import br.com.souza.twitterclone.accounts.database.model.UsersSearchHistoric;
 import br.com.souza.twitterclone.accounts.database.repository.AlertedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.BlockedUsersRepository;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
+import br.com.souza.twitterclone.accounts.database.repository.UsersSearchHistoricRepository;
 import br.com.souza.twitterclone.accounts.database.repository.followsdetails.IFollowsDetailsStrategy;
 import br.com.souza.twitterclone.accounts.database.repository.followsdetails.factory.FollowsDetailsStrategyFactory;
 import br.com.souza.twitterclone.accounts.database.repository.impl.AllUserKnownFollowersRepository;
@@ -15,14 +17,18 @@ import br.com.souza.twitterclone.accounts.dto.user.KnownUsersResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsByIdentifierResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserDetailsResponse;
 import br.com.souza.twitterclone.accounts.dto.user.UserPreviewResponse;
+import br.com.souza.twitterclone.accounts.dto.user.UserSearchHistoricResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUserResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUsernameResponse;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.service.user.IUserService;
+import br.com.souza.twitterclone.accounts.util.UsefulDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +44,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     private final IUserService iUserService;
     private final FollowsDetailsStrategyFactory followsDetailsStrategyFactory;
     private final AllUserKnownFollowersRepository allUserKnownFollowersRepository;
+    private final UsersSearchHistoricRepository usersSearchHistoricRepository;
+    private static final Integer MAX_HISTORIC_SIZE = 15;
 
     public UsersSearchServiceImpl(UserRepository userRepository,
                                   UsersRepositoryImpl usersRepositoryImpl,
@@ -47,7 +55,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                                   WhoToFollowRepositoryImpl whoToFollowRepository,
                                   IUserService iUserService,
                                   FollowsDetailsStrategyFactory followsDetailsStrategyFactory,
-                                  AllUserKnownFollowersRepository allUserKnownFollowersRepository) {
+                                  AllUserKnownFollowersRepository allUserKnownFollowersRepository,
+                                  UsersSearchHistoricRepository usersSearchHistoricRepository) {
         this.userRepository = userRepository;
         this.usersRepositoryImpl = usersRepositoryImpl;
         this.blockedUsersRepository = blockedUsersRepository;
@@ -57,6 +66,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         this.iUserService = iUserService;
         this.followsDetailsStrategyFactory = followsDetailsStrategyFactory;
         this.allUserKnownFollowersRepository = allUserKnownFollowersRepository;
+        this.usersSearchHistoricRepository = usersSearchHistoricRepository;
     }
 
     @Override
@@ -82,8 +92,35 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
+    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization, Boolean savehistoric) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
+
+        if (savehistoric != null && savehistoric) {
+            List<UsersSearchHistoric> usersSearchHistoric = usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier);
+            if (usersSearchHistoric.size() >= MAX_HISTORIC_SIZE) {
+                UsersSearchHistoric older = usersSearchHistoric.stream()
+                        .min(Comparator.comparing(UsersSearchHistoric::getSearchDate))
+                        .get();
+                usersSearchHistoricRepository.delete(older);
+            }
+
+            Optional<UsersSearchHistoric> possivelHistorico = usersSearchHistoric.stream()
+                    .filter(h -> h.getSearchedIdentifier().equals(targetUser.getIdentifier()))
+                    .findAny();
+
+            if (possivelHistorico.isPresent()) {
+                possivelHistorico.get().setSearchDate(UsefulDate.now());
+                usersSearchHistoricRepository.save(possivelHistorico.get());
+            } else {
+                usersSearchHistoricRepository.save(UsersSearchHistoric.builder()
+                        .identifier(UUID.randomUUID().toString())
+                        .searcherIdentifier(sessionUserIdentifier)
+                        .searchedIdentifier(targetUser.getIdentifier())
+                        .text(null)
+                        .searchDate(UsefulDate.now())
+                        .build());
+            }
+        }
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(targetUser.getIdentifier())
@@ -105,7 +142,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size, String authorization){
+    public List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size, String authorization) {
         return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page, size, authorization);
     }
 
@@ -122,25 +159,25 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public ValidEmailResponse isValidEmail(String email){
+    public ValidEmailResponse isValidEmail(String email) {
         return ValidEmailResponse.builder()
                 .isValidEmail(userRepository.findByEmail(email).isEmpty())
                 .build();
     }
 
     @Override
-    public ValidUsernameResponse isValidUsername(String username){
+    public ValidUsernameResponse isValidUsername(String username) {
         return ValidUsernameResponse.builder()
                 .isValidUsername(userRepository.findByUsername(username).isEmpty())
                 .build();
     }
 
     @Override
-    public ValidUserResponse isValidUser(String username){
+    public ValidUserResponse isValidUser(String username) {
         Optional<User> user;
 
         user = userRepository.findByUsername(username);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return ValidUserResponse.builder()
                     .isValidUser(true)
                     .isUsername(true)
@@ -149,7 +186,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         }
 
         user = userRepository.findByEmail(username);
-        if(user.isPresent()){
+        if (user.isPresent()) {
             return ValidUserResponse.builder()
                     .isValidUser(true)
                     .isUsername(false)
@@ -182,14 +219,14 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<String> getAlertedUsers(String sessionUserIdentifier){
+    public List<String> getAlertedUsers(String sessionUserIdentifier) {
         return alertedUsersRepository.findAllByIdAlertedIdentifier(sessionUserIdentifier).stream()
                 .map(user -> user.getId().getAlerterIdentifier())
                 .toList();
     }
 
     @Override
-    public FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier){
+    public FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier) {
         return FollowsAndFollowersResponse.builder()
                 .followers(iUsersInteractionsService.getUserFollowersCount(targetUserIdentifier))
                 .follows(iUsersInteractionsService.getUserFollowsCount(targetUserIdentifier))
@@ -200,6 +237,15 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     public List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         return allUserKnownFollowersRepository.getUserFollowsInformations(sessionUserIdentifier, targetUser.getIdentifier());
+    }
+
+    @Override
+    public List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier, String authorization) throws Exception {
+        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(sessionUserIdentifier);
+
+        return usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier).stream()
+                .map(h -> new UserSearchHistoricResponse(h, user))
+                .toList();
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
