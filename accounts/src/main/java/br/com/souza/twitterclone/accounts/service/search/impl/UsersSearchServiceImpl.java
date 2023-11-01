@@ -21,6 +21,7 @@ import br.com.souza.twitterclone.accounts.dto.user.UserSearchHistoricResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidEmailResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUserResponse;
 import br.com.souza.twitterclone.accounts.dto.user.ValidUsernameResponse;
+import br.com.souza.twitterclone.accounts.handler.exceptions.UserNotFoundException;
 import br.com.souza.twitterclone.accounts.service.interactions.IUsersInteractionsService;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.service.user.IUserService;
@@ -92,35 +93,8 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization, Boolean savehistoric) throws Exception {
+    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
-
-        if (savehistoric != null && savehistoric) {
-            List<UsersSearchHistoric> usersSearchHistoric = usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier);
-            if (usersSearchHistoric.size() >= MAX_HISTORIC_SIZE) {
-                UsersSearchHistoric older = usersSearchHistoric.stream()
-                        .min(Comparator.comparing(UsersSearchHistoric::getSearchDate))
-                        .get();
-                usersSearchHistoricRepository.delete(older);
-            }
-
-            Optional<UsersSearchHistoric> possivelHistorico = usersSearchHistoric.stream()
-                    .filter(h -> h.getSearchedIdentifier().equals(targetUser.getIdentifier()))
-                    .findAny();
-
-            if (possivelHistorico.isPresent()) {
-                possivelHistorico.get().setSearchDate(UsefulDate.now());
-                usersSearchHistoricRepository.save(possivelHistorico.get());
-            } else {
-                usersSearchHistoricRepository.save(UsersSearchHistoric.builder()
-                        .identifier(UUID.randomUUID().toString())
-                        .searcherIdentifier(sessionUserIdentifier)
-                        .searchedIdentifier(targetUser.getIdentifier())
-                        .text(null)
-                        .searchDate(UsefulDate.now())
-                        .build());
-            }
-        }
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
                 .blockerIdentifier(targetUser.getIdentifier())
@@ -241,11 +215,73 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
 
     @Override
     public List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier, String authorization) throws Exception {
-        User user = iUserService.findUserByUsernameOrEmailOrIdentifier(sessionUserIdentifier);
-
         return usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier).stream()
-                .map(h -> new UserSearchHistoricResponse(h, user))
+                .map(h -> {
+                    try {
+                        return new UserSearchHistoricResponse(h, iUserService);
+                    } catch (UserNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .sorted(Comparator.comparing(UserSearchHistoricResponse::getSearchDate).reversed())
                 .toList();
+    }
+
+    @Override
+    public void saveUserSearchHistoric(String sessionUserIdentifier, String targetUserIdentifier, String text) throws Exception {
+
+        if (text == null && targetUserIdentifier == null) {
+            throw new Exception("Text or UserIdentifier must have value");
+        }
+
+        List<UsersSearchHistoric> usersSearchHistoric = usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier);
+        if (usersSearchHistoric.size() >= MAX_HISTORIC_SIZE) {
+            UsersSearchHistoric older = usersSearchHistoric.stream()
+                    .min(Comparator.comparing(UsersSearchHistoric::getSearchDate))
+                    .get();
+            usersSearchHistoricRepository.delete(older);
+        }
+
+        if (targetUserIdentifier != null) {
+            User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);;
+            Optional<UsersSearchHistoric> possivelHistorico = usersSearchHistoric.stream()
+                    .filter(h -> h.getSearchedIdentifier() != null)
+                    .filter(h -> h.getSearchedIdentifier().equals(targetUser.getIdentifier()))
+                    .findAny();
+
+            if (possivelHistorico.isPresent()) {
+                possivelHistorico.get().setSearchDate(UsefulDate.now());
+                usersSearchHistoricRepository.save(possivelHistorico.get());
+            }else{
+                usersSearchHistoricRepository.save(UsersSearchHistoric.builder()
+                        .identifier(UUID.randomUUID().toString())
+                        .searcherIdentifier(sessionUserIdentifier)
+                        .searchedIdentifier(targetUser.getIdentifier())
+                        .text(null)
+                        .searchDate(UsefulDate.now())
+                        .build());
+            }
+        }
+
+        if (text != null) {
+            Optional<UsersSearchHistoric> possivelHistorico = usersSearchHistoric.stream()
+                    .filter(h -> h.getText() != null)
+                    .filter(h -> h.getText().equals(text))
+                    .findAny();
+
+            if (possivelHistorico.isPresent()) {
+                possivelHistorico.get().setSearchDate(UsefulDate.now());
+                usersSearchHistoricRepository.save(possivelHistorico.get());
+            }else {
+                usersSearchHistoricRepository.save(UsersSearchHistoric.builder()
+                        .identifier(UUID.randomUUID().toString())
+                        .searcherIdentifier(sessionUserIdentifier)
+                        .searchedIdentifier(null)
+                        .text(text)
+                        .searchDate(UsefulDate.now())
+                        .build());
+            }
+        }
     }
 
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {

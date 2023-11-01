@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,9 +34,8 @@ public class UserSearchControllerImpl implements IUserSearchController {
 
     @GetMapping(value = "/byidentifier/{identifier}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(@PathVariable("identifier") String targetUserIdentifier,
-                                                                                    @RequestHeader("Authorization") String authorization,
-                                                                                    @RequestParam(value = "savehistoric", required = false) Boolean savehistoric) throws Exception {
-        return new ResponseEntity<>(iUsersSearchService.searchUserInfosByIdentifier(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization, savehistoric), HttpStatus.OK);
+                                                                                    @RequestHeader("Authorization") String authorization) throws Exception {
+        return new ResponseEntity<>(iUsersSearchService.searchUserInfosByIdentifier(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifier, authorization), HttpStatus.OK);
     }
 
     @GetMapping(value = "/byusername", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -109,5 +109,12 @@ public class UserSearchControllerImpl implements IUserSearchController {
     @GetMapping(value = "/historic", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserSearchHistoricResponse>> getUserSearchHistoric(@RequestHeader("Authorization") String authorization) throws Exception {
         return new ResponseEntity<>(iUsersSearchService.getUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), authorization), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/historic", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> saveUserSearchHistoric(@RequestParam(value = "targetUserIdentifier", required = false) String targetUserIdentifer,
+                                                       @RequestParam(value = "text", required = false) String text) throws Exception {
+        iUsersSearchService.saveUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifer, text);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

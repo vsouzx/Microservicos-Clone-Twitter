@@ -31,8 +31,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier,
-                                                                             String authorization,
-                                                                             @Parameter(description = "Se vai salvar a busca no historico ou nao") Boolean savehistoric) throws Exception;
+                                                                             String authorization) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {

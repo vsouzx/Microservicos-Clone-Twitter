@@ -8,7 +8,7 @@ import java.util.List;
 public interface IUsersSearchService {
 
     UserDetailsResponse searchUserInfos(String userIdentifier, String authorization) throws Exception;
-    UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String userIdentifier, String targetUserIdentifier, String authorization, Boolean savehistoric) throws Exception;
+    UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String userIdentifier, String targetUserIdentifier, String authorization) throws Exception;
     List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization) throws Exception;
     List<UserDetailsByIdentifierResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size, String authorization) throws Exception;
     List<UserPreviewResponse> getUserPendingFollowers(String sessionUserIdentifier, Integer page, Integer size) throws Exception;
@@ -21,5 +21,6 @@ public interface IUsersSearchService {
     FollowsAndFollowersResponse getFollowsAndFollowers(String targetUserIdentifier);
     List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception;
     List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier, String authorization) throws Exception;
+    void saveUserSearchHistoric(String sessionUserIdentifier, String targetUserIdentifier, String text) throws Exception;
 
 }
