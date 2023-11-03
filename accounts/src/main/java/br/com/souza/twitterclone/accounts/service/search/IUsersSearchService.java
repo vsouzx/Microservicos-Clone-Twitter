@@ -22,5 +22,7 @@ public interface IUsersSearchService {
     List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception;
     List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier, String authorization) throws Exception;
     void saveUserSearchHistoric(String sessionUserIdentifier, String targetUserIdentifier, String text) throws Exception;
+    void deleteUserSearchHistoric(String historicIdentifier) throws Exception;
+    void deleteAllUserSearchHistoric(String sessionUserIdentifier) throws Exception;
 
 }

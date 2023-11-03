@@ -5,10 +5,12 @@ import br.com.souza.twitterclone.accounts.database.model.UsersSearchHistoric;
 import br.com.souza.twitterclone.accounts.dto.user.*;
 import br.com.souza.twitterclone.accounts.service.search.IUsersSearchService;
 import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -112,9 +114,20 @@ public class UserSearchControllerImpl implements IUserSearchController {
     }
 
     @PostMapping(value = "/historic", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> saveUserSearchHistoric(@RequestParam(value = "targetUserIdentifier", required = false) String targetUserIdentifer,
-                                                       @RequestParam(value = "text", required = false) String text) throws Exception {
-        iUsersSearchService.saveUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), targetUserIdentifer, text);
+    public ResponseEntity<Void> saveUserSearchHistoric(@RequestBody SaveHistoricRequest request) throws Exception {
+        iUsersSearchService.saveUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), request.getTargetUserIdentifier(), request.getText());
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(value = "/historic/{historicIdentifier}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteUserSearchHistoric(@PathVariable("historicIdentifier") String historicIdentifier) throws Exception {
+        iUsersSearchService.deleteUserSearchHistoric(historicIdentifier);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(value = "/historic/all", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteAllUserSearchHistoric() throws Exception {
+        iUsersSearchService.deleteAllUserSearchHistoric(FindUserIdentifierHelper.getIdentifier());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

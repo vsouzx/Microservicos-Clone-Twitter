@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -116,7 +117,7 @@ public interface IUserSearchController {
     })
     ResponseEntity<List<UserPreviewResponse>> getVerified() throws Exception;
 
-    @Operation(summary = "Retorna os dados da foto de perfil do user")
+    @Operation(summary = "Retorna os usuarios alertados")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
             @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
@@ -125,7 +126,7 @@ public interface IUserSearchController {
     })
     ResponseEntity<List<String>> getAlertedUsers() throws Exception;
 
-    @Operation(summary = "Lista os seguidores em comum entre usuarios")
+    @Operation(summary = "Lista os seguidos e seguidores")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
             @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
@@ -133,4 +134,51 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<FollowsAndFollowersResponse> getFollowsAndFollowers(@Parameter(description = "Identificador do target useer") String targetUserIdentifier) throws Exception;
+
+    @Operation(summary = "Lista os seguidores em comum entre usuarios")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@Parameter(description = "Identificador do target useer") String targetUserIdentifier,
+                                                                  String authorization) throws Exception;
+
+    @Operation(summary = "Lista o historico de busca do usuario")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<List<UserSearchHistoricResponse>> getUserSearchHistoric(String authorization) throws Exception;
+
+    @Operation(summary = "Salva uma busca no historico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> saveUserSearchHistoric(@Valid SaveHistoricRequest request) throws Exception;
+
+    @Operation(summary = "Deleta uma busca do historico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> deleteUserSearchHistoric(@Parameter(description = "Identificador da busca") String targetUserIdentifier) throws Exception;
+
+    @Operation(summary = "Deleta todas as buscas de um historico")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Retorna uma lista"),
+            @ApiResponse(responseCode = "400", description = "Se houve erro do usuário na consulta", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
+    })
+    ResponseEntity<Void> deleteAllUserSearchHistoric() throws Exception;
+
 }

@@ -284,6 +284,19 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         }
     }
 
+    @Override
+    public void deleteUserSearchHistoric(String historicIdentifier) throws Exception {
+        usersSearchHistoricRepository.findById(historicIdentifier)
+                        .orElseThrow(() -> new Exception("Historic not found"));
+        usersSearchHistoricRepository.deleteById(historicIdentifier);
+    }
+
+    @Override
+    public void deleteAllUserSearchHistoric(String sessionUserIdentifier) throws Exception {
+        List<UsersSearchHistoric> usersSearchHistoric = usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier);
+        usersSearchHistoricRepository.deleteAll(usersSearchHistoric);
+    }
+
     private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
