@@ -15,5 +15,6 @@ public class UserMinimalizeResponse {
     private String firstName;
     private String username;
     private String profilePhotoUrl;
+    private Boolean isVerified;
 
 }
