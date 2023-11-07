@@ -91,4 +91,9 @@ public class UserFollowingRepository implements IFollowsDetailsStrategy {
 
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "FOLLOWING";
+    }
 }

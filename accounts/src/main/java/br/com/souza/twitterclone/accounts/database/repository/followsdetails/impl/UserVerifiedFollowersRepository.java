@@ -92,4 +92,9 @@ public class UserVerifiedFollowersRepository implements IFollowsDetailsStrategy 
         }
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "VERIFIED_FOLLOWERS";
+    }
 }

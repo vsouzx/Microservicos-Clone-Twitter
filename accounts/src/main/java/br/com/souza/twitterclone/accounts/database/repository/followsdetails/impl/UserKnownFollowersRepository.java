@@ -95,4 +95,9 @@ public class UserKnownFollowersRepository implements IFollowsDetailsStrategy {
 
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "KNOWN_FOLLOWERS";
+    }
 }
