@@ -87,7 +87,11 @@ public class ExploreByMainRepository implements IExploreStrategy {
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build());
         }
-
         return response;
+    }
+
+    @Override
+    public String getStrategyName() {
+        return "MAIN";
     }
 }

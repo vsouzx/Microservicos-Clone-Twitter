@@ -84,4 +84,9 @@ public class PostsTimelineRepository implements ITimelineStrategy {
         }
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "POSTS";
+    }
 }

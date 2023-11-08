@@ -88,7 +88,11 @@ public class ExploreByMediaRepository implements IExploreStrategy {
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build());
         }
-
         return response;
+    }
+
+    @Override
+    public String getStrategyName() {
+        return "MEDIA";
     }
 }

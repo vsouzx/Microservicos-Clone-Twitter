@@ -1,9 +1,7 @@
 package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 
-import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
-import br.comsouza.twitterclone.feed.handler.exceptions.ServerSideErrorException;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -88,5 +86,10 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         }
 
         return response;
+    }
+
+    @Override
+    public String getStrategyName() {
+        return "FOLLOWING";
     }
 }

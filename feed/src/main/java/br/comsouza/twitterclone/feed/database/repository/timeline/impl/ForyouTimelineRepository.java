@@ -90,4 +90,9 @@ public class ForyouTimelineRepository implements ITimelineStrategy {
         }
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "FORYOU";
+    }
 }

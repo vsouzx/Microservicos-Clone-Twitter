@@ -90,4 +90,9 @@ public class ExploreByLatterRepository implements IExploreStrategy {
 
         return response;
     }
+
+    @Override
+    public String getStrategyName() {
+        return "LATTER";
+    }
 }

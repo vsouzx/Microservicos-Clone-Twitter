@@ -1,6 +1,5 @@
 package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 
-import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
@@ -83,5 +82,10 @@ public class MediasTimelineRepository implements ITimelineStrategy {
             }
         }
         return response;
+    }
+
+    @Override
+    public String getStrategyName() {
+        return "MEDIAS";
     }
 }
