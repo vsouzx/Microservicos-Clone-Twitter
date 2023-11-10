@@ -5,7 +5,7 @@
 
 <br>
 
-<h2>O que será implementado:</h2>
+# Serviços implementados:
 <p><b>ConfigServer</b> ✔️</p> 
 <p><b>ConfigServer Repository</b>✔️ <a href="https://github.com/vsouzx/Microservicos-Clone-Twitter-Repository"> Link do repositorio</a></p>
 <p><b>Discovery</b> ✔️</p>
@@ -15,4 +15,11 @@
 <p>Micro Serviço de <b>email </b>(sendo um Consumer Kafka) ✔️</p>
 <p>Micro Serviço de <b>feed </b>(posts, retweets, likes, comentarios, timeline, for you, etc) ✔️ </p>
 <p>Micro Serviço de <b>notificações</b> ✔️ (Server-Sent Events)</p>
-<p>Micro Serviço de <b>DM (Chat)</b> 🔜 (Websocket)</p>
+<p>Micro Serviço de <b>DM (Chat)</b> ✔️ (Websocket)</p>
+
+# Design Patterns usados:
+<p>Singleton</p>
+<p>Strategy</p>
+<p>Factory</p>
+<p>Builder</p>
+<p>Data Transfer Objects</p>
