@@ -3,7 +3,6 @@
 <p>Backend do "clone" do Twitter, usando arquitetura de microsservicos com Spring.</p>
 <p>O <b>frontend</b> está sendo feito em Angular, pelo <a href="https://github.com/souzxvini?tab=repositories">Vinicius Souza</a> !</p>
 
-<br>
 
 # Serviços implementados:
 <p><b>ConfigServer</b> ✔️</p> 
