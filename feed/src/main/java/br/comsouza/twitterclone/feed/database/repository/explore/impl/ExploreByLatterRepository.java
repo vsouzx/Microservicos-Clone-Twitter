@@ -25,12 +25,13 @@ public class ExploreByLatterRepository implements IExploreStrategy {
 
     @Override
     public List<TimelineTweetResponse> find(String keyword, Integer page, Integer size, String sessionUserIdentifier) {
+
         List<TimelineTweetResponse> response = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        sb.append("DECLARE @keyWord                 VARCHAR(MAX)    ? ");
-        sb.append("	      ,@PageNumber				INT             ? ");
-        sb.append("       ,@RowsOfPage				INT             ? ");
-        sb.append("	      ,@sessionUserIdentifier   VARCHAR(MAX)    ? ");
+        sb.append("DECLARE @keyWord                 VARCHAR(MAX)  =  ? ");
+        sb.append("	      ,@PageNumber				INT           =  ? ");
+        sb.append("       ,@RowsOfPage				INT           =  ? ");
+        sb.append("	      ,@sessionUserIdentifier   VARCHAR(MAX)  =  ? ");
         sb.append("  ");
         sb.append("SELECT t.tweet_identifier   ");
         sb.append("	  ,t.original_tweet_identifier   ");

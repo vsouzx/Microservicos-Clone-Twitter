@@ -18,7 +18,6 @@ public class ExplorerServiceImpl implements IExplorerService{
 
     @Override
     public List<TimelineTweetResponse> find(String type, String keyword, Integer page, Integer size, String sessionUserIdentifier) throws Exception {
-        IExploreStrategy strategy = explorerStrategyFactory.getStrategy(type);
-        return strategy.find(keyword, page, size, sessionUserIdentifier);
+        return explorerStrategyFactory.getStrategy(type).find(keyword, page, size, sessionUserIdentifier);
     }
 }
