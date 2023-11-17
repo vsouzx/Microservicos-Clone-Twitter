@@ -42,7 +42,4 @@ public class Tweets {
     @Column(name = "can_be_replied_by_not_followed_user")
     private Boolean canBeRepliedByNotFollowedUser;
 
-    @Lob
-    @Column(name = "attachment")
-    private byte[] attachment;
 }

@@ -20,12 +20,14 @@ import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToCommentException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToLikeException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToRetweetException;
+import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.client.INotificationsClientService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsMessageTranslatorService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import br.comsouza.twitterclone.feed.util.UsefulDate;
+import com.amazonaws.services.s3.AmazonS3;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,7 @@ public class PostsServiceImpl implements IPostsService {
     private final PostResumeRepository postResumeRepository;
     private final IPostsMessageTranslatorService messageTranslatorService;
     private final INotificationsClientService iNotificationsClientService;
+    private final IAmazonService iAmazonService;
 
     public PostsServiceImpl(ITweetsRepository tweetsRepository,
                             ITweetTypeService iTweetTypeService,
@@ -54,7 +57,9 @@ public class PostsServiceImpl implements IPostsService {
                             IAccountsClient iAccountsClient,
                             PostResumeRepository postResumeRepository,
                             IPostsMessageTranslatorService messageTranslatorService,
-                            INotificationsClientService iNotificationsClientService) {
+                            INotificationsClientService iNotificationsClientService,
+                            AmazonS3 s3client,
+                            IAmazonService iAmazonService) {
         this.tweetsRepository = tweetsRepository;
         this.iTweetTypeService = iTweetTypeService;
         this.iInteractionsService = iInteractionsService;
@@ -64,6 +69,7 @@ public class PostsServiceImpl implements IPostsService {
         this.postResumeRepository = postResumeRepository;
         this.messageTranslatorService = messageTranslatorService;
         this.iNotificationsClientService = iNotificationsClientService;
+        this.iAmazonService = iAmazonService;
     }
 
     @Override
@@ -82,12 +88,11 @@ public class PostsServiceImpl implements IPostsService {
                 .messageTranslations(null)
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(UsefulDate.now())
-                .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                 .canBeRepliedByNotFollowedUser(flag.equals("1"))
                 .build());
 
+        iAmazonService.saveAttachmentInBucketS3(attachment, tweetIdentifier);
         messageTranslatorService.translateMessage(tweet, authorization);
-
         iNotificationsClientService.notifyAlerters(sessionUserIdentifier, NotificationsTypeEnum.NEW_POST.toString(), tweet.getTweetIdentifier(), authorization);
     }
 
@@ -133,10 +138,10 @@ public class PostsServiceImpl implements IPostsService {
                     .messageTranslations(null)
                     .type(type)
                     .publicationTime(UsefulDate.now())
-                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .canBeRepliedByNotFollowedUser(true)
                     .build());
 
+            iAmazonService.saveAttachmentInBucketS3(attachment, tweet.getTweetIdentifier());
             messageTranslatorService.translateMessage(tweet, authorization);
 
             iNotificationsClientService.createNewNotification(
@@ -197,10 +202,11 @@ public class PostsServiceImpl implements IPostsService {
                     .messageTranslations(null)
                     .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                     .publicationTime(UsefulDate.now())
-                    .attachment(!attachment.isEmpty() ? attachment.getBytes() : null)
                     .canBeRepliedByNotFollowedUser(true)
                     .build());
 
+
+            iAmazonService.saveAttachmentInBucketS3(attachment, tweet.getTweetIdentifier());
             messageTranslatorService.translateMessage(tweet, authorization);
 
             iNotificationsClientService.createNewNotification(
@@ -294,7 +300,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization) {
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization) throws Exception {
         TimelineTweetResponse originalTweet;
 
         post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false, authorization));
@@ -309,7 +315,7 @@ public class PostsServiceImpl implements IPostsService {
         return tweetsRepository.findAllByUserIdentifier(sessionUserIdentifier).size();
     }
 
-    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization) {
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization) throws Exception {
 
         final String mainTweetType = mainTweet.getTweetTypeDescription();
         final String secondaryTweetType = secondaryTweet.getTweetTypeDescription();
@@ -325,4 +331,5 @@ public class PostsServiceImpl implements IPostsService {
         }
         return null;
     }
+
 }

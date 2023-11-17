@@ -10,6 +10,6 @@ public interface IPostsService {
     void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String identifier) throws Exception;
     void likeToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception;
     void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception;
-    void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization);
+    void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization) throws Exception;
     Integer getTweetsCount(String sessionUserIdentifier);
 }

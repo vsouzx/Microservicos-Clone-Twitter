@@ -2,6 +2,7 @@ package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,15 +17,18 @@ public class MediasTimelineRepository implements ITimelineStrategy {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
+    private final IAmazonService iAmazonService;
 
     public MediasTimelineRepository(EntityManager em,
-                                    IInteractionsService iInteractionsService) {
+                                    IInteractionsService iInteractionsService,
+                                    IAmazonService iAmazonService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
+        this.iAmazonService = iAmazonService;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier){
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetUserIdentifier    VARCHAR(MAX) = ? ");
@@ -39,7 +43,6 @@ public class MediasTimelineRepository implements ITimelineStrategy {
         sb.append("	     ,u.first_name   ");
         sb.append("	     ,u.profile_photo_url   ");
         sb.append("	     ,t.message   ");
-        sb.append("	     ,t.attachment   ");
         sb.append("FROM tweets t   ");
         sb.append("INNER JOIN users u   ");
         sb.append("	ON u.identifier = t.user_identifier   ");
@@ -71,7 +74,7 @@ public class MediasTimelineRepository implements ITimelineStrategy {
                         .userFirstName((String) result[5])
                         .userProfilePhotoUrl((String) result[6])
                         .tweetMessage((String) result[7])
-                        .tweetAttachment((byte[]) result[8])
+                        .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
                         .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
                         .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
                         .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))

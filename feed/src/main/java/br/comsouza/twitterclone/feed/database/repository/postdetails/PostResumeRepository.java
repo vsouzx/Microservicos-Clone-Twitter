@@ -1,7 +1,7 @@
 package br.comsouza.twitterclone.feed.database.repository.postdetails;
 
-import br.comsouza.twitterclone.feed.client.IAccountsClient;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -14,14 +14,17 @@ public class PostResumeRepository {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
+    private final IAmazonService iAmazonService;
 
     public PostResumeRepository(EntityManager em,
-                                IInteractionsService iInteractionsService) {
+                                IInteractionsService iInteractionsService,
+                                IAmazonService iAmazonService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
+        this.iAmazonService = iAmazonService;
     }
 
-    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier) {
+    public TimelineTweetResponse find(String sessionUserIdentifier, String targetTweetIdentifier) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");
@@ -34,7 +37,6 @@ public class PostResumeRepository {
         sb.append("	  ,u.first_name  ");
         sb.append("	  ,u.profile_photo_identifier  ");
         sb.append("	  ,t.message  ");
-        sb.append("	  ,t.attachment  ");
         sb.append("FROM tweets t  ");
         sb.append("INNER JOIN users u  ");
         sb.append("	ON u.identifier = t.user_identifier  ");
@@ -46,28 +48,24 @@ public class PostResumeRepository {
         Query query = em.createNativeQuery(sb.toString());
         query.setParameter(1, targetTweetIdentifier);
 
-        try {
-            Object[] result = (Object[]) query.getSingleResult();
+        Object[] result = (Object[]) query.getSingleResult();
 
-            return TimelineTweetResponse.builder()
-                    .tweetIdentifier((String) result[0])
-                    .originalTweetIdentifier((String) result[1])
-                    .tweetTypeDescription((String) result[2])
-                    .userIdentifier((String) result[3])
-                    .userUsername((String) result[4])
-                    .userFirstName((String) result[5])
-                    .userProfilePhotoUrl((String) result[6])
-                    .tweetMessage((String) result[7])
-                    .tweetAttachment((byte[]) result[8])
-                    .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
-                    .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
-                    .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
-                    .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
-                    .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
-                    .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
-                    .build();
-        } catch (Exception e) {
-            return null;
-        }
+        return TimelineTweetResponse.builder()
+                .tweetIdentifier((String) result[0])
+                .originalTweetIdentifier((String) result[1])
+                .tweetTypeDescription((String) result[2])
+                .userIdentifier((String) result[3])
+                .userUsername((String) result[4])
+                .userFirstName((String) result[5])
+                .userProfilePhotoUrl((String) result[6])
+                .tweetMessage((String) result[7])
+                .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
+                .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
+                .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
+                .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
+                .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
+                .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
+                .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
+                .build();
     }
 }

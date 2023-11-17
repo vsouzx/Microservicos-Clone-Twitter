@@ -2,7 +2,13 @@ package br.comsouza.twitterclone.feed.database.repository.timeline.impl;
 
 import br.comsouza.twitterclone.feed.database.repository.timeline.ITimelineStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -16,15 +22,18 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
     @PersistenceContext
     private final EntityManager em;
     private final IInteractionsService iInteractionsService;
+    private final IAmazonService iAmazonService;
 
     public FollowingTimelineRepository(EntityManager em,
-                                       IInteractionsService iInteractionsService) {
+                                       IInteractionsService iInteractionsService,
+                                       IAmazonService iAmazonService) {
         this.em = em;
         this.iInteractionsService = iInteractionsService;
+        this.iAmazonService = iAmazonService;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier) {
+    public List<TimelineTweetResponse> getTimeLine(String sessionUserIdentifier, Integer page, Integer size, String targetUserIdentifier) throws Exception {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @sessionUserIdentifier VARCHAR(MAX) = ? ");
@@ -39,7 +48,6 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         sb.append("   ,u.first_name ");
         sb.append("	  ,u.profile_photo_url ");
         sb.append("	  ,t.message ");
-        sb.append("	  ,t.attachment ");
         sb.append("FROM tweets t ");
         sb.append("INNER JOIN users_follows f ");
         sb.append("	ON f.follower_identifier = @sessionUserIdentifier ");
@@ -75,7 +83,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
                     .userFirstName((String) result[5])
                     .userProfilePhotoUrl((String) result[6])
                     .tweetMessage((String) result[7])
-                    .tweetAttachment((byte[]) result[8])
+                    .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
                     .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
                     .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
                     .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
@@ -84,7 +92,6 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
                     .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
                     .build());
         }
-
         return response;
     }
 
@@ -92,4 +99,5 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
     public String getStrategyName() {
         return "FOLLOWING";
     }
+
 }

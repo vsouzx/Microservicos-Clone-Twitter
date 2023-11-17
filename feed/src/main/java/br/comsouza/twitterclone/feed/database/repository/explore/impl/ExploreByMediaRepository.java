@@ -2,6 +2,7 @@ package br.comsouza.twitterclone.feed.database.repository.explore.impl;
 
 import br.comsouza.twitterclone.feed.database.repository.explore.IExploreStrategy;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
+import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -16,15 +17,18 @@ public class ExploreByMediaRepository implements IExploreStrategy {
     private final IInteractionsService iInteractionsService;
     @PersistenceContext
     private final EntityManager entityManager;
+    private final IAmazonService iAmazonService;
 
     public ExploreByMediaRepository(IInteractionsService iInteractionsService,
-                                     EntityManager entityManager) {
+                                    EntityManager entityManager,
+                                    IAmazonService iAmazonService) {
         this.iInteractionsService = iInteractionsService;
         this.entityManager = entityManager;
+        this.iAmazonService = iAmazonService;
     }
 
     @Override
-    public List<TimelineTweetResponse> find(String keyword, Integer page, Integer size, String sessionUserIdentifier) {
+    public List<TimelineTweetResponse> find(String keyword, Integer page, Integer size, String sessionUserIdentifier) throws Exception {
 
         List<TimelineTweetResponse> response = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
@@ -80,7 +84,7 @@ public class ExploreByMediaRepository implements IExploreStrategy {
                     .userFirstName((String) result[5])
                     .userProfilePhotoUrl((String) result[6])
                     .tweetMessage((String) result[7])
-                    .tweetAttachment((byte[]) result[8])
+                    .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
                     .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
                     .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
                     .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))

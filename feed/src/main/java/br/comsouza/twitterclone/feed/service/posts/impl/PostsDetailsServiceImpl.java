@@ -59,7 +59,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization) throws TweetNotFoundException {
+    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
