@@ -34,3 +34,4 @@
 <p>Docker</p>
 <p>SQL</p>
 <p>Mensageria com Apache Kafka</p>
+<p>AWS SDK Bucket S3</p>
