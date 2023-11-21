@@ -57,31 +57,16 @@ public class FavoriteTweetsRepository {
         query.setParameter(2, page);
         query.setParameter(3, size);
 
-        List<Object[]> list = query.getResultList();
+        List<Object[]> lista = query.getResultList();
 
-        List<TimelineTweetResponse> response = new ArrayList<>();
-        if (!list.isEmpty()) {
-            for (Object[] result : list) {
-                response.add(TimelineTweetResponse.builder()
-                        .tweetIdentifier((String) result[0])
-                        .originalTweetIdentifier((String) result[1])
-                        .tweetTypeDescription((String) result[2])
-                        .userIdentifier((String) result[3])
-                        .userUsername((String) result[4])
-                        .userFirstName((String) result[5])
-                        .userProfilePhotoUrl((String) result[6])
-                        .tweetMessage((String) result[7])
-                        .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
-                        .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
-                        .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
-                        .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
-                        .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
-                        .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
-                        .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
-                        .originalTweetResponse(null)
-                        .build());
-            }
-        }
-        return response;
+        return lista.stream()
+                .map(result -> {
+                    try {
+                        return new TimelineTweetResponse(result, iAmazonService, iInteractionsService, sessionUserIdentifier);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
     }
 }
