@@ -6,7 +6,8 @@ CREATE TABLE tweets(
 	[message_translations] [varchar](255) COLLATE Latin1_General_100_CI_AI_SC_UTF8,
 	[type] [uniqueidentifier],
 	[publication_time] DATETIME,
-	[can_be_replied_by_not_followed_user] BIT
+	[can_be_replied_by_not_followed_user] BIT,
+	[has_attachment] BIT
 PRIMARY KEY CLUSTERED 
 (
 	[tweet_identifier] ASC

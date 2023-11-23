@@ -31,13 +31,12 @@ public class AmazonServiceImpl implements IAmazonService{
     }
 
     @Override
-    public byte[] loadAttachmentFromS3(String tweetIdentifier) throws Exception {
+    public byte[] loadAttachmentFromS3(String tweetIdentifier) {
         try{
             S3Object s3Object = s3client.getObject(System.getenv("BUCKET_NAME"), tweetIdentifier.toUpperCase());
             S3ObjectInputStream s3ObjectInputStream = s3Object.getObjectContent();
             return IOUtils.toByteArray(s3ObjectInputStream);
         }catch (Exception e){
-            log.error("Erro ao buscar attachment: ", e);
             return null;
         }
     }

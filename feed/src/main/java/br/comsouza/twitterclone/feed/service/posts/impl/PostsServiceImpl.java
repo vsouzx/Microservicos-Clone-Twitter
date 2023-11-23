@@ -89,6 +89,7 @@ public class PostsServiceImpl implements IPostsService {
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(UsefulDate.now())
                 .canBeRepliedByNotFollowedUser(flag.equals("1"))
+                .hasAttachment(attachment != null && !attachment.isEmpty())
                 .build());
 
         iAmazonService.saveAttachmentInBucketS3(attachment, tweetIdentifier);
@@ -139,6 +140,7 @@ public class PostsServiceImpl implements IPostsService {
                     .type(type)
                     .publicationTime(UsefulDate.now())
                     .canBeRepliedByNotFollowedUser(true)
+                    .hasAttachment(attachment != null && !attachment.isEmpty())
                     .build());
 
             iAmazonService.saveAttachmentInBucketS3(attachment, tweet.getTweetIdentifier());
@@ -203,6 +205,7 @@ public class PostsServiceImpl implements IPostsService {
                     .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                     .publicationTime(UsefulDate.now())
                     .canBeRepliedByNotFollowedUser(true)
+                    .hasAttachment(attachment != null && !attachment.isEmpty())
                     .build());
 
 

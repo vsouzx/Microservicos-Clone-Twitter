@@ -28,6 +28,7 @@ public class PostResumeRepository {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");
+        sb.append("       ,@sessionUserIdentifier VARCHAR(MAX) = ?  ");
         sb.append("  ");
         sb.append("SELECT t.tweet_identifier  ");
         sb.append("	  ,t.original_tweet_identifier  ");
@@ -35,8 +36,45 @@ public class PostResumeRepository {
         sb.append("	  ,u.identifier  ");
         sb.append("	  ,u.username  ");
         sb.append("	  ,u.first_name  ");
-        sb.append("	  ,u.profile_photo_identifier  ");
+        sb.append("	  ,u.profile_photo_url  ");
         sb.append("	  ,t.message  ");
+        sb.append("	  ,(SELECT COUNT(*)  ");
+        sb.append("	    FROM tweets t2 ");
+        sb.append("		INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		WHERE t2.original_tweet_identifier = t.tweet_identifier  ");
+        sb.append("			AND tp.description = 'COMMENT') commentsCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	    FROM tweets t2 ");
+        sb.append("		INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		WHERE t2.original_tweet_identifier = t.tweet_identifier  ");
+        sb.append("			AND tp.description = 'RETWEET') retweetCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_likes  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) likesCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_views  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) viewsCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_favs   ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) favsCount ");
+        sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets_likes  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isLikedByMe ");
+        sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets_favs  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isFavoritedByMe ");
+        sb.append("	   ,(SELECT IIF(MAX(t2.tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets t2 ");
+        sb.append("		 INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		 WHERE t2.user_identifier = @sessionUserIdentifier ");
+        sb.append("		 AND t2.original_tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND tp.description = 'RETWEET') isRetweetedByMe ");
+        sb.append("		 ,t.has_attachment ");
         sb.append("FROM tweets t  ");
         sb.append("INNER JOIN users u  ");
         sb.append("	ON u.identifier = t.user_identifier  ");
@@ -47,25 +85,10 @@ public class PostResumeRepository {
 
         Query query = em.createNativeQuery(sb.toString());
         query.setParameter(1, targetTweetIdentifier);
+        query.setParameter(2, sessionUserIdentifier);
 
         Object[] result = (Object[]) query.getSingleResult();
 
-        return TimelineTweetResponse.builder()
-                .tweetIdentifier((String) result[0])
-                .originalTweetIdentifier((String) result[1])
-                .tweetTypeDescription((String) result[2])
-                .userIdentifier((String) result[3])
-                .userUsername((String) result[4])
-                .userFirstName((String) result[5])
-                .userProfilePhotoUrl((String) result[6])
-                .tweetMessage((String) result[7])
-                .tweetAttachment(iAmazonService.loadAttachmentFromS3((String) result[0]))
-                .tweetCommentsCount(iInteractionsService.getAllTweetCommentsCount((String) result[0]))
-                .tweetRetweetsCount(iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]))
-                .tweetLikesCount(iInteractionsService.getTweetLikesCount((String) result[0]))
-                .tweetViewsCount(iInteractionsService.getTweetViewsCount((String) result[0]))
-                .isLikedByMe(iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent())
-                .isRetweetedByMe(iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent())
-                .build();
+        return new TimelineTweetResponse(result, iAmazonService);
     }
 }

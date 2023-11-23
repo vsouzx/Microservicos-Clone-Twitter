@@ -34,7 +34,7 @@ public class TimelineTweetResponse {
     private String userProfilePhotoUrl;
     private byte[] tweetAttachment;
 
-    public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService, IInteractionsService iInteractionsService, String sessionUserIdentifier) throws Exception {
+    public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {
         this.tweetIdentifier = (String) result[0];
         this.originalTweetIdentifier = (String) result[1];
         this.tweetTypeDescription = (String) result[2];
@@ -43,13 +43,14 @@ public class TimelineTweetResponse {
         this.userFirstName = (String) result[5];
         this.userProfilePhotoUrl = (String) result[6];
         this.tweetMessage = (String) result[7];
-        this.tweetAttachment = iAmazonService.loadAttachmentFromS3((String) result[0]);
-        this.tweetCommentsCount = iInteractionsService.getAllTweetCommentsCount((String) result[0]);
-        this.tweetRetweetsCount = iInteractionsService.getTweetAllRetweetsTypesCount((String) result[0]);
-        this.tweetLikesCount = iInteractionsService.getTweetLikesCount((String) result[0]);
-        this.tweetViewsCount = iInteractionsService.getTweetViewsCount((String) result[0]);
-        this.tweetFavsCount = iInteractionsService.getTweetFavsCount((String) result[0]);
-        this.isLikedByMe = iInteractionsService.verifyIsLiked((String) result[0], sessionUserIdentifier).isPresent();
-        this.isRetweetedByMe = iInteractionsService.verifyIsRetweeted((String) result[0], sessionUserIdentifier).isPresent();
+        this.tweetCommentsCount = (Integer) result[8];
+        this.tweetRetweetsCount = (Integer) result[9];
+        this.tweetLikesCount = (Integer) result[10];
+        this.tweetViewsCount = (Integer) result[11];
+        this.tweetFavsCount = (Integer) result[12];
+        this.isLikedByMe = (boolean) result[13];
+        this.isFavoritedByMe = (boolean) result[14];
+        this.isRetweetedByMe = (boolean) result[15];
+        this.tweetAttachment = result[16] != null && (boolean) result[16] ? iAmazonService.loadAttachmentFromS3((String) result[0]) : null;
     }
 }

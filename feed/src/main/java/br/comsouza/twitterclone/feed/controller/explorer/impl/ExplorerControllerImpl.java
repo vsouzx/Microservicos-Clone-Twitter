@@ -24,10 +24,10 @@ public class ExplorerControllerImpl implements IExplorerController {
     }
 
     @GetMapping(value = "/{type}")
-    public ResponseEntity<List<TimelineTweetResponse>> getExploredTweets(@PathVariable(value = "type", required = false) String type,
+    public ResponseEntity<List<TimelineTweetResponse>> getExploredTweets(@PathVariable(value = "type") String type,
                                                                          @RequestParam(value = "keyword", required = false) String keyword,
-                                                                         @RequestParam(value = "page", required = true) Integer page,
-                                                                         @RequestParam(value = "size", required = true) Integer size) throws Exception {
+                                                                         @RequestParam(value = "page") Integer page,
+                                                                         @RequestParam(value = "size") Integer size) throws Exception {
         return new ResponseEntity<>(iExplorerService.find(type, keyword, page, size, FindUserIdentifierHelper.getIdentifier()), HttpStatus.OK);
     }
 }

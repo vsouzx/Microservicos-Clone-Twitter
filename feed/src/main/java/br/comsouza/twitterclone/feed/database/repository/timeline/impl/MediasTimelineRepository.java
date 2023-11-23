@@ -16,14 +16,11 @@ public class MediasTimelineRepository implements ITimelineStrategy {
 
     @PersistenceContext
     private final EntityManager em;
-    private final IInteractionsService iInteractionsService;
     private final IAmazonService iAmazonService;
 
     public MediasTimelineRepository(EntityManager em,
-                                    IInteractionsService iInteractionsService,
                                     IAmazonService iAmazonService) {
         this.em = em;
-        this.iInteractionsService = iInteractionsService;
         this.iAmazonService = iAmazonService;
     }
 
@@ -43,13 +40,50 @@ public class MediasTimelineRepository implements ITimelineStrategy {
         sb.append("	     ,u.first_name   ");
         sb.append("	     ,u.profile_photo_url   ");
         sb.append("	     ,t.message   ");
+        sb.append("	  ,(SELECT COUNT(*)  ");
+        sb.append("	    FROM tweets t2 ");
+        sb.append("		INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		WHERE t2.original_tweet_identifier = t.tweet_identifier  ");
+        sb.append("			AND tp.description = 'COMMENT') commentsCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	    FROM tweets t2 ");
+        sb.append("		INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		WHERE t2.original_tweet_identifier = t.tweet_identifier  ");
+        sb.append("			AND tp.description = 'RETWEET') retweetCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_likes  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) likesCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_views  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) viewsCount ");
+        sb.append("	   ,(SELECT COUNT(*)  ");
+        sb.append("	     FROM tweets_favs   ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier) favsCount ");
+        sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets_likes  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isLikedByMe ");
+        sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets_favs  ");
+        sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isFavoritedByMe ");
+        sb.append("	   ,(SELECT IIF(MAX(t2.tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
+        sb.append("	     FROM tweets t2 ");
+        sb.append("		 INNER JOIN tweets_types tp ");
+        sb.append("			ON tp.type_identifier = t2.type ");
+        sb.append("		 WHERE t2.user_identifier = @sessionUserIdentifier ");
+        sb.append("		 AND t2.original_tweet_identifier = t.tweet_identifier ");
+        sb.append("		 AND tp.description = 'RETWEET') isRetweetedByMe ");
+        sb.append("		 ,t.has_attachment ");
         sb.append("FROM tweets t   ");
         sb.append("INNER JOIN users u   ");
         sb.append("	ON u.identifier = t.user_identifier   ");
         sb.append("INNER JOIN tweets_types p   ");
         sb.append("	ON p.type_identifier = t.type   ");
         sb.append("WHERE t.user_identifier = @targetUserIdentifier  ");
-        sb.append("	AND t.attachment IS NOT NULL ");
+        sb.append("	AND t.has_attachment = CONVERT(BIT, 1) ");
         sb.append("ORDER BY t.publication_time desc   ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS     ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY     ");
@@ -61,15 +95,11 @@ public class MediasTimelineRepository implements ITimelineStrategy {
 
         List<Object[]> lista = query.getResultList();
 
-        return lista.stream()
-                .map(result -> {
-                    try {
-                        return new TimelineTweetResponse(result, iAmazonService, iInteractionsService, sessionUserIdentifier);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
+        List<TimelineTweetResponse> response = new ArrayList<>();
+        for(Object[] result : lista){
+            response.add(new TimelineTweetResponse(result, iAmazonService));
+        }
+        return response;
     }
 
     @Override

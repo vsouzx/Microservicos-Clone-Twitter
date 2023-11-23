@@ -44,23 +44,9 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public Integer getAllTweetCommentsCount(String tweetIdentifier) {
-        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier())).size();
-    }
-
-    @Override
     public Page<Tweets> getTweetCommentsPageable(String tweetIdentifier, Integer page, Integer size) {
         TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString());
         return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeInOrderByPublicationTimeDesc(tweetIdentifier, Collections.singletonList(tweetType.getTypeIdentifier()), PageRequest.of(page, size));
-    }
-
-    @Override
-    public Integer getTweetAllRetweetsTypesCount(String tweetIdentifier) {
-        List<String> retweetsTypes = new ArrayList<>();
-        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier());
-        retweetsTypes.add(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier());
-        return iTweetsRepository.findAllByOriginalTweetIdentifierAndTypeIn(tweetIdentifier, retweetsTypes).size();
     }
 
     @Override
@@ -78,23 +64,8 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public Integer getTweetLikesCount(String tweetIdentifier) {
-        return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
-    }
-
-    @Override
     public Page<TweetsLikes> getTweetLikesPageable(String tweetIdentifier, Integer page, Integer size) {
         return iTweetsLikesRepository.findAllByIdTweetIdentifier(tweetIdentifier, PageRequest.of(page, size));
-    }
-
-    @Override
-    public Integer getTweetViewsCount(String tweetIdentifier) {
-        return iTweetsViewsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
-    }
-
-    @Override
-    public Integer getTweetFavsCount(String tweetIdentifier) {
-        return iTweetsFavsRepository.findAllByIdTweetIdentifier(tweetIdentifier).size();
     }
 
     @Override
