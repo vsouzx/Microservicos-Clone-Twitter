@@ -30,7 +30,6 @@ public class ExploreByMediaRepository implements IExploreStrategy {
     @Override
     public List<TimelineTweetResponse> find(String keyword, Integer page, Integer size, String sessionUserIdentifier) throws Exception {
 
-        List<TimelineTweetResponse> response = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @keyWord                 VARCHAR(MAX)   = ? ");
         sb.append("	      ,@PageNumber				INT            = ? ");
@@ -74,15 +73,13 @@ public class ExploreByMediaRepository implements IExploreStrategy {
 
         List<Object[]> lista = query.getResultList();
 
-        return lista.stream()
-                .map(result -> {
-                    try {
-                        return new TimelineTweetResponse(result, iAmazonService, iInteractionsService, sessionUserIdentifier);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
-                .toList();
+        List<TimelineTweetResponse> response = new ArrayList<>();
+
+        for(Object[] result : lista){
+            response.add(new TimelineTweetResponse(result, iAmazonService, iInteractionsService, sessionUserIdentifier));
+        }
+
+        return response;
     }
 
     @Override
