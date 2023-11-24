@@ -60,11 +60,11 @@ public class PostDetailsRepository {
         sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
         sb.append("	     FROM tweets_likes  ");
         sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
-        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isLikedByMe ");
+        sb.append("		 AND user_identifier = @sessionUserIdentifier) isLikedByMe ");
         sb.append("	   ,(SELECT IIF(MAX(tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
         sb.append("	     FROM tweets_favs  ");
         sb.append("		 WHERE tweet_identifier = t.tweet_identifier ");
-        sb.append("		 AND t.user_identifier = @sessionUserIdentifier) isFavoritedByMe ");
+        sb.append("		 AND user_identifier = @sessionUserIdentifier) isFavoritedByMe ");
         sb.append("	   ,(SELECT IIF(MAX(t2.tweet_identifier) IS NULL, CONVERT(BIT, 0), CONVERT(BIT, 1)) ");
         sb.append("	     FROM tweets t2 ");
         sb.append("		 INNER JOIN tweets_types tp ");

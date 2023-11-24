@@ -111,7 +111,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToRetweetException();
         }
 
-        String type = message == null && attachment.isEmpty()
+        String type = message == null && (attachment == null || attachment.isEmpty())
                 ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
                 : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
