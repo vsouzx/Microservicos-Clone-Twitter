@@ -33,6 +33,7 @@ public class TimelineTweetResponse {
     private boolean isFavoritedByMe;
     private String userProfilePhotoUrl;
     private byte[] tweetAttachment;
+    private boolean userIsVerified;
 
     public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {
         this.tweetIdentifier = (String) result[0];
@@ -52,5 +53,6 @@ public class TimelineTweetResponse {
         this.isFavoritedByMe = (boolean) result[14];
         this.isRetweetedByMe = (boolean) result[15];
         this.tweetAttachment = result[16] != null && (boolean) result[16] ? iAmazonService.loadAttachmentFromS3((String) result[0]) : null;
+        this.userIsVerified = (boolean) result[17];
     }
 }

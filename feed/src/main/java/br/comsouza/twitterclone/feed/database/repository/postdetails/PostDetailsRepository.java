@@ -26,6 +26,7 @@ public class PostDetailsRepository {
 
         StringBuilder sb = new StringBuilder();
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");
+        sb.append("       ,@sessionUserIdentifier VARCHAR(MAX) = ?  ");
         sb.append("  ");
         sb.append("SELECT t.tweet_identifier  ");
         sb.append("	  ,t.original_tweet_identifier  ");
@@ -72,6 +73,7 @@ public class PostDetailsRepository {
         sb.append("		 AND t2.original_tweet_identifier = t.tweet_identifier ");
         sb.append("		 AND tp.description = 'RETWEET') isRetweetedByMe ");
         sb.append("		 ,t.has_attachment ");
+        sb.append("		 ,u.verified ");
         sb.append("FROM tweets t  ");
         sb.append("INNER JOIN users u  ");
         sb.append("	ON u.identifier = t.user_identifier  ");
@@ -82,6 +84,7 @@ public class PostDetailsRepository {
 
         Query query = em.createNativeQuery(sb.toString());
         query.setParameter(1, targetTweetIdentifier);
+        query.setParameter(2, sessionUserIdentifier);
 
         Object[] result = (Object[]) query.getSingleResult();
         return new TimelineTweetResponse(result, iAmazonService);

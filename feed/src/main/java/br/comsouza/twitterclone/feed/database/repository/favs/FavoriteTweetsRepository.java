@@ -75,6 +75,7 @@ public class FavoriteTweetsRepository {
         sb.append("		 AND t2.original_tweet_identifier = t.tweet_identifier ");
         sb.append("		 AND tp.description = 'RETWEET') isRetweetedByMe ");
         sb.append("		 ,t.has_attachment ");
+        sb.append("		 ,u.verified ");
         sb.append("	     ,f.time ");
         sb.append("FROM tweets t ");
         sb.append("INNER JOIN tweets_favs f ");
