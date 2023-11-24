@@ -1,6 +1,7 @@
 CREATE TABLE tweets_views(
 	[tweet_identifier] [uniqueidentifier] NOT NULL,
-	[user_identifier] [uniqueidentifier] NOT NULL
+	[user_identifier] [uniqueidentifier] NOT NULL,
+	[time] DATETIME
 )
 GO
 

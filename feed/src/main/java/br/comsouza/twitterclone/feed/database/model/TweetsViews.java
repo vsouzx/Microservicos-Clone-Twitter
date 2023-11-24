@@ -20,7 +20,8 @@ public class TweetsViews {
     @EmbeddedId
     @AttributeOverrides({
             @AttributeOverride(name = "tweetIdentifier", column = @Column(name = "tweet_identifier", length = 36)),
-            @AttributeOverride(name = "userIdentifier", column = @Column(name = "user_identifier", length = 36))
+            @AttributeOverride(name = "userIdentifier", column = @Column(name = "user_identifier", length = 36)),
+            @AttributeOverride(name = "time", column = @Column(name = "time"))
     })
     private TweetsViewsId id;
 

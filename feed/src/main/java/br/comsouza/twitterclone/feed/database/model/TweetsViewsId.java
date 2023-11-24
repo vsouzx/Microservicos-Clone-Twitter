@@ -22,4 +22,7 @@ public class TweetsViewsId {
     @Column(name = "user_identifier", length = 36)
     private String userIdentifier;
 
+    @Column(name = "time")
+    private LocalDateTime time;
+
 }

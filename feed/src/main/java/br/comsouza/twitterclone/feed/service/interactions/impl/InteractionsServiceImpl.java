@@ -74,6 +74,7 @@ public class InteractionsServiceImpl implements IInteractionsService {
                 .id(TweetsViewsId.builder()
                         .tweetIdentifier(tweetIdentifier)
                         .userIdentifier(userIdentifier)
+                        .time(LocalDateTime.now())
                         .build())
                 .build());
     }
