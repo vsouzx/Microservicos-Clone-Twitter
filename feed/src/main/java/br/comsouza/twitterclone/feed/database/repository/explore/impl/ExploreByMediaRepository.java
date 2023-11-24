@@ -52,7 +52,7 @@ public class ExploreByMediaRepository implements IExploreStrategy {
         sb.append("		INNER JOIN tweets_types tp ");
         sb.append("			ON tp.type_identifier = t2.type ");
         sb.append("		WHERE t2.original_tweet_identifier = t.tweet_identifier  ");
-        sb.append("			AND tp.description = 'RETWEET') retweetCount ");
+        sb.append("			AND tp.description IN ('RETWEET', 'NO_VALUE_RETWEET')) retweetCount ");
         sb.append("	   ,(SELECT COUNT(*)  ");
         sb.append("	     FROM tweets_likes  ");
         sb.append("		 WHERE tweet_identifier = t.tweet_identifier) likesCount ");
@@ -77,7 +77,6 @@ public class ExploreByMediaRepository implements IExploreStrategy {
         sb.append("		 WHERE t2.user_identifier = @sessionUserIdentifier ");
         sb.append("		 AND t2.original_tweet_identifier = t.tweet_identifier ");
         sb.append("		 AND tp.description IN ('RETWEET', 'NO_VALUE_RETWEET')) isRetweetedByMe ");
-
         sb.append("		 ,t.has_attachment ");
         sb.append("		 ,u.verified ");
         sb.append("FROM tweets t    ");
