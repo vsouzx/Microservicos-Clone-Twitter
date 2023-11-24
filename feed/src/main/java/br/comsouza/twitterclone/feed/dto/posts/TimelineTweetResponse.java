@@ -28,9 +28,9 @@ public class TimelineTweetResponse {
     private int tweetLikesCount;
     private int tweetViewsCount;
     private int tweetFavsCount;
-    private boolean isLikedByMe;
-    private boolean isRetweetedByMe;
-    private boolean isFavoritedByMe;
+    private boolean likedByMe;
+    private boolean retweetedByMe;
+    private boolean favoritedByMe;
     private String userProfilePhotoUrl;
     private byte[] tweetAttachment;
     private boolean userIsVerified;
@@ -49,9 +49,9 @@ public class TimelineTweetResponse {
         this.tweetLikesCount = (Integer) result[10];
         this.tweetViewsCount = (Integer) result[11];
         this.tweetFavsCount = (Integer) result[12];
-        this.isLikedByMe = (boolean) result[13];
-        this.isFavoritedByMe = (boolean) result[14];
-        this.isRetweetedByMe = (boolean) result[15];
+        this.likedByMe = (boolean) result[13];
+        this.favoritedByMe = (boolean) result[14];
+        this.retweetedByMe = (boolean) result[15];
         this.tweetAttachment = result[16] != null && (boolean) result[16] ? iAmazonService.loadAttachmentFromS3((String) result[0]) : null;
         this.userIsVerified = (boolean) result[17];
     }
