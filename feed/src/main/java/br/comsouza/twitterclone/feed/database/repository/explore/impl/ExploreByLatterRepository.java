@@ -93,7 +93,7 @@ public class ExploreByLatterRepository implements IExploreStrategy {
         sb.append("	AND b.blocked_identifier IS NULL  ");
         sb.append("	AND t.message IS NOT NULL ");
         sb.append("	AND (@keyWord IS NULL OR UPPER(t.message) LIKE '%' + UPPER(@keyWord) + '%')  ");
-        sb.append("ORDER BY t.publication_time ");
+        sb.append("ORDER BY t.publication_time desc ");
         sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS     ");
         sb.append("FETCH NEXT @RowsOfPage ROWS ONLY     ");
 
