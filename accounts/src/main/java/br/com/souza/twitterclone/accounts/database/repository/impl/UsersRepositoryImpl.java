@@ -14,13 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UsersRepositoryImpl {
 
-    private final IUsersInteractionsService usersInteractionsService;
     @PersistenceContext
     private final EntityManager em;
 
-    public UsersRepositoryImpl(IUsersInteractionsService usersInteractionsService,
-                               EntityManager em) {
-        this.usersInteractionsService = usersInteractionsService;
+    public UsersRepositoryImpl(EntityManager em) {
         this.em = em;
     }
 
@@ -31,25 +28,48 @@ public class UsersRepositoryImpl {
         sb.append("	      ,@targetUsername		VARCHAR(MAX)    = ? ");
         sb.append("	      ,@PageNumber			INT             = ? ");
         sb.append("       ,@RowsOfPage			INT             = ? ");
-        sb.append("  ");
-        sb.append("SELECT DISTINCT  u.identifier ");
-        sb.append("				,u.first_name   ");
-        sb.append("			    ,u.username   ");
-        sb.append("				,u.biography   ");
-        sb.append("				,u.location ");
-        sb.append("				,u.site ");
-        sb.append("				,u.registration_time ");
-        sb.append("				,u.private_account   ");
-        sb.append("				,u.profile_photo_url ");
-        sb.append("				,u.background_photo_url ");
-        sb.append("				,u.verified ");
+        sb.append("   ");
+        sb.append("SELECT DISTINCT  u.identifier  ");
+        sb.append("				,u.first_name    ");
+        sb.append("			    ,u.username    ");
+        sb.append("				,u.biography    ");
+        sb.append("				,u.location  ");
+        sb.append("				,u.site  ");
+        sb.append("				,u.registration_time  ");
+        sb.append("				,u.private_account    ");
+        sb.append("				,u.profile_photo_url  ");
+        sb.append("				,u.background_photo_url  ");
+        sb.append("				,u.verified  ");
+        sb.append("				,(SELECT IIF(MAX(blocker_identifier) IS NULL, 0, 1)  ");
+        sb.append("				  FROM blocked_users ");
+        sb.append("				  WHERE blocked_identifier = u.identifier ");
+        sb.append("					AND blocker_identifier = @sessionUser) isBlockedByMe ");
         sb.append(" ");
-        sb.append("FROM users u    ");
-        sb.append("WHERE (UPPER(u.username) LIKE UPPER('%'+ @targetUsername + '%') OR UPPER(u.first_name) LIKE UPPER('%'+ @targetUsername + '%')) ");
-        sb.append("	AND u.identifier <> @sessionUser ");
-        sb.append("ORDER BY u.identifier  ");
-        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS  ");
-        sb.append("FETCH NEXT @RowsOfPage ROWS ONLY  ");
+        sb.append("				,(SELECT IIF(MAX(blocked_identifier) IS NULL, 0, 1)  ");
+        sb.append("				  FROM blocked_users ");
+        sb.append("				  WHERE blocked_identifier = @sessionUser ");
+        sb.append("					AND blocker_identifier = u.identifier) hasBlockedMe ");
+        sb.append(" ");
+        sb.append("				,(SELECT IIF(MAX(follower_identifier) IS NULL, 0, 1)  ");
+        sb.append("				  FROM users_follows ");
+        sb.append("				  WHERE followed_identifier = u.identifier ");
+        sb.append("					AND follower_identifier = @sessionUser) isFollowedByMe ");
+        sb.append(" ");
+        sb.append("				,(SELECT IIF(MAX(pending_follower_identifier) IS NULL, 0, 1)  ");
+        sb.append("				  FROM users_pending_follows ");
+        sb.append("				  WHERE pending_followed_identifier = u.identifier ");
+        sb.append("					AND pending_follower_identifier = @sessionUser) isPendingFollowedByMe ");
+        sb.append(" ");
+        sb.append("				,(SELECT IIF(MAX(followed_identifier) IS NULL, 0, 1)  ");
+        sb.append("				  FROM users_follows ");
+        sb.append("				  WHERE followed_identifier = @sessionUser ");
+        sb.append("					AND follower_identifier = u.identifier) isFollowingMe ");
+        sb.append("FROM users u     ");
+        sb.append("WHERE (UPPER(u.username) LIKE UPPER('%'+ @targetUsername + '%') OR UPPER(u.first_name) LIKE UPPER('%'+ @targetUsername + '%'))  ");
+        sb.append("	AND u.identifier <> @sessionUser  ");
+        sb.append("ORDER BY u.identifier   ");
+        sb.append("OFFSET (@PageNumber) * @RowsOfPage ROWS   ");
+        sb.append("FETCH NEXT @RowsOfPage ROWS ONLY   ");
 
         Query query = em.createNativeQuery(sb.toString());
 
@@ -67,14 +87,18 @@ public class UsersRepositoryImpl {
                     .userIdentifier((String) result[0])
                     .firstName((String) result[1])
                     .username((String) result[2])
+                    .biography((String) result[3])
+                    .location((String) result[4])
+                    .site((String) result[5])
+                    .registrationTime(((Timestamp) result[6]).toLocalDateTime())
                     .privateAccount((Boolean) result[7])
                     .profilePhotoUrl((String) result[8])
                     .isVerified((Boolean) result[10])
-                    .isBlockedByMe(usersInteractionsService.verifyIfIsBlocked(sessionUserIdentifier, (String) result[0]).isPresent())
-                    .hasBlockedMe(usersInteractionsService.verifyIfIsBlocked((String) result[0], sessionUserIdentifier).isPresent())
-                    .isFollowedByMe(usersInteractionsService.verifyIfIsFollowing(sessionUserIdentifier, (String) result[0]).isPresent())
-                    .isPendingFollowedByMe(usersInteractionsService.verifyIfIsPendingFollowing(sessionUserIdentifier, (String) result[0]).isPresent())
-                    .isFollowingMe(usersInteractionsService.verifyIfIsFollowing((String) result[0], sessionUserIdentifier).isPresent())
+                    .isBlockedByMe((Boolean) result[11])
+                    .hasBlockedMe((Boolean) result[12])
+                    .isFollowedByMe((Boolean) result[13])
+                    .isPendingFollowedByMe((Boolean) result[14])
+                    .isFollowingMe((Boolean) result[15])
                     .build());
         }
         return response;
