@@ -33,6 +33,7 @@ public class UserSearchHistoricResponse {
                     .username(user.getUsername())
                     .profilePhotoUrl(user.getProfilePhotoUrl())
                     .isVerified(user.getVerified())
+                    .biography(user.getBiography())
                     .build();
         }
     }
