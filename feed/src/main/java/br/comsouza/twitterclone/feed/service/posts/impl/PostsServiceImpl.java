@@ -15,6 +15,7 @@ import br.comsouza.twitterclone.feed.dto.client.UserDetailsByIdentifierResponse;
 import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.enums.NotificationsTypeEnum;
 import br.comsouza.twitterclone.feed.enums.TweetTypeEnum;
+import br.comsouza.twitterclone.feed.handler.exceptions.InvalidAttachmentException;
 import br.comsouza.twitterclone.feed.handler.exceptions.InvalidTweetException;
 import br.comsouza.twitterclone.feed.handler.exceptions.TweetNotFoundException;
 import br.comsouza.twitterclone.feed.handler.exceptions.UnableToCommentException;
@@ -28,6 +29,7 @@ import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.service.tweettype.ITweetTypeService;
 import br.comsouza.twitterclone.feed.util.UsefulDate;
 import com.amazonaws.services.s3.AmazonS3;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -73,9 +75,13 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void postNewTweet(String message, String sessionUserIdentifier, MultipartFile attachment, String flag, String authorization) throws Exception {
-        if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
+    public void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String flag, String authorization) throws Exception {
+        if ((message == null || message.isBlank()) && (attachments == null)) {
             throw new InvalidTweetException();
+        }
+
+        if(attachments != null && attachments.size() > 4){
+            throw new InvalidAttachmentException();
         }
 
         final String tweetIdentifier = UUID.randomUUID().toString();
@@ -89,16 +95,18 @@ public class PostsServiceImpl implements IPostsService {
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(UsefulDate.now())
                 .canBeRepliedByNotFollowedUser(flag.equals("1"))
-                .hasAttachment(attachment != null && !attachment.isEmpty())
+                .hasAttachment(attachments != null)
                 .build());
 
-        iAmazonService.saveAttachmentInBucketS3(attachment, tweetIdentifier);
+        if(attachments != null){
+            iAmazonService.saveAttachmentInBucketS3(attachments, tweetIdentifier);
+        }
         messageTranslatorService.translateMessage(tweet, authorization);
         iNotificationsClientService.notifyAlerters(sessionUserIdentifier, NotificationsTypeEnum.NEW_POST.toString(), tweet.getTweetIdentifier(), authorization);
     }
 
     @Override
-    public void retweetToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
+    public void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier, String authorization) throws Exception {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -111,7 +119,11 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToRetweetException();
         }
 
-        String type = message == null && (attachment == null || attachment.isEmpty())
+        if(attachments != null && attachments.size() > 4){
+            throw new InvalidAttachmentException();
+        }
+
+        String type = message == null && (attachments == null)
                 ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
                 : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
@@ -140,10 +152,13 @@ public class PostsServiceImpl implements IPostsService {
                     .type(type)
                     .publicationTime(UsefulDate.now())
                     .canBeRepliedByNotFollowedUser(true)
-                    .hasAttachment(attachment != null && !attachment.isEmpty())
+                    .hasAttachment(attachments != null)
                     .build());
 
-            iAmazonService.saveAttachmentInBucketS3(attachment, tweet.getTweetIdentifier());
+            if(attachments != null){
+                iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
+            }
+
             messageTranslatorService.translateMessage(tweet, authorization);
 
             iNotificationsClientService.createNewNotification(
@@ -158,9 +173,13 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void commentToggle(String message, String sessionUserIdentifier, MultipartFile attachment, String originalTweetIdentifier, String authorization) throws Exception {
-        if ((message == null || message.isBlank()) && (attachment == null || attachment.isEmpty())) {
+    public void commentToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier, String authorization) throws Exception {
+        if ((message == null || message.isBlank()) && (attachments == null)) {
             throw new InvalidTweetException();
+        }
+
+        if(attachments != null && attachments.size() > 4){
+            throw new InvalidAttachmentException();
         }
 
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
@@ -205,11 +224,12 @@ public class PostsServiceImpl implements IPostsService {
                     .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                     .publicationTime(UsefulDate.now())
                     .canBeRepliedByNotFollowedUser(true)
-                    .hasAttachment(attachment != null && !attachment.isEmpty())
+                    .hasAttachment(attachments != null)
                     .build());
 
-
-            iAmazonService.saveAttachmentInBucketS3(attachment, tweet.getTweetIdentifier());
+            if(attachments != null){
+                iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
+            }
             messageTranslatorService.translateMessage(tweet, authorization);
 
             iNotificationsClientService.createNewNotification(

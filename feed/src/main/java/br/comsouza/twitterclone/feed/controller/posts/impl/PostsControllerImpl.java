@@ -3,6 +3,7 @@ package br.comsouza.twitterclone.feed.controller.posts.impl;
 import br.comsouza.twitterclone.feed.controller.posts.IPostsController;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import br.comsouza.twitterclone.feed.util.FindUserIdentifierHelper;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,27 +28,27 @@ public class PostsControllerImpl implements IPostsController {
     @PostMapping(value = "/newtweet")
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
                                              @RequestPart(value = "canBeReplied", required = true) String flag,
-                                             @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                             @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments,
                                              @RequestHeader("Authorization") String authorization) throws Exception {
-        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachment, flag, authorization);
+        iPostsService.postNewTweet(request, FindUserIdentifierHelper.getIdentifier(), attachments, flag, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/retweettoggle/{originalTweet}")
     public ResponseEntity<Void> retweetToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
-                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                              @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments,
                                               @RequestHeader("Authorization") String authorization) throws Exception {
-        iPostsService.retweetToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
+        iPostsService.retweetToggle(request, FindUserIdentifierHelper.getIdentifier(), attachments, originalTweet, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/commenttoggle/{originalTweet}")
     public ResponseEntity<Void> commentToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
-                                              @RequestPart(value = "attachment", required = false) MultipartFile attachment,
+                                              @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments,
                                               @RequestHeader("Authorization") String authorization) throws Exception {
-        iPostsService.commentToggle(request, FindUserIdentifierHelper.getIdentifier(), attachment, originalTweet, authorization);
+        iPostsService.commentToggle(request, FindUserIdentifierHelper.getIdentifier(), attachments, originalTweet, authorization);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

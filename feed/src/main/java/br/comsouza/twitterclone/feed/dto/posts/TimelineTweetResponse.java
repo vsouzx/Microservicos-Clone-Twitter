@@ -32,7 +32,7 @@ public class TimelineTweetResponse {
     private boolean retweetedByMe;
     private boolean favoritedByMe;
     private String userProfilePhotoUrl;
-    private byte[] tweetAttachment;
+    private List<byte[]> tweetAttachment;
     private boolean userIsVerified;
 
     public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {

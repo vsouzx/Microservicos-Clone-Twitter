@@ -113,7 +113,7 @@ public class UserSearchControllerImpl implements IUserSearchController {
         return new ResponseEntity<>(iUsersSearchService.getUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), authorization), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/historic", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/historic", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> saveUserSearchHistoric(@RequestBody SaveHistoricRequest request) throws Exception {
         iUsersSearchService.saveUserSearchHistoric(FindUserIdentifierHelper.getIdentifier(), request.getTargetUserIdentifier(), request.getText());
         return new ResponseEntity<>(HttpStatus.CREATED);
