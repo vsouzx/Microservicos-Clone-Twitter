@@ -83,6 +83,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         sb.append("		 AND tp.description IN ('RETWEET', 'NO_VALUE_RETWEET')) isRetweetedByMe ");
         sb.append("		 ,t.has_attachment ");
         sb.append("		 ,u.verified ");
+        sb.append("		 ,t.publication_time ");
         sb.append("FROM tweets t ");
         sb.append("INNER JOIN users_follows f ");
         sb.append("	ON f.follower_identifier = @sessionUserIdentifier ");

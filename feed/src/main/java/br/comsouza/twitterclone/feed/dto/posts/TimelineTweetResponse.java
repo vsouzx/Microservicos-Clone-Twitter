@@ -2,6 +2,8 @@ package br.comsouza.twitterclone.feed.dto.posts;
 
 import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +36,7 @@ public class TimelineTweetResponse {
     private String userProfilePhotoUrl;
     private List<byte[]> tweetAttachment;
     private boolean userIsVerified;
+    private LocalDateTime publicationTime;
 
     public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {
         this.tweetIdentifier = (String) result[0];
@@ -54,5 +57,6 @@ public class TimelineTweetResponse {
         this.retweetedByMe = (boolean) result[15];
         this.tweetAttachment = result[16] != null && (boolean) result[16] ? iAmazonService.loadAttachmentFromS3((String) result[0]) : null;
         this.userIsVerified = (boolean) result[17];
+        this.publicationTime = ((Timestamp) result[18]).toLocalDateTime();
     }
 }
