@@ -24,7 +24,7 @@ public class FavoritesServiceImpl implements IFavoritesService {
         List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size);
 
         for(TimelineTweetResponse fav : favs){
-            iPostsService.loadTweetResponses(fav, userIdentifier, authorization);
+            iPostsService.loadTweetResponses(fav, userIdentifier);
         }
         return favs;
     }

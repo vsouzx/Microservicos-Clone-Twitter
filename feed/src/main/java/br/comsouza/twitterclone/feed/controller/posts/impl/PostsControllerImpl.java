@@ -43,7 +43,7 @@ public class PostsControllerImpl implements IPostsController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/commenttoggle/{originalTweet}")
+    @PostMapping(value = "/newcomment/{originalTweet}")
     public ResponseEntity<Void> commentToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
                                               @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments,

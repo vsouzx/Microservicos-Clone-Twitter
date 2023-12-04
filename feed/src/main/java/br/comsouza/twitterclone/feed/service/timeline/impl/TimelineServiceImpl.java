@@ -27,7 +27,7 @@ public class TimelineServiceImpl implements ITimelineService {
         List<TimelineTweetResponse> posts = strategy.getTimeLine(sessionUserIdentifier, page, size, targetUserIdentifier != null ? targetUserIdentifier : sessionUserIdentifier);
 
         for(TimelineTweetResponse post : posts){
-            iPostsService.loadTweetResponses(post, sessionUserIdentifier, authorization);
+            iPostsService.loadTweetResponses(post, sessionUserIdentifier);
         }
         
         return posts;

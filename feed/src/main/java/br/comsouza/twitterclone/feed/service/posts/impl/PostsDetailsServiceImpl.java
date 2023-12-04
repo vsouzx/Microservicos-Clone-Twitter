@@ -52,14 +52,14 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
             return tweet;
         }
 
-        iPostsService.loadTweetResponses(tweet, sessionUserIdentifier, authorization);
-        tweet.setTweetCommentsList(getTweetComments(sessionUserIdentifier, tweetIdentifier, 0, 10, authorization));
+        iPostsService.loadTweetResponses(tweet, sessionUserIdentifier);
+        tweet.setTweetCommentsList(getTweetComments(sessionUserIdentifier, tweetIdentifier, 0, 10));
 
         return tweet;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization) throws Exception {
+    public List<TimelineTweetResponse> getTweetComments(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -96,7 +96,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
         }
 
         for (TimelineTweetResponse post : response) {
-            iPostsService.loadTweetResponses(post, sessionUserIdentifier, authorization);
+            iPostsService.loadTweetResponses(post, sessionUserIdentifier);
         }
         return response;
     }

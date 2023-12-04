@@ -34,7 +34,6 @@ public interface IPostsDetailsController {
     })
     ResponseEntity<List<TimelineTweetResponse>> getTweetComments(String identifier,
                                                                  @Parameter(description = "Page number") @NotNull Integer page,
-                                                                 @Parameter(description = "Page size") @NotNull Integer size,
-                                                                 String authorization) throws Exception;
+                                                                 @Parameter(description = "Page size") @NotNull Integer size) throws Exception;
 
 }

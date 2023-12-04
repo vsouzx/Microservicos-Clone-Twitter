@@ -2,6 +2,7 @@ package br.comsouza.twitterclone.feed.dto.posts;
 
 import br.comsouza.twitterclone.feed.service.aws.IAmazonService;
 import br.comsouza.twitterclone.feed.service.interactions.IInteractionsService;
+import br.comsouza.twitterclone.feed.util.UsefulDate;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +38,7 @@ public class TimelineTweetResponse {
     private List<byte[]> tweetAttachment;
     private boolean userIsVerified;
     private LocalDateTime publicationTime;
+    private LocalDateTime nowTime;
 
     public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {
         this.tweetIdentifier = (String) result[0];
@@ -58,5 +60,6 @@ public class TimelineTweetResponse {
         this.tweetAttachment = result[16] != null && (boolean) result[16] ? iAmazonService.loadAttachmentFromS3((String) result[0]) : null;
         this.userIsVerified = (boolean) result[17];
         this.publicationTime = ((Timestamp) result[18]).toLocalDateTime();
+        this.nowTime = UsefulDate.now();
     }
 }

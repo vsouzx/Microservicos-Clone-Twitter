@@ -80,7 +80,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new InvalidTweetException();
         }
 
-        if(attachments != null && attachments.size() > 4){
+        if (attachments != null && attachments.size() > 4) {
             throw new InvalidAttachmentException();
         }
 
@@ -98,7 +98,7 @@ public class PostsServiceImpl implements IPostsService {
                 .hasAttachment(attachments != null)
                 .build());
 
-        if(attachments != null){
+        if (attachments != null) {
             iAmazonService.saveAttachmentInBucketS3(attachments, tweetIdentifier);
         }
         messageTranslatorService.translateMessage(tweet, authorization);
@@ -119,7 +119,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToRetweetException();
         }
 
-        if(attachments != null && attachments.size() > 4){
+        if (attachments != null && attachments.size() > 4) {
             throw new InvalidAttachmentException();
         }
 
@@ -155,7 +155,7 @@ public class PostsServiceImpl implements IPostsService {
                     .hasAttachment(attachments != null)
                     .build());
 
-            if(attachments != null){
+            if (attachments != null) {
                 iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
             }
 
@@ -178,7 +178,7 @@ public class PostsServiceImpl implements IPostsService {
             throw new InvalidTweetException();
         }
 
-        if(attachments != null && attachments.size() > 4){
+        if (attachments != null && attachments.size() > 4) {
             throw new InvalidAttachmentException();
         }
 
@@ -200,46 +200,32 @@ public class PostsServiceImpl implements IPostsService {
             throw new UnableToCommentException();
         }
 
-        Optional<Tweets> optionalTweet = iInteractionsService.verifyIsCommented(originalTweetIdentifier, sessionUserIdentifier);
+        Tweets tweet = tweetsRepository.save(Tweets.builder()
+                .tweetIdentifier(UUID.randomUUID().toString())
+                .userIdentifier(sessionUserIdentifier)
+                .originalTweetIdentifier(originalTweetIdentifier)
+                .message(message)
+                .messageTranslations(null)
+                .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
+                .publicationTime(UsefulDate.now())
+                .canBeRepliedByNotFollowedUser(true)
+                .hasAttachment(attachments != null)
+                .build());
 
-        if (optionalTweet.isPresent()) {
-            iNotificationsClientService.deleteNotification(
-                    DeleteNotificationRequest.builder()
-                            .tweetIdentifier(optionalTweet.get().getTweetIdentifier())
-                            .userSenderIdentifier(sessionUserIdentifier)
-                            .userReceiverIdentifier(originalTweet.getUserIdentifier())
-                            .typeDescription(NotificationsTypeEnum.NEW_COMMENT.toString())
-                            .build(),
-                    authorization);
-            tweetsRepository.delete(optionalTweet.get());
+        if (attachments != null) {
+            iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
         }
 
-        if (optionalTweet.isEmpty()) {
-            Tweets tweet = tweetsRepository.save(Tweets.builder()
-                    .tweetIdentifier(UUID.randomUUID().toString())
-                    .userIdentifier(sessionUserIdentifier)
-                    .originalTweetIdentifier(originalTweetIdentifier)
-                    .message(message)
-                    .messageTranslations(null)
-                    .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
-                    .publicationTime(UsefulDate.now())
-                    .canBeRepliedByNotFollowedUser(true)
-                    .hasAttachment(attachments != null)
-                    .build());
+        messageTranslatorService.translateMessage(tweet, authorization);
 
-            if(attachments != null){
-                iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
-            }
-            messageTranslatorService.translateMessage(tweet, authorization);
+        iNotificationsClientService.createNewNotification(
+                sessionUserIdentifier,
+                originalTweet.getUserIdentifier(),
+                NotificationsTypeEnum.NEW_COMMENT.toString(),
+                tweet.getTweetIdentifier(),
+                authorization
+        );
 
-            iNotificationsClientService.createNewNotification(
-                    sessionUserIdentifier,
-                    originalTweet.getUserIdentifier(),
-                    NotificationsTypeEnum.NEW_COMMENT.toString(),
-                    tweet.getTweetIdentifier(),
-                    authorization
-            );
-        }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
@@ -274,7 +260,7 @@ public class PostsServiceImpl implements IPostsService {
             iTweetsLikesRepository.delete(optionalTweetLike.get());
         }
 
-        if(optionalTweetLike.isEmpty()){
+        if (optionalTweetLike.isEmpty()) {
             iTweetsLikesRepository.save(TweetsLikes.builder()
                     .id(TweetsLikesId.builder()
                             .tweetIdentifier(tweetIdentifier)
@@ -323,13 +309,13 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier, String authorization) throws Exception {
+    public void loadTweetResponses(TimelineTweetResponse post, String sessionUserIdentifier) throws Exception {
         TimelineTweetResponse originalTweet;
 
-        post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false, authorization));
+        post.setOriginalTweetResponse(getPostResumeByIdentifier(post, post, sessionUserIdentifier, false));
         originalTweet = post.getOriginalTweetResponse();
         if (originalTweet != null) {
-            originalTweet.setOriginalTweetResponse(getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true, authorization));
+            originalTweet.setOriginalTweetResponse(getPostResumeByIdentifier(post, originalTweet, sessionUserIdentifier, true));
         }
     }
 
@@ -338,13 +324,12 @@ public class PostsServiceImpl implements IPostsService {
         return tweetsRepository.findAllByUserIdentifier(sessionUserIdentifier).size();
     }
 
-    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel, String authorization) throws Exception {
+    private TimelineTweetResponse getPostResumeByIdentifier(TimelineTweetResponse mainTweet, TimelineTweetResponse secondaryTweet, String sessionUserIdentifier, boolean isThirdLevel) throws Exception {
 
         final String mainTweetType = mainTweet.getTweetTypeDescription();
         final String secondaryTweetType = secondaryTweet.getTweetTypeDescription();
 
         if (!mainTweetType.equals(TweetTypeEnum.TWEET.toString()) && !secondaryTweetType.equals(TweetTypeEnum.TWEET.toString())) {
-
             if (mainTweetType.equals(TweetTypeEnum.RETWEET.toString()) && !isThirdLevel) {
                 return postResumeRepository.find(sessionUserIdentifier, secondaryTweet.getOriginalTweetIdentifier());
             }
