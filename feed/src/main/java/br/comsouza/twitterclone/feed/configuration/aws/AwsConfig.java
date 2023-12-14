@@ -14,7 +14,7 @@ public class AwsConfig {
     public AmazonS3 s3client() {
         return AmazonS3ClientBuilder.standard()
                 .withCredentials(new DefaultAWSCredentialsProviderChain())
-                .withRegion(Regions.US_EAST_1)
+                .withRegion(Regions.SA_EAST_1)
                 .build();
     }
 
