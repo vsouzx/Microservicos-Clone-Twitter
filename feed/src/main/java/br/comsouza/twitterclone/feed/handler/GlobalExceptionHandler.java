@@ -1,6 +1,7 @@
 package br.comsouza.twitterclone.feed.handler;
 
 import br.comsouza.twitterclone.feed.dto.handler.CustomErrorResponse;
+import br.comsouza.twitterclone.feed.handler.exceptions.ApiAuthorizationException;
 import br.comsouza.twitterclone.feed.handler.exceptions.ErrorCodeException;
 import br.comsouza.twitterclone.feed.handler.exceptions.ServerErrorException;
 import jakarta.annotation.Resource;
@@ -19,6 +20,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Resource
     private MessageSource messageSource;
+
+    @ExceptionHandler({ApiAuthorizationException.class})
+    private ResponseEntity<Object> handleApiAuthorizationError(Exception e, WebRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return handleExceptionInternal(e, null, headers, HttpStatus.UNAUTHORIZED, request);
+    }
 
     @ExceptionHandler({ErrorCodeException.class})
     private ResponseEntity<Object> handleCodigoDeErro(Exception e, WebRequest request) {

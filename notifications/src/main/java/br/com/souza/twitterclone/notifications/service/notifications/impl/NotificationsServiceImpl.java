@@ -47,13 +47,13 @@ public class NotificationsServiceImpl implements INotificationsService {
     }
 
     @Override
-    public void createNewNotification(NewNotificationRequest request, String authorization) throws Exception {
+    public void createNewNotification(NewNotificationRequest request) throws Exception {
         NotificationsTypes notificationType = iNotificationsTypesRepository.findByDescription(request.getTypeDescription())
                 .orElseThrow(NotificationTypeNotFoundException::new);
 
         if (request.getTweetIdentifier() != null) {
             try {
-                iFeedClient.getTweetDetails(request.getTweetIdentifier(), authorization, false);
+                iFeedClient.getTweetDetails(request.getTweetIdentifier(), false);
             } catch (Exception e) {
                 throw new TweetNotFoundException();
             }
@@ -61,7 +61,7 @@ public class NotificationsServiceImpl implements INotificationsService {
 
         UserDetailsByIdentifierResponse user;
         try {
-            user = iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier(), authorization);
+            user = iAccountsClient.getUserInfosByIdentifier(request.getUserSenderIdentifier());
         } catch (Exception e) {
             throw new UserNotFoundException();
         }
@@ -80,7 +80,7 @@ public class NotificationsServiceImpl implements INotificationsService {
     }
 
     @Override
-    public List<NotificationsResponse> getUserNotifications(Integer page, Integer size, String authorization, String userIdentifier) throws Exception {
+    public List<NotificationsResponse> getUserNotifications(Integer page, Integer size, String userIdentifier) throws Exception {
         List<NotificationsResponse> response = new ArrayList<>();
         NotificationsTypes notificationsType;
 
@@ -93,9 +93,9 @@ public class NotificationsServiceImpl implements INotificationsService {
             response.add(NotificationsResponse.builder()
                     .notificationIdentifier(notification.getIdentifier())
                     .typeDescription(notificationsType.getDescription())
-                    .userResponse(iAccountsClient.getUserInfosByIdentifier(notification.getUserSenderIdentifier(), authorization))
+                    .userResponse(iAccountsClient.getUserInfosByIdentifier(notification.getUserSenderIdentifier()))
                     .tweetResponse(notification.getTweetIdentifier() != null
-                            ? iFeedClient.getTweetDetails(notification.getTweetIdentifier(), authorization, true)
+                            ? iFeedClient.getTweetDetails(notification.getTweetIdentifier(), true)
                             : null)
                     .build());
         }

@@ -21,7 +21,7 @@ public class UsersRepositoryImpl {
         this.em = em;
     }
 
-    public List<UserDetailsByIdentifierResponse> findAllByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size, String authorization){
+    public List<UserDetailsByIdentifierResponse> findAllByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX)    = ? ");

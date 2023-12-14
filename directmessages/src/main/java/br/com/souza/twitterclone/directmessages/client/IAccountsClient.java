@@ -10,6 +10,5 @@ import org.springframework.web.bind.annotation.RequestHeader;
 public interface IAccountsClient {
 
     @GetMapping(value = "/accounts/v1/user/search/byidentifier/{identifier}")
-    UserDetailsByIdentifierResponse getUserInfosByIdentifier(@PathVariable("identifier") String identifier, @RequestHeader("Authorization") String authorization);
-
+    UserDetailsByIdentifierResponse getUserInfosByIdentifier(@PathVariable("identifier") String identifier, @RequestHeader("LOGGED_USER_IDENTIFIER") String loggedUserIdentifier);
 }

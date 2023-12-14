@@ -13,7 +13,7 @@ public interface IUsersInteractionsService {
 
     void blockToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
 
-    void followToggle(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception;
+    void followToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception;
 
     void pendingFollowAcceptDecline(String sessionUserIdentifier, String targetUserIdentifier, boolean accept) throws Exception;
 
@@ -37,6 +37,6 @@ public interface IUsersInteractionsService {
 
     Integer getUserFollowsCount(String targetUserIdentifier);
 
-    Integer getTweetsCount(String targetUserIdentifier, String authorization);
+    Integer getTweetsCount(String targetUserIdentifier);
 
 }

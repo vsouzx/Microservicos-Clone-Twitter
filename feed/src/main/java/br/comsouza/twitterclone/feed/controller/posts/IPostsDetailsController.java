@@ -22,7 +22,6 @@ public interface IPostsDetailsController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<TimelineTweetResponse> getTweetDetails(String identifier,
-                                                          String authorization,
                                                           Boolean load) throws Exception;
 
     @Operation(summary = "Get tweet list comments.")

@@ -5,10 +5,9 @@ import br.com.souza.twitterclone.notifications.dto.notifications.DeleteNotificat
 import br.com.souza.twitterclone.notifications.dto.notifications.NewNotificationRequest;
 import br.com.souza.twitterclone.notifications.dto.notifications.NotificationsResponse;
 import br.com.souza.twitterclone.notifications.service.notifications.INotificationsService;
+import br.com.souza.twitterclone.notifications.service.redis.RedisService;
 import br.com.souza.twitterclone.notifications.util.FindUserIdentifierHelper;
-import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,27 +26,34 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationsControllerImpl implements INotificationsController {
 
     private final INotificationsService iNotificationsService;
+    private final RedisService redisService;
 
-    public NotificationsControllerImpl(INotificationsService iNotificationsService) {
+    public NotificationsControllerImpl(INotificationsService iNotificationsService,
+                                       RedisService redisService) {
         this.iNotificationsService = iNotificationsService;
+        this.redisService = redisService;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Void> createNewNotification(@RequestBody NewNotificationRequest request,
-                                                      @RequestHeader("Authorization") String authorization) throws Exception {
-        iNotificationsService.createNewNotification(request, authorization);
+    public ResponseEntity<Void> createNewNotification(@RequestBody NewNotificationRequest request) throws Exception {
+        String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
+        redisService.isValidUser(sessionUserIdentifier);
+        iNotificationsService.createNewNotification(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<NotificationsResponse>> getUserNotifications(@RequestHeader("Authorization") String authorization,
-                                                                            @RequestParam("page") Integer page,
+    public ResponseEntity<List<NotificationsResponse>> getUserNotifications(@RequestParam("page") Integer page,
                                                                             @RequestParam("size") Integer size) throws Exception {
-        return new ResponseEntity<>(iNotificationsService.getUserNotifications(page, size, authorization, FindUserIdentifierHelper.getIdentifier()), HttpStatus.CREATED);
+        String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
+        redisService.isValidUser(sessionUserIdentifier);
+        return new ResponseEntity<>(iNotificationsService.getUserNotifications(page, size, sessionUserIdentifier), HttpStatus.CREATED);
     }
 
     @DeleteMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteNotification(@RequestBody DeleteNotificationRequest request) throws Exception {
+        String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
+        redisService.isValidUser(sessionUserIdentifier);
         iNotificationsService.deleteNotification(request);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

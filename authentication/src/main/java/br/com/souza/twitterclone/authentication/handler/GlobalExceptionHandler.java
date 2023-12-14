@@ -16,9 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @Resource
-    private MessageSource messageSource;
-
     @ExceptionHandler({Exception.class})
     private ResponseEntity<Object> handleGeneralError(Exception e, WebRequest request) {
         CustomErrorResponse error = new CustomErrorResponse();

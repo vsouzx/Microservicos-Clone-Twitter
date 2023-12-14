@@ -12,11 +12,11 @@ public interface IUsersInfosService {
 
     void updateUserInfos(UserInfosUpdateRequest request, String identifier) throws Exception;
 
-    void updateUserEmail(UserEmailUpdateRequest request, String identifier, String authorization) throws Exception;
+    void updateUserEmail(UserEmailUpdateRequest request, String identifier) throws Exception;
 
     void updateUserUsername(UserUsernameUpdateRequest request, String identifier) throws Exception;
 
-    void updateUserPassword(UserPasswordUpdateRequest request, String identifier, String authorization) throws Exception;
+    void updateUserPassword(UserPasswordUpdateRequest request, String identifier) throws Exception;
 
     void updateUserPrivacy(UserPrivacyUpdateRequest request, String identifier) throws Exception;
 

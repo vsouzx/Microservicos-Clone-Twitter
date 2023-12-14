@@ -23,7 +23,6 @@ public interface ITimelineController {
     ResponseEntity<List<TimelineTweetResponse>> getFollowingTimeline(@Parameter(description = "Timeline types: 'foryou', 'following', 'posts', 'medias', 'replies', 'likes'") String type,
                                                                      @Parameter(description = "Target user identifier") String targetUserIdentifier,
                                                                      Integer page,
-                                                                     Integer size,
-                                                                     String authorization) throws Exception;
+                                                                     Integer size) throws Exception;
 
 }

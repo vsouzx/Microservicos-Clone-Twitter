@@ -18,6 +18,6 @@ public interface ISseController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<SseEmitter> subscribe(String token) throws Exception;
+    ResponseEntity<SseEmitter> subscribe(String identificador) throws Exception;
 
 }

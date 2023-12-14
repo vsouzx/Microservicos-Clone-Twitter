@@ -1,6 +1,5 @@
 package br.com.souza.twitterclone.accounts.service.infos.impl;
 
-import br.com.souza.twitterclone.accounts.configuration.security.TokenProvider;
 import br.com.souza.twitterclone.accounts.database.model.User;
 import br.com.souza.twitterclone.accounts.database.repository.UserRepository;
 import br.com.souza.twitterclone.accounts.dto.user.ImageUpdateRequest;
@@ -34,7 +33,6 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
-    private final TokenProvider tokenProvider;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private static final String TOPIC = "twitterclone-new-register";
     private static final Integer PAUSE_TIME = 15000;
@@ -43,12 +41,10 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     public UsersInfosServiceImpl(UserRepository userRepository,
                                  PasswordEncoder passwordEncoder,
                                  RedisService redisService,
-                                 TokenProvider tokenProvider,
                                  KafkaTemplate<String, String> kafkaTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.redisService = redisService;
-        this.tokenProvider = tokenProvider;
         this.kafkaTemplate = kafkaTemplate;
     }
 
@@ -68,7 +64,7 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     }
 
     @Override
-    public void updateUserEmail(UserEmailUpdateRequest request, String identifier, String authorization) throws Exception {
+    public void updateUserEmail(UserEmailUpdateRequest request, String identifier) throws Exception {
         User user = userRepository.findById(identifier)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -85,9 +81,7 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         user.setEmail(request.getEmail());
 
         //remover autenticacao do usuário do Redis, obrigando-o a se logar novamente
-        String sessionId = tokenProvider.getSessionIdentifierFromToken(authorization);
-        redisService.removeKey(sessionId);
-        redisService.removeKey(TokenProvider.AUTH + identifier);
+        redisService.removeKey("AUTH_" + identifier);
 
         userRepository.save(user);
 
@@ -116,7 +110,7 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
     }
 
     @Override
-    public void updateUserPassword(UserPasswordUpdateRequest request, String identifier, String authorization) throws Exception {
+    public void updateUserPassword(UserPasswordUpdateRequest request, String identifier) throws Exception {
         User user = userRepository.findById(identifier)
                 .orElseThrow(UserNotFoundException::new);
 
@@ -133,9 +127,7 @@ public class UsersInfosServiceImpl implements IUsersInfosService {
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 
         //remover autenticacao do usuário do Redis, obrigando-o a se logar novamente
-        String sessionId = tokenProvider.getSessionIdentifierFromToken(authorization);
-        redisService.removeKey(sessionId);
-        redisService.removeKey(TokenProvider.AUTH + identifier);
+        redisService.removeKey("AUTH_" + identifier);
 
         userRepository.save(user);
     }

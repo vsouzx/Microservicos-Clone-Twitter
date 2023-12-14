@@ -19,7 +19,7 @@ public class NotificationsClientServiceImpl implements INotificationsClientServi
     }
 
     @Override
-    public void createNewNotification(String userSender, String userReceiver, String tweetType, String tweetIdentifier, String authorization) {
+    public void createNewNotification(String userSender, String userReceiver, String tweetType, String tweetIdentifier) {
         new Thread() {
             @SneakyThrows
             @Override
@@ -30,7 +30,7 @@ public class NotificationsClientServiceImpl implements INotificationsClientServi
                             .userSenderIdentifier(userSender)
                             .userReceiverIdentifier(userReceiver)
                             .typeDescription(tweetType)
-                            .build(), authorization);
+                            .build());
                 } catch (Exception e) {
                     log.error("Erro ao criar notificação: ", e);
                 }
@@ -39,7 +39,7 @@ public class NotificationsClientServiceImpl implements INotificationsClientServi
     }
 
     @Override
-    public void deleteNotification(DeleteNotificationRequest request, String authorization) {
-        iNotificationsClient.deleteNotification(request, authorization);
+    public void deleteNotification(DeleteNotificationRequest request) {
+        iNotificationsClient.deleteNotification(request);
     }
 }

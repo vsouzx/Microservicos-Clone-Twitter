@@ -38,13 +38,13 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
     }
 
     @Override
-    public void translateMessage(Tweets tweet, String authorization) throws Exception {
+    public void translateMessage(Tweets tweet) throws Exception {
 
         new Thread() {
             @SneakyThrows
             @Override
             public void run() {
-                UserDetailsResponse sessionUser = iAccountsClient.getUserDetails(authorization);
+                UserDetailsResponse sessionUser = iAccountsClient.getUserDetails();
                 if (sessionUser == null) {
                     throw new Exception("User not found");
                 }

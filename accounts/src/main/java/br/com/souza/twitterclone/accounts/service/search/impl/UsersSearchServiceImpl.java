@@ -71,7 +71,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public UserDetailsResponse searchUserInfos(String sessionUserIdentifier, String authorization) throws Exception {
+    public UserDetailsResponse searchUserInfos(String sessionUserIdentifier) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(sessionUserIdentifier);
 
         return UserDetailsResponse.builder()
@@ -87,13 +87,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .languagePreference(user.getLanguagePreference())
                 .profilePhotoUrl(user.getProfilePhotoUrl())
                 .backgroundPhotoUrl(user.getBackgroundPhotoUrl())
-                .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier(), authorization))
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(user.getIdentifier()))
                 .isVerified(user.getVerified())
                 .build();
     }
 
     @Override
-    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
+    public UserDetailsByIdentifierResponse searchUserInfosByIdentifier(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
         boolean isSessionUserIdentifierBlocked = blockedUsersRepository.findById(BlockedUsersId.builder()
@@ -107,24 +107,24 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .build()).isPresent();
 
         if (isSessionUserIdentifierBlocked) {
-            return responseSessionUserIdentifierBlocked(targetUser, targetUserIdentifierBlocked, authorization);
+            return responseSessionUserIdentifierBlocked(targetUser, targetUserIdentifierBlocked);
         }
         if (targetUserIdentifierBlocked) {
-            return responseTargetUserIdentifierBlocked(targetUser, authorization);
+            return responseTargetUserIdentifierBlocked(targetUser);
         }
-        return fullResponse(targetUser, sessionUserIdentifier, authorization);
+        return fullResponse(targetUser, sessionUserIdentifier);
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size, String authorization) {
-        return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page, size, authorization);
+    public List<UserDetailsByIdentifierResponse> getUsersByUsername(String sessionUserIdentifier, String targetUsername, Integer page, Integer size) {
+        return usersRepositoryImpl.findAllByUsername(sessionUserIdentifier, targetUsername, page, size);
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size, String authorization) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getUserFollowsDetails(String sessionUserIdentifier, String targetUserIdentifier, String type, Integer page, Integer size) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         IFollowsDetailsStrategy strategy = followsDetailsStrategyFactory.getStrategy(type);
-        return strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size, authorization);
+        return strategy.getUserFollowsInformations(sessionUserIdentifier, user.getIdentifier(), page, size);
     }
 
     @Override
@@ -174,9 +174,9 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified, String authorization) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getWhoToFollow(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified) throws Exception {
         User user = iUserService.findUserByUsernameOrEmailOrIdentifier(userOnScreen == null || userOnScreen.isBlank() ? sessionUserIdentifier : userOnScreen);
-        return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), isVerified, authorization);
+        return whoToFollowRepository.find(sessionUserIdentifier, page, size, user.getIdentifier(), isVerified);
     }
 
     @Override
@@ -208,13 +208,13 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
     }
 
     @Override
-    public List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
+    public List<KnownUsersResponse> getAllKnownFollowers(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
         return allUserKnownFollowersRepository.getUserFollowsInformations(sessionUserIdentifier, targetUser.getIdentifier());
     }
 
     @Override
-    public List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier, String authorization) throws Exception {
+    public List<UserSearchHistoricResponse> getUserSearchHistoric(String sessionUserIdentifier) throws Exception {
         return usersSearchHistoricRepository.findAllBySearcherIdentifier(sessionUserIdentifier).stream()
                 .map(h -> {
                     try {
@@ -297,7 +297,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
         usersSearchHistoricRepository.deleteAll(usersSearchHistoric);
     }
 
-    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe, String authorization) throws Exception {
+    private UserDetailsByIdentifierResponse responseSessionUserIdentifierBlocked(User targetUser, boolean isBlockedByMe) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
@@ -317,11 +317,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isSilencedByMe(false)
                 .profilePhotoUrl(targetUser.getProfilePhotoUrl())
                 .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
-                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier()))
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(User targetUser, String authorization) throws Exception {
+    private UserDetailsByIdentifierResponse responseTargetUserIdentifierBlocked(User targetUser) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
@@ -341,11 +341,11 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isSilencedByMe(false)
                 .profilePhotoUrl(targetUser.getProfilePhotoUrl())
                 .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
-                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier()))
                 .build();
     }
 
-    private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser, String authorization) throws Exception {
+    private UserDetailsByIdentifierResponse fullResponse(User targetUser, String sessionUser) throws Exception {
         return UserDetailsByIdentifierResponse.builder()
                 .userIdentifier(targetUser.getIdentifier())
                 .firstName(targetUser.getFirstName())
@@ -366,7 +366,7 @@ public class UsersSearchServiceImpl implements IUsersSearchService {
                 .isNotificationsAlertedByMe(iUsersInteractionsService.verifyIfIsAlerted(sessionUser, targetUser.getIdentifier()).isPresent())
                 .profilePhotoUrl(targetUser.getProfilePhotoUrl())
                 .backgroundPhotoUrl(targetUser.getBackgroundPhotoUrl())
-                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier(), authorization))
+                .tweetsCount(iUsersInteractionsService.getTweetsCount(targetUser.getIdentifier()))
                 .isVerified(targetUser.getVerified())
                 .build();
     }

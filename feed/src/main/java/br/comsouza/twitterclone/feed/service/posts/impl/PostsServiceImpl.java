@@ -75,7 +75,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String flag, String authorization) throws Exception {
+    public void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String flag) throws Exception {
         if ((message == null || message.isBlank()) && (attachments == null)) {
             throw new InvalidTweetException();
         }
@@ -101,16 +101,16 @@ public class PostsServiceImpl implements IPostsService {
         if (attachments != null) {
             iAmazonService.saveAttachmentInBucketS3(attachments, tweetIdentifier);
         }
-        messageTranslatorService.translateMessage(tweet, authorization);
-        iNotificationsClientService.notifyAlerters(sessionUserIdentifier, NotificationsTypeEnum.NEW_POST.toString(), tweet.getTweetIdentifier(), authorization);
+        messageTranslatorService.translateMessage(tweet);
+        iNotificationsClientService.notifyAlerters(sessionUserIdentifier, NotificationsTypeEnum.NEW_POST.toString(), tweet.getTweetIdentifier());
     }
 
     @Override
-    public void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier, String authorization) throws Exception {
+    public void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier) throws Exception {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
         if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
@@ -136,8 +136,7 @@ public class PostsServiceImpl implements IPostsService {
                             .userSenderIdentifier(sessionUserIdentifier)
                             .userReceiverIdentifier(originalTweet.getUserIdentifier())
                             .typeDescription(NotificationsTypeEnum.NEW_RETWEET.toString())
-                            .build(),
-                    authorization
+                            .build()
             );
             tweetsRepository.delete(tweetsOptional.get());
         }
@@ -159,21 +158,20 @@ public class PostsServiceImpl implements IPostsService {
                 iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
             }
 
-            messageTranslatorService.translateMessage(tweet, authorization);
+            messageTranslatorService.translateMessage(tweet);
 
             iNotificationsClientService.createNewNotification(
                     sessionUserIdentifier,
                     originalTweet.getUserIdentifier(),
                     NotificationsTypeEnum.NEW_RETWEET.toString(),
-                    tweet.getTweetIdentifier(),
-                    authorization
+                    tweet.getTweetIdentifier()
             );
         }
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
-    public void commentToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier, String authorization) throws Exception {
+    public void commentToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier) throws Exception {
         if ((message == null || message.isBlank()) && (attachments == null)) {
             throw new InvalidTweetException();
         }
@@ -185,7 +183,7 @@ public class PostsServiceImpl implements IPostsService {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
         if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
@@ -216,25 +214,24 @@ public class PostsServiceImpl implements IPostsService {
             iAmazonService.saveAttachmentInBucketS3(attachments, tweet.getTweetIdentifier());
         }
 
-        messageTranslatorService.translateMessage(tweet, authorization);
+        messageTranslatorService.translateMessage(tweet);
 
         iNotificationsClientService.createNewNotification(
                 sessionUserIdentifier,
                 originalTweet.getUserIdentifier(),
                 NotificationsTypeEnum.NEW_COMMENT.toString(),
-                tweet.getTweetIdentifier(),
-                authorization
+                tweet.getTweetIdentifier()
         );
 
         iInteractionsService.increaseViewsCount(originalTweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
-    public void likeToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
+    public void likeToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
         Tweets originalTweet = tweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
         if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }
@@ -255,8 +252,7 @@ public class PostsServiceImpl implements IPostsService {
                             .userSenderIdentifier(sessionUserIdentifier)
                             .userReceiverIdentifier(originalTweet.getUserIdentifier())
                             .typeDescription(NotificationsTypeEnum.NEW_LIKE.toString())
-                            .build(),
-                    authorization);
+                            .build());
             iTweetsLikesRepository.delete(optionalTweetLike.get());
         }
 
@@ -272,19 +268,18 @@ public class PostsServiceImpl implements IPostsService {
                     sessionUserIdentifier,
                     originalTweet.getUserIdentifier(),
                     NotificationsTypeEnum.NEW_LIKE.toString(),
-                    tweetIdentifier,
-                    authorization
+                    tweetIdentifier
             );
         }
         iInteractionsService.increaseViewsCount(tweetIdentifier, sessionUserIdentifier);
     }
 
     @Override
-    public void favToggle(String tweetIdentifier, String sessionUserIdentifier, String authorization) throws Exception {
+    public void favToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception {
         Tweets originalTweet = tweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier(), authorization);
+        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
         if (tweetUserInfos == null) {
             throw new Exception("User info not found");
         }

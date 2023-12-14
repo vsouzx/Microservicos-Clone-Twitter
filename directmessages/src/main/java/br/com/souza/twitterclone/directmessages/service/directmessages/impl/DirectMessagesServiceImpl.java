@@ -50,7 +50,7 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
     }
 
     @Override
-    public List<ChatsMessageResponse> getSpecificChat(String sessionUserIdentifier, String chatIdentifier, Integer page, Integer size, String authorization) throws Exception {
+    public List<ChatsMessageResponse> getSpecificChat(String sessionUserIdentifier, String chatIdentifier, Integer page, Integer size) throws Exception {
 
         chatMessagesRepository.findAllByChatIdentifier(chatIdentifier).stream()
                 .filter(m -> !m.getUserIdentifier().equals(sessionUserIdentifier) && !m.getSeen())
@@ -68,13 +68,13 @@ public class DirectMessagesServiceImpl implements IDirectMessagesService {
 
         return chatMessagesRepository.findAllByChatIdentifier(chatIdentifier, sessionUserIdentifier, page, size)
                 .stream()
-                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, authorization, sessionUserIdentifier, iChatMessagesReactionsRepository))
+                .map(m -> new ChatsMessageResponse(m, iFeedClient, iAccountsClient, sessionUserIdentifier, iChatMessagesReactionsRepository))
                 .sorted(Comparator.comparing(ChatsMessageResponse::getCreationDate))
                 .toList();
     }
 
     @Override
-    public String initChat(String sessionUserIdentifier, String targetUserIdentifier, String auth){
+    public String initChat(String sessionUserIdentifier, String targetUserIdentifier){
         Optional<DmChats> possibleChat = iDmChatsRepository.findByUserIdentifier1AndUserIdentifier2(sessionUserIdentifier, targetUserIdentifier);
         if(possibleChat.isEmpty()){
             possibleChat = iDmChatsRepository.findByUserIdentifier1AndUserIdentifier2(targetUserIdentifier, sessionUserIdentifier);

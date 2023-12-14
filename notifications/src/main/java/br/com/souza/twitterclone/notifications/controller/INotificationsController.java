@@ -22,8 +22,7 @@ public interface INotificationsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> createNewNotification(@Valid NewNotificationRequest request,
-                                               String authorization) throws Exception;
+    ResponseEntity<Void> createNewNotification(@Valid NewNotificationRequest request) throws Exception;
 
     @Operation(summary = "Get all user notifications.")
     @ApiResponses(value = {
@@ -32,8 +31,7 @@ public interface INotificationsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<NotificationsResponse>> getUserNotifications(String authorization,
-                                                                     Integer page,
+    ResponseEntity<List<NotificationsResponse>> getUserNotifications(Integer page,
                                                                      Integer pageSize) throws Exception;
 
     @Operation(summary = "Get all user notifications.")

@@ -102,7 +102,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public void followToggle(String sessionUserIdentifier, String targetUserIdentifier, String authorization) throws Exception {
+    public void followToggle(String sessionUserIdentifier, String targetUserIdentifier) throws Exception {
         User targetUser = iUserService.findUserByUsernameOrEmailOrIdentifier(targetUserIdentifier);
 
         Optional<BlockedUsers> targetUserIsBlocked = verifyIfIsBlocked(sessionUserIdentifier, targetUser.getIdentifier());
@@ -126,8 +126,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                             .userSenderIdentifier(sessionUserIdentifier)
                             .userReceiverIdentifier(targetUser.getIdentifier())
                             .typeDescription(NotificationsTypeEnum.NEW_FOLLOWER.toString())
-                            .build(),
-                    authorization
+                            .build()
             );
 
             usersFollowsRepository.delete(targetUserIsFollowed.get());
@@ -155,8 +154,7 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
                         sessionUserIdentifier,
                         targetUser.getIdentifier(),
                         NotificationsTypeEnum.NEW_FOLLOWER.toString(),
-                        null,
-                        authorization
+                        null
                 );
             }
         }
@@ -301,8 +299,8 @@ public class UsersInteractionsServiceImpl implements IUsersInteractionsService {
     }
 
     @Override
-    public Integer getTweetsCount(String targetUserIdentifier, String authorization) {
-        return iFeedClient.getTweetsCount(targetUserIdentifier, authorization);
+    public Integer getTweetsCount(String targetUserIdentifier) {
+        return iFeedClient.getTweetsCount(targetUserIdentifier);
     }
 
     private List<UserPreviewResponse> rowMapper(List<User> followers, String sessionUserIdentifier) throws Exception {

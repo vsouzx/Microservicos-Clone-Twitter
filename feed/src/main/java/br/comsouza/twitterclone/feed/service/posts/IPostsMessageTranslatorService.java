@@ -6,5 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IPostsMessageTranslatorService {
 
-    void translateMessage(Tweets tweet, String authorization) throws Exception;
+    void translateMessage(Tweets tweet) throws Exception;
 }

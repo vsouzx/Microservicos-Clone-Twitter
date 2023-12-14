@@ -25,7 +25,7 @@ public class UserKnownFollowersRepository implements IFollowsDetailsStrategy {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization){
+    public List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	    VARCHAR(MAX) = ?  ");
@@ -89,7 +89,7 @@ public class UserKnownFollowersRepository implements IFollowsDetailsStrategy {
                     .isFollowingMe(usersInteractionsService.verifyIfIsFollowing((String) result[0], sessionUserIdentifier).isPresent())
                     .isSilencedByMe(usersInteractionsService.verifyIfIsSilenced(sessionUserIdentifier, (String) result[0]).isPresent())
                     .isNotificationsAlertedByMe(usersInteractionsService.verifyIfIsAlerted(sessionUserIdentifier, (String) result[0]).isPresent())
-                    .tweetsCount(usersInteractionsService.getTweetsCount((String) result[0], authorization))
+                    .tweetsCount(usersInteractionsService.getTweetsCount((String) result[0]))
                     .build());
         }
 

@@ -1,12 +1,12 @@
 package br.com.souza.twitterclone.directmessages.handler.websocket;
 
-import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.directmessages.database.model.DmChats;
 import br.com.souza.twitterclone.directmessages.database.repository.IDmChatsRepository;
 import br.com.souza.twitterclone.directmessages.dto.MessageRequest;
 import br.com.souza.twitterclone.directmessages.service.commons.IHandlersCommons;
 import br.com.souza.twitterclone.directmessages.service.handlers.IMessageHandlerStrategy;
 import br.com.souza.twitterclone.directmessages.service.handlers.factory.MessageHandlerFactory;
+import br.com.souza.twitterclone.directmessages.service.redis.RedisService;
 import br.com.souza.twitterclone.directmessages.util.SingletonChatMessagesConnections;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Optional;
@@ -20,30 +20,36 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 public class ChatMessagesHandler extends TextWebSocketHandler {
 
     private final SingletonChatMessagesConnections singletonChatMessagesConnections;
-    private final TokenProvider tokenProvider;
     private final IDmChatsRepository iDmChatsRepository;
     private final ObjectMapper mapper;
     private final MessageHandlerFactory messageHandlerFactory;
     private final IHandlersCommons iHandlersCommons;
+    private final RedisService redisService;
 
-    public ChatMessagesHandler(TokenProvider tokenProvider,
-                               IDmChatsRepository iDmChatsRepository,
+    public ChatMessagesHandler(IDmChatsRepository iDmChatsRepository,
                                ObjectMapper mapper,
                                MessageHandlerFactory messageHandlerFactory,
-                               IHandlersCommons iHandlersCommons) {
+                               IHandlersCommons iHandlersCommons,
+                               RedisService redisService) {
         this.iDmChatsRepository = iDmChatsRepository;
         this.mapper = mapper;
         this.messageHandlerFactory = messageHandlerFactory;
         this.iHandlersCommons = iHandlersCommons;
+        this.redisService = redisService;
         this.singletonChatMessagesConnections = SingletonChatMessagesConnections.getInstance();
-        this.tokenProvider = tokenProvider;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
         Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
-        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
+        if (sessionToken.isPresent()) {
+            try{
+                redisService.isValidUser(sessionToken.get());
+            }catch (Exception e){
+                session.close(CloseStatus.POLICY_VIOLATION);
+            }
+
             Optional<String> chatIdentifier = iHandlersCommons.getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
                 singletonChatMessagesConnections.put(chatIdentifier.get(), session);
@@ -59,8 +65,12 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         Optional<String> sessionToken = iHandlersCommons.sessionToken(session);
-        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            String userIdentifier = tokenProvider.getIdentifierFromToken(sessionToken.get());
+        if (sessionToken.isPresent()) {
+            try{
+                redisService.isValidUser(sessionToken.get());
+            }catch (Exception e){
+                session.close(CloseStatus.POLICY_VIOLATION);
+            }
 
             Optional<String> chatIdentifier = iHandlersCommons.getChatIdentifier(session);
             if (chatIdentifier.isPresent()) {
@@ -73,10 +83,10 @@ public class ChatMessagesHandler extends TextWebSocketHandler {
                     session.sendMessage(new TextMessage("pong"));
                     return;
                 }
-                String receiverIdentifier = iHandlersCommons.getReceiverIdentifier(chat.get(), userIdentifier);
+                String receiverIdentifier = iHandlersCommons.getReceiverIdentifier(chat.get(), sessionToken.get());
                 MessageRequest messageRequest = mapper.readValue(message.getPayload(), MessageRequest.class);
                 IMessageHandlerStrategy strategy = messageHandlerFactory.getStrategy(messageRequest.getType());
-                strategy.processMessage(messageRequest, chatIdentifier.get(), userIdentifier, receiverIdentifier, sessionToken.get());
+                strategy.processMessage(messageRequest, chatIdentifier.get(), sessionToken.get(), receiverIdentifier);
             } else {
                 session.close(CloseStatus.BAD_DATA);
             }

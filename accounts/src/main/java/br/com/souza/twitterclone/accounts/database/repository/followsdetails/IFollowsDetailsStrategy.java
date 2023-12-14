@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface IFollowsDetailsStrategy {
 
-    List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size, String authorization);
+    List<UserDetailsByIdentifierResponse> getUserFollowsInformations(String sessionUserIdentifier, String targetUserIdentifier, Integer page, Integer size);
     String getStrategyName();
 }

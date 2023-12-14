@@ -22,7 +22,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<UserDetailsResponse> getUserInfos(String authorization) throws Exception;
+    ResponseEntity<UserDetailsResponse> getUserInfos() throws Exception;
 
     @Operation(summary = "Retorna as informações de um usuário pesquisado")
     @ApiResponses(value = {
@@ -31,8 +31,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier,
-                                                                             String authorization) throws Exception;
+    ResponseEntity<UserDetailsByIdentifierResponse> getUserInfosByIdentifier(String targetUserIdentifier) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {
@@ -43,8 +42,7 @@ public interface IUserSearchController {
     })
     ResponseEntity<List<UserDetailsByIdentifierResponse>> getUsersByUsername(String targetUserIdentifier,
                                                                              @Parameter(description = "Numero da pagina") Integer page,
-                                                                             @Parameter(description = "Tamanho da pagina") Integer size,
-                                                                             String authorization) throws Exception;
+                                                                             @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
 
     @Operation(summary = "Retorna uma lista de usuários de acordo com o username")
     @ApiResponses(value = {
@@ -56,8 +54,7 @@ public interface IUserSearchController {
     ResponseEntity<List<UserDetailsByIdentifierResponse>> getUserFollowsDetails(@Parameter(description = "Id do usuário") String targetUserIdentifier,
                                                                                 @Parameter(description = "Tipo da busca: 'following', 'followers', 'know_followers', 'verified_followers'") String type,
                                                                                 @Parameter(description = "Numero da pagina") Integer page,
-                                                                                @Parameter(description = "Tamanho da pagina") Integer size,
-                                                                                String auth) throws Exception;
+                                                                                @Parameter(description = "Tamanho da pagina") Integer size) throws Exception;
 
     @Operation(summary = "Retorna uma lista quem o usuário segue")
     @ApiResponses(value = {
@@ -105,8 +102,7 @@ public interface IUserSearchController {
     ResponseEntity<List<UserDetailsByIdentifierResponse>> getWhoToFollow(@Parameter(description = "Numero da pagina") Integer page,
                                                                          @Parameter(description = "Tamanho da pagina") Integer size,
                                                                          @Parameter(description = "Usuário que não é para aparecer") String userOnScreen,
-                                                                         @Parameter(description = "Retornar apenas verificados") Boolean isVerified,
-                                                                         String authorization) throws Exception;
+                                                                         @Parameter(description = "Retornar apenas verificados") Boolean isVerified) throws Exception;
 
     @Operation(summary = "Lista os usuários verificados")
     @ApiResponses(value = {
@@ -142,8 +138,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@Parameter(description = "Identificador do target useer") String targetUserIdentifier,
-                                                                  String authorization) throws Exception;
+    ResponseEntity<List<KnownUsersResponse>> getAllKnownFollowers(@Parameter(description = "Identificador do target useer") String targetUserIdentifier) throws Exception;
 
     @Operation(summary = "Lista o historico de busca do usuario")
     @ApiResponses(value = {
@@ -152,7 +147,7 @@ public interface IUserSearchController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<List<UserSearchHistoricResponse>> getUserSearchHistoric(String authorization) throws Exception;
+    ResponseEntity<List<UserSearchHistoricResponse>> getUserSearchHistoric() throws Exception;
 
     @Operation(summary = "Salva uma busca no historico")
     @ApiResponses(value = {

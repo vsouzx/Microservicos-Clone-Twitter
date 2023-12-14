@@ -28,7 +28,7 @@ public interface IUserInteractionsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> followToggle(String targetIdentifier, String authorization) throws Exception;
+    ResponseEntity<Void> followToggle(String targetIdentifier) throws Exception;
 
     @Operation(summary = "Accept/decline pendings follows.")
     @ApiResponses(value = {

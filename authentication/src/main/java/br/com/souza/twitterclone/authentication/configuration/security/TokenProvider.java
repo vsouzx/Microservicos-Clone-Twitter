@@ -33,12 +33,9 @@ public class TokenProvider {
     private static final int EXPIRED = 440;
     private static final String ISSUER = "Web Token";
     private final SecurityProperties securityProperties;
-    private final RedisService redisService;
 
-    public TokenProvider(SecurityProperties securityProperties,
-                         RedisService redisService) {
+    public TokenProvider(SecurityProperties securityProperties) {
         this.securityProperties = securityProperties;
-        this.redisService = redisService;
     }
 
     public TokenResponse generateToken(Authentication authentication) {
@@ -49,12 +46,10 @@ public class TokenProvider {
         Date exp = new Date(System.currentTimeMillis() + expirationInMillis);
 
         final User user = getUsuario(authentication);
-        final String sessionIdentifier = UUID.randomUUID().toString();
-        redisService.setValue(sessionIdentifier, user.getIdentifier(), TimeUnit.MILLISECONDS, expirationInMillis, false);
 
         final String auth = Jwts.builder()
                 .setIssuer(ISSUER)
-                .setSubject(sessionIdentifier)
+                .setSubject(user.getIdentifier())
                 .setIssuedAt(now)
                 .setNotBefore(now)
                 .setExpiration(exp)
@@ -98,8 +93,7 @@ public class TokenProvider {
         jwt = extractToken(jwt);
         String secret = securityProperties.getJwtKey();
         Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
-        String sessionIdentifier = claims.getSubject();
-        return (String) redisService.getValue(sessionIdentifier);
+        return claims.getSubject();
     }
 
     public User getUsuario(Authentication authentication) {

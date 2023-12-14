@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface IFavoritesService {
 
-    List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size, String authorization) throws Exception;
+    List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size) throws Exception;
 
 }

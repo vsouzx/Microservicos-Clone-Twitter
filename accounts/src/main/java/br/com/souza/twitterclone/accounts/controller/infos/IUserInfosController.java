@@ -34,7 +34,7 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> updateUserEmail(@Valid UserEmailUpdateRequest request, String authorization) throws Exception;
+    ResponseEntity<Void> updateUserEmail(@Valid UserEmailUpdateRequest request) throws Exception;
 
     @Operation(summary = "Atualiza username (@) do usuário.")
     @ApiResponses(value = {
@@ -52,7 +52,7 @@ public interface IUserInfosController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> updateUserPassword(@Valid UserPasswordUpdateRequest request, String authorization) throws Exception;
+    ResponseEntity<Void> updateUserPassword(@Valid UserPasswordUpdateRequest request) throws Exception;
 
     @Operation(summary = "Atualiza privacidade da conta do usuário.")
     @ApiResponses(value = {

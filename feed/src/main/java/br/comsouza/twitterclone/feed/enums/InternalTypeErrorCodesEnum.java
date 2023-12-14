@@ -8,7 +8,9 @@ public enum InternalTypeErrorCodesEnum {
     E420002("420.002", "You are not able to retweet this tweet."),
     E420003("420.003", "You are not able to reply this tweet."),
     E420004("420.004", "You are not able to like this tweet."),
-    E420005("420.005", "You cannot send more than 4 attachments.");
+    E420005("420.005", "You cannot send more than 4 attachments."),
+    E410016("401.000", "Unauthorized request.");
+
 
     private final String code;
     private final String message;

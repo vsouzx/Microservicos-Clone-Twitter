@@ -19,7 +19,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> postNewTweet(String request, String flag, List<MultipartFile> attachments, String authorization) throws Exception;
+    ResponseEntity<Void> postNewTweet(String request, String flag, List<MultipartFile> attachments) throws Exception;
 
     @Operation(summary = "Creates a new tweet's retweet.")
     @ApiResponses(value = {
@@ -28,7 +28,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> retweetToggle(String originalTweet, String request, List<MultipartFile> attachment, String authorization) throws Exception;
+    ResponseEntity<Void> retweetToggle(String originalTweet, String request, List<MultipartFile> attachment) throws Exception;
 
     @Operation(summary = "Creates a new tweet's comment.")
     @ApiResponses(value = {
@@ -37,7 +37,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> commentToggle(String originalTweet, String request, List<MultipartFile> attachment, String identifier) throws Exception;
+    ResponseEntity<Void> commentToggle(String originalTweet, String request, List<MultipartFile> attachment) throws Exception;
 
     @Operation(summary = "Like/unlike tweets.")
     @ApiResponses(value = {
@@ -46,7 +46,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> likeToggle(String tweet, String authoriaztion) throws Exception;
+    ResponseEntity<Void> likeToggle(String tweet) throws Exception;
 
     @Operation(summary = "Fav/unfav tweets.")
     @ApiResponses(value = {
@@ -55,7 +55,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> favToggle(String tweet, String authorization) throws Exception;
+    ResponseEntity<Void> favToggle(String tweet) throws Exception;
 
     @Operation(summary = "Get users tweets count.")
     @ApiResponses(value = {

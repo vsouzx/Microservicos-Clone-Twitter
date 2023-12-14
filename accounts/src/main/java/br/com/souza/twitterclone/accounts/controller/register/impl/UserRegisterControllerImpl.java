@@ -2,7 +2,9 @@ package br.com.souza.twitterclone.accounts.controller.register.impl;
 
 import br.com.souza.twitterclone.accounts.controller.register.IUserRegisterController;
 import br.com.souza.twitterclone.accounts.dto.user.UserRegistrationRequest;
+import br.com.souza.twitterclone.accounts.service.redis.RedisService;
 import br.com.souza.twitterclone.accounts.service.register.IUsersRegisterService;
+import br.com.souza.twitterclone.accounts.util.FindUserIdentifierHelper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(value = "/v1/user/register")

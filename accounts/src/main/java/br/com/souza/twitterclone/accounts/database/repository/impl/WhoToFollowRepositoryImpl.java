@@ -23,7 +23,7 @@ public class WhoToFollowRepositoryImpl {
         this.iUsersInteractionsService = iUsersInteractionsService;
     }
 
-    public List<UserDetailsByIdentifierResponse> find(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified, String authorization){
+    public List<UserDetailsByIdentifierResponse> find(String sessionUserIdentifier, Integer page, Integer size, String userOnScreen, Boolean isVerified){
         StringBuilder sb = new StringBuilder();
 
         sb.append("DECLARE @sessionUser	        VARCHAR(MAX) = ? ");
@@ -97,7 +97,7 @@ public class WhoToFollowRepositoryImpl {
                     .isFollowingMe(iUsersInteractionsService.verifyIfIsFollowing((String) result[0], sessionUserIdentifier).isPresent())
                     .isSilencedByMe(iUsersInteractionsService.verifyIfIsSilenced(sessionUserIdentifier, (String) result[0]).isPresent())
                     .isNotificationsAlertedByMe(iUsersInteractionsService.verifyIfIsAlerted(sessionUserIdentifier, (String) result[0]).isPresent())
-                    .tweetsCount(iUsersInteractionsService.getTweetsCount((String) result[0], authorization))
+                    .tweetsCount(iUsersInteractionsService.getTweetsCount((String) result[0]))
                     .build());
         }
 

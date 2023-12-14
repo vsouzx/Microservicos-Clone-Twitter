@@ -1,8 +1,8 @@
-package br.com.souza.twitterclone.directmessages.configuration.authorization;
+package br.com.souza.twitterclone.gateway.security;
 
-import br.com.souza.twitterclone.directmessages.properties.SecurityProperties;
-import br.com.souza.twitterclone.directmessages.service.redis.RedisService;
-import br.com.souza.twitterclone.directmessages.util.UsefulDate;
+import br.com.souza.twitterclone.gateway.properties.SecurityProperties;
+import br.com.souza.twitterclone.gateway.service.RedisService;
+import br.com.souza.twitterclone.gateway.util.UsefulDate;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -35,7 +35,7 @@ public class TokenProvider {
         this.redisService = redisService;
     }
 
-    public boolean isValid(String jwt, ServletResponse response) throws IOException {
+    public void isValid(String jwt) throws Exception{
         try {
             jwt = extractToken(jwt);
             String secret = securityProperties.getJwtKey();
@@ -44,44 +44,20 @@ public class TokenProvider {
             JWSVerifier verifier = new MACVerifier(securityProperties.getJwtKey().getBytes(StandardCharsets.UTF_8));
             if (!signedJWT.verify(verifier)) {
                 log.error("Invalid JWT token!");
-                ((HttpServletResponse) response).sendError(UNAUTHORIZED);
-                return false;
+                throw new Exception("Token expirado: {}");
             }
             Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
             String sessionIdentifier = claims.getSubject();
             String identifier = (String) redisService.getValue(sessionIdentifier);
-            return (identifier != null);
-        } catch (ExpiredJwtException e) {
-            log.error("Token expirado: {}", e);
-            ((HttpServletResponse) response).sendError(EXPIRED);
-            return false;
-        }catch (Exception e) {
-            log.error("Token inválido: {}", e);
-            ((HttpServletResponse) response).sendError(UNAUTHORIZED);
-            return false;
-        }
-    }
-
-    public boolean validateTokenWebSocketSession(String authToken){
-        try {
-            authToken = extractToken(authToken);
-            SignedJWT signedJWT = SignedJWT.parse(authToken);
-            JWSVerifier verifier = new MACVerifier(securityProperties.getJwtKey().getBytes(StandardCharsets.UTF_8));
-            if (!signedJWT.verify(verifier)) {
-                return false;
+            if(identifier == null){
+                throw new Exception("Token não existe no redis.");
             }
-            String secret = securityProperties.getJwtKey();
-            Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(authToken).getBody();
-            JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
-            return !Instant.ofEpochMilli(claims.getExpirationTime().getTime())
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate().isBefore(ChronoLocalDate.from(UsefulDate.now()));
         } catch (ExpiredJwtException e) {
-            log.debug("Expired JWT token.");
-            return false;
+            log.error("Token expirado: ", e);
+            throw new Exception("Token expirado: {}", e);
         }catch (Exception e) {
-            log.debug("Invalid JWT token.", e);
-            return false;
+            log.error("Token inválido: ", e);
+            throw new Exception("Token inválido: {}");
         }
     }
 
@@ -100,4 +76,3 @@ public class TokenProvider {
         return authToken;
     }
 }
-

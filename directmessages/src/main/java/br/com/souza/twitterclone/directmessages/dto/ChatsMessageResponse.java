@@ -31,17 +31,17 @@ public class ChatsMessageResponse {
     private Boolean isMine;
     private String type;
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String sessionUserIdentifier, String type){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String chatMessageSessionUserIdentifier, String sessionUserIdentifier, String type){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
-            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), sessionUserIdentifier);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
             this.reactions = null;
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
-                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), false);
             }
             this.isMine = chatMessageSessionUserIdentifier.equals(sessionUserIdentifier);
             this.type = type;
@@ -51,19 +51,19 @@ public class ChatsMessageResponse {
         }
     }
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, String type, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String sessionUserIdentifier, String type, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
-            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), sessionUserIdentifier);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
             this.reactions = iChatMessagesReactionsRepository.findAllByIdMessageIdentifier(message.getIdentifier());
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
-                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), false);
             }
-            this.isMine = chatMessageSessionUserIdentifier.equals(message.getUserIdentifier());
+            this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
             this.type = type;
         }catch (Exception e){
             e.printStackTrace();
@@ -71,19 +71,19 @@ public class ChatsMessageResponse {
         }
     }
 
-    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String authorization, String chatMessageSessionUserIdentifier, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
+    public ChatsMessageResponse(ChatMessages message, IFeedClient feedClient, IAccountsClient iAccountClient, String sessionUserIdentifier, IChatMessagesReactionsRepository iChatMessagesReactionsRepository){
         try{
             this.identifier = message.getIdentifier();
             this.chatIdentifier = message.getChatIdentifier();
-            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), authorization);
+            this.user = iAccountClient.getUserInfosByIdentifier(message.getUserIdentifier(), sessionUserIdentifier);
             this.text = message.getText();
             this.creationDate = message.getCreationDate();
             this.reactions = iChatMessagesReactionsRepository.findAllByIdMessageIdentifier(message.getIdentifier());
             this.seen = message.getSeen();
             if(message.getTweetIdentifier() != null){
-                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), authorization, false);
+                this.tweet = feedClient.getTweetDetails(message.getTweetIdentifier(), false);
             }
-            this.isMine = chatMessageSessionUserIdentifier.equals(message.getUserIdentifier());
+            this.isMine = sessionUserIdentifier.equals(message.getUserIdentifier());
         }catch (Exception e){
             e.printStackTrace();
             throw e;

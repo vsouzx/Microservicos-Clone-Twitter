@@ -47,7 +47,7 @@ public class ReactMessageHandler implements IMessageHandlerStrategy {
     }
 
     @Override
-    public void processMessage(MessageRequest messageRequest, String chatIdentifier, String sessionUserIdentifier, String receiverIdentifier, String sessionToken) throws Exception {
+    public void processMessage(MessageRequest messageRequest, String chatIdentifier, String sessionUserIdentifier, String receiverIdentifier) throws Exception {
         Set<WebSocketSession> chatMessagesSessions = singletonChatMessagesConnections.get(chatIdentifier);
 
         ChatMessages chatMessage = iChatMessagesRepository.findById(messageRequest.getMessageIdentifier())
@@ -77,7 +77,7 @@ public class ReactMessageHandler implements IMessageHandlerStrategy {
         if (chatMessagesSessions != null) {
             for (WebSocketSession s : chatMessagesSessions) {
                 try {
-                    s.sendMessage(createReactionMessage(s, sessionToken, chatMessage));
+                    s.sendMessage(createReactionMessage(s, chatMessage));
                 } catch (Exception e) {
                     s.close();
                 }
@@ -85,9 +85,9 @@ public class ReactMessageHandler implements IMessageHandlerStrategy {
         }
     }
 
-    private TextMessage createReactionMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage) throws Exception {
+    private TextMessage createReactionMessage(WebSocketSession session, ChatMessages chatMessage) throws Exception {
         String chatMessagesSessionUserIdentifier = iHandlersCommons.getSessionUserIdentifier(session);
-        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionUserIdentifier, "REACTION_MESSAGE", iChatMessagesReactionsRepository);
+        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, chatMessagesSessionUserIdentifier, "REACTION_MESSAGE", iChatMessagesReactionsRepository);
         String sessionUserResponse = objectMapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
     }

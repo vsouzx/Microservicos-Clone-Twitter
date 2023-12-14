@@ -77,7 +77,7 @@ public class LoggingGlobalRegister implements GlobalFilter, Ordered {
 
     @Override
     public int getOrder() {
-        return -2;
+        return -1;
     }
 
     private Mono<? extends DataBuffer> join(Publisher<? extends DataBuffer> dataBuffers) {

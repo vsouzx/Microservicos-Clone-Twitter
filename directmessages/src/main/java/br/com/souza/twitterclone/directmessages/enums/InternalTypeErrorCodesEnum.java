@@ -7,7 +7,9 @@ public enum InternalTypeErrorCodesEnum {
     E420001("420.001", "This tweet doesn't exists."),
     E420002("420.002", "You are not able to retweet this tweet."),
     E420003("420.003", "You are not able to reply this tweet."),
-    E420004("420.004", "You are not able to like this tweet.");
+    E420004("420.004", "You are not able to like this tweet."),
+    E410016("401.000", "Unauthorized request.");
+
 
     private final String code;
     private final String message;

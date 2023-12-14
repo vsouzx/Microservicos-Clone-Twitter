@@ -23,6 +23,5 @@ public interface IFavoritesController {
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
     ResponseEntity<List<TimelineTweetResponse>> getFavsTweets(@Parameter(description = "Page number") Integer pageNumber,
-                                                              @Parameter(description = "Page size") Integer pageSize,
-                                                              String authorization) throws Exception;
+                                                              @Parameter(description = "Page size") Integer pageSize) throws Exception;
 }

@@ -42,7 +42,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier, String authorization, Boolean load) throws Exception {
+    public TimelineTweetResponse getTweetDetails(String sessionUserIdentifier, String tweetIdentifier, Boolean load) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -72,20 +72,20 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getTweetNoValueRetweets(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getTweetNoValueRetweets(String tweetIdentifier, Integer page, Integer size) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
         List<UserDetailsByIdentifierResponse> response = new ArrayList<>();
         List<Tweets> retweets = iInteractionsService.getTweetOnlyNoValueRetweetsPageable(tweetIdentifier, page, size).getContent();
         for (Tweets retweet : retweets) {
-            response.add(iAccountsClient.getUserInfosByIdentifier(retweet.getUserIdentifier(), authorization));
+            response.add(iAccountsClient.getUserInfosByIdentifier(retweet.getUserIdentifier()));
         }
         return response;
     }
 
     @Override
-    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size, String authorization) throws Exception {
+    public List<TimelineTweetResponse> getTweetRetweets(String sessionUserIdentifier, String tweetIdentifier, Integer page, Integer size) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -102,7 +102,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
     }
 
     @Override
-    public List<UserDetailsByIdentifierResponse> getTweetLikes(String authorization, String tweetIdentifier, Integer page, Integer size) throws Exception {
+    public List<UserDetailsByIdentifierResponse> getTweetLikes(String tweetIdentifier, Integer page, Integer size) throws Exception {
         iTweetsRepository.findById(tweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -110,7 +110,7 @@ public class PostsDetailsServiceImpl implements IPostsDetailsService {
         List<TweetsLikes> likes =  iInteractionsService.getTweetLikesPageable(tweetIdentifier, page, size).getContent();
 
         for (TweetsLikes like : likes) {
-            response.add(iAccountsClient.getUserInfosByIdentifier(like.getId().getUserIdentifier(), authorization));
+            response.add(iAccountsClient.getUserInfosByIdentifier(like.getId().getUserIdentifier()));
         }
         return response;
     }

@@ -1,6 +1,7 @@
 package br.com.souza.twitterclone.notifications.handler;
 
 import br.com.souza.twitterclone.notifications.dto.handler.CustomErrorResponse;
+import br.com.souza.twitterclone.notifications.handler.exceptions.ApiAuthorizationException;
 import br.com.souza.twitterclone.notifications.handler.exceptions.ErrorCodeException;
 import br.com.souza.twitterclone.notifications.handler.exceptions.ServerErrorException;
 import jakarta.annotation.Resource;
@@ -16,6 +17,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler({ApiAuthorizationException.class})
+    private ResponseEntity<Object> handleApiAuthorizationError(Exception e, WebRequest request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return handleExceptionInternal(e, null, headers, HttpStatus.UNAUTHORIZED, request);
+    }
 
     @ExceptionHandler({Exception.class})
     private ResponseEntity<Object> handleGeneralError(Exception e, WebRequest request) {

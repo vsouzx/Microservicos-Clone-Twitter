@@ -48,7 +48,7 @@ public class HideMessageHandler implements IMessageHandlerStrategy {
     }
 
     @Override
-    public void processMessage(MessageRequest messageRequest, String chatIdentifier, String sessionUserIdentifier, String receiverIdentifier, String sessionToken) throws Exception {
+    public void processMessage(MessageRequest messageRequest, String chatIdentifier, String sessionUserIdentifier, String receiverIdentifier) throws Exception {
         Set<WebSocketSession> chatMessagesSessions = singletonChatMessagesConnections.get(chatIdentifier);
         Set<WebSocketSession> sessionUserSessions = singletonDmChatsConnections.get(sessionUserIdentifier);
         Set<WebSocketSession> secondaryUserSessions = singletonDmChatsConnections.get(receiverIdentifier);
@@ -68,7 +68,7 @@ public class HideMessageHandler implements IMessageHandlerStrategy {
             if (chatMessagesSessions != null) {
                 for (WebSocketSession s : chatMessagesSessions) {
                     try {
-                        s.sendMessage(createHideMessage(s, sessionToken, chatMessage, sessionUserIdentifier));
+                        s.sendMessage(createHideMessage(s, chatMessage, sessionUserIdentifier));
                     } catch (Exception e) {
                         s.close();
                     }
@@ -97,9 +97,9 @@ public class HideMessageHandler implements IMessageHandlerStrategy {
         }
     }
 
-    private TextMessage createHideMessage(WebSocketSession session, String sessionToken, ChatMessages chatMessage, String sessionUserIdentifier) throws Exception {
+    private TextMessage createHideMessage(WebSocketSession session, ChatMessages chatMessage, String sessionUserIdentifier) throws Exception {
         String chatMessagesSessionUserIdentifier = iHandlersCommons.getSessionUserIdentifier(session);
-        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, sessionToken, chatMessagesSessionUserIdentifier, sessionUserIdentifier, "HIDE_MESSAGE");
+        ChatsMessageResponse sessionUserChatResponse = new ChatsMessageResponse(chatMessage, iFeedClient, iAccountsClient, chatMessagesSessionUserIdentifier, sessionUserIdentifier, "HIDE_MESSAGE");
         String sessionUserResponse = objectMapper.writeValueAsString(sessionUserChatResponse);
         return new TextMessage(sessionUserResponse);
     }

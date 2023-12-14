@@ -1,9 +1,8 @@
 package br.com.souza.twitterclone.directmessages.service.commons.impl;
 
-import br.com.souza.twitterclone.directmessages.configuration.authorization.TokenProvider;
 import br.com.souza.twitterclone.directmessages.database.model.DmChats;
 import br.com.souza.twitterclone.directmessages.service.commons.IHandlersCommons;
-import java.io.IOException;
+import br.com.souza.twitterclone.directmessages.service.redis.RedisService;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
@@ -14,10 +13,10 @@ import org.springframework.web.util.UriComponents;
 @Service
 public class HandlersCommonsImpl implements IHandlersCommons {
 
-    private final TokenProvider tokenProvider;
+    private final RedisService redisService;
 
-    public HandlersCommonsImpl(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+    public HandlersCommonsImpl(RedisService redisService) {
+        this.redisService = redisService;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class HandlersCommonsImpl implements IHandlersCommons {
                 .map(UriComponentsBuilder::fromUri)
                 .map(UriComponentsBuilder::build)
                 .map(UriComponents::getQueryParams)
-                .map(it -> it.get("token"))
+                .map(it -> it.get("userIdentifier"))
                 .flatMap(it -> it.stream().findFirst())
                 .map(String::trim);
     }
@@ -50,10 +49,15 @@ public class HandlersCommonsImpl implements IHandlersCommons {
     }
 
     @Override
-    public String getSessionUserIdentifier(WebSocketSession session) throws IOException {
+    public String getSessionUserIdentifier(WebSocketSession session) throws Exception {
         Optional<String> sessionToken = sessionToken(session);
-        if (sessionToken.isPresent() && tokenProvider.validateTokenWebSocketSession(sessionToken.get())) {
-            return tokenProvider.getIdentifierFromToken(sessionToken.get());
+        if (sessionToken.isPresent()) {
+            try{
+                redisService.isValidUser(sessionToken.get());
+            }catch (Exception e){
+                session.close(CloseStatus.POLICY_VIOLATION);
+            }
+            return sessionToken.get();
         } else {
             session.close(CloseStatus.BAD_DATA);
             return null;

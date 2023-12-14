@@ -1,5 +1,7 @@
 package br.com.souza.twitterclone.accounts.service.redis;
 
+import br.com.souza.twitterclone.accounts.dto.auth.TokenResponse;
+import br.com.souza.twitterclone.accounts.handler.exceptions.ApiAuthorizationException;
 import java.util.concurrent.TimeUnit;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -20,13 +22,6 @@ public class RedisService {
                         RedisTemplate<String, Object> template) {
         this.mapper = mapper;
         this.template = template;
-    }
-
-    public synchronized Object getValue(final String key) {
-
-        template.setHashValueSerializer(new StringRedisSerializer());
-        template.setValueSerializer(new StringRedisSerializer());
-        return template.opsForValue().get(key);
     }
 
     public void removeKey(final String key) {
@@ -52,5 +47,11 @@ public class RedisService {
         template.opsForValue().set(key, value);
         // set a expire for a message
         template.expire(key, timeout, unit);
+    }
+
+    public void isValidUser(String userIdentifier) throws Exception {
+        if(getValue("AUTH_" + userIdentifier, TokenResponse.class) == null){
+            throw new ApiAuthorizationException();
+        }
     }
 }

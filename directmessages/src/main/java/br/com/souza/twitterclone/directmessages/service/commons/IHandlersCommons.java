@@ -13,5 +13,5 @@ public interface IHandlersCommons {
 
     Optional<String> getChatIdentifier(WebSocketSession session);
 
-    String getSessionUserIdentifier(WebSocketSession session) throws IOException;
+    String getSessionUserIdentifier(WebSocketSession session) throws Exception;
 }
