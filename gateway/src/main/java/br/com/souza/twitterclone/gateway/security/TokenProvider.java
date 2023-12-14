@@ -1,5 +1,6 @@
 package br.com.souza.twitterclone.gateway.security;
 
+import br.com.souza.twitterclone.gateway.dto.auth.TokenResponse;
 import br.com.souza.twitterclone.gateway.properties.SecurityProperties;
 import br.com.souza.twitterclone.gateway.service.RedisService;
 import br.com.souza.twitterclone.gateway.util.UsefulDate;
@@ -47,9 +48,9 @@ public class TokenProvider {
                 throw new Exception("Token expirado: {}");
             }
             Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
-            String sessionIdentifier = claims.getSubject();
-            String identifier = (String) redisService.getValue(sessionIdentifier);
-            if(identifier == null){
+            String userIdentifier = claims.getSubject();
+            String session = (String) redisService.getValue("AUTH_" + userIdentifier, TokenResponse.class);
+            if(session == null){
                 throw new Exception("Token não existe no redis.");
             }
         } catch (ExpiredJwtException e) {
@@ -65,8 +66,7 @@ public class TokenProvider {
         jwt = extractToken(jwt);
         String secret = securityProperties.getJwtKey();
         Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
-        String sessionIdentifier = claims.getSubject();
-        return (String) redisService.getValue(sessionIdentifier);
+        return claims.getSubject();
     }
 
     private String extractToken(String authToken) {
