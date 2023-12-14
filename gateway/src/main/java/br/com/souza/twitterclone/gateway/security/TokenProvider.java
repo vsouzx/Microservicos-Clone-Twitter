@@ -49,7 +49,7 @@ public class TokenProvider {
             }
             Claims claims = Jwts.parser().setSigningKey(secret.getBytes(StandardCharsets.UTF_8)).parseClaimsJws(jwt).getBody();
             String userIdentifier = claims.getSubject();
-            String session = (String) redisService.getValue("AUTH_" + userIdentifier, TokenResponse.class);
+            TokenResponse session = (TokenResponse) redisService.getValue("AUTH_" + userIdentifier, TokenResponse.class);
             if(session == null){
                 throw new Exception("Token não existe no redis.");
             }
