@@ -32,7 +32,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        return handleExceptionInternal(e, null, headers, HttpStatus.BAD_REQUEST, request);
+        return handleExceptionInternal(e, error, headers, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler({ApiAuthorizationException.class})
