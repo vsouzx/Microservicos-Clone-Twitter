@@ -183,19 +183,20 @@ public class PostsServiceImpl implements IPostsService {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
-        UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
-        if (tweetUserInfos == null) {
-            throw new Exception("User info not found");
-        }
-
-        if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
-            throw new UnableToCommentException();
-        }
-        if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
-            throw new UnableToCommentException();
-        }
-        if (!originalTweet.getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
-            throw new UnableToCommentException();
+        if(!originalTweet.getUserIdentifier().equals(sessionUserIdentifier)){
+            UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
+            if (tweetUserInfos == null) {
+                throw new Exception("User info not found");
+            }
+            if (tweetUserInfos.getHasBlockedMe() || tweetUserInfos.getIsBlockedByMe()) {
+                throw new UnableToCommentException();
+            }
+            if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
+                throw new UnableToCommentException();
+            }
+            if (!originalTweet.getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
+                throw new UnableToCommentException();
+            }
         }
 
         Tweets tweet = tweetsRepository.save(Tweets.builder()
