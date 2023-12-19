@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @RestControllerAdvice
@@ -20,6 +21,19 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Resource
     private MessageSource messageSource;
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Object> handleMaxSizeException(MaxUploadSizeExceededException e, WebRequest request) {
+        CustomErrorResponse error = new CustomErrorResponse();
+        error.setError("The file exceeds the maximum allowed size of 2MB.");
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setCode("400");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return handleExceptionInternal(e, null, headers, HttpStatus.BAD_REQUEST, request);
+    }
 
     @ExceptionHandler({ApiAuthorizationException.class})
     private ResponseEntity<Object> handleApiAuthorizationError(Exception e, WebRequest request) {
