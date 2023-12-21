@@ -14,7 +14,7 @@ public interface IInteractionsService {
     Page<TweetsLikes> getTweetLikesPageable(String tweetIdentifier, Integer page, Integer size);
     void increaseViewsCount(String tweetIdentifier, String userIdentifier);
     Optional<TweetsLikes> verifyIsLiked(String tweetIdentifier, String userIdentifier);
-    Optional<Tweets> verifyIsRetweeted(String tweetIdentifier, String userIdentifier);
+    Optional<Tweets> verifyIsNoValueRetweeted(String tweetIdentifier, String userIdentifier);
     Optional<Tweets> verifyIsCommented(String tweetIdentifier, String userIdentifier);
     Optional<TweetsFavs> verifyIsFavorited(String tweetIdentifier, String userIdentifier);
 }

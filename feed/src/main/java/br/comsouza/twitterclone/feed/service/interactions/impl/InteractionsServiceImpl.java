@@ -85,15 +85,9 @@ public class InteractionsServiceImpl implements IInteractionsService {
     }
 
     @Override
-    public Optional<Tweets> verifyIsRetweeted(String tweetIdentifier, String userIdentifier) {
-        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString());
-        Optional<Tweets> tweet = iTweetsRepository.findByUserIdentifierAndOriginalTweetIdentifierAndType(userIdentifier, tweetIdentifier, tweetType.getTypeIdentifier());
-
-        if(tweet.isEmpty()){
-            tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString());
-            tweet = iTweetsRepository.findByUserIdentifierAndOriginalTweetIdentifierAndType(userIdentifier, tweetIdentifier, tweetType.getTypeIdentifier());
-        }
-        return tweet;
+    public Optional<Tweets> verifyIsNoValueRetweeted(String tweetIdentifier, String userIdentifier) {
+        TweetsTypes tweetType = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString());
+        return iTweetsRepository.findByUserIdentifierAndOriginalTweetIdentifierAndType(userIdentifier, tweetIdentifier, tweetType.getTypeIdentifier());
     }
 
     @Override

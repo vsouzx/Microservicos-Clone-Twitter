@@ -124,12 +124,12 @@ public class PostsServiceImpl implements IPostsService {
         }
 
         String type = message == null && (attachments == null)
-                ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
-                : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
+                ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier()
+                : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.name()).getTypeIdentifier();
 
         Optional<Tweets> tweetsOptional = Optional.empty();
-        if(type.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString())){
-            tweetsOptional = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
+        if(type.equals(TweetTypeEnum.NO_VALUE_RETWEET.name())){
+            tweetsOptional = iInteractionsService.verifyIsNoValueRetweeted(originalTweetIdentifier, sessionUserIdentifier);
         }
 
         if (tweetsOptional.isPresent()) {
