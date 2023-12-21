@@ -124,7 +124,7 @@ public class PostsServiceImpl implements IPostsService {
         }
 
         String noValuesRetweetTypeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier();
-        String retweetTypeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier();
+        String retweetTypeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.name()).getTypeIdentifier();
 
         String type = message == null && (attachments == null)
                 ? noValuesRetweetTypeIdentifier
