@@ -25,50 +25,51 @@ public class NotificationsClientServiceImpl implements INotificationsClientServi
 
     @Override
     public void createNewNotification(String userSender, String userReceiver, String tweetType, String tweetIdentifier) {
-        new Thread() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                try {
-                    iNotificationsClient.createNewNotification(NewNotificationRequest.builder()
-                            .tweetIdentifier(tweetIdentifier)
-                            .userSenderIdentifier(userSender)
-                            .userReceiverIdentifier(userReceiver)
-                            .typeDescription(tweetType)
-                            .build());
-                } catch (Exception e) {
-                    log.error("Erro ao criar notificação: ", e);
-                }
-            }
-        }.start();
+//        new Thread() {
+//            @SneakyThrows
+//            @Override
+//            public void run() {
+//                try {
+//                    iNotificationsClient.createNewNotification(NewNotificationRequest.builder()
+//                            .tweetIdentifier(tweetIdentifier)
+//                            .userSenderIdentifier(userSender)
+//                            .userReceiverIdentifier(userReceiver)
+//                            .typeDescription(tweetType)
+//                            .build());
+//                } catch (Exception e) {
+//                    log.error("Erro ao criar notificação: ", e);
+//                }
+//            }
+//        }.start();
     }
 
     @Override
     public void deleteNotification(DeleteNotificationRequest request) {
-            iNotificationsClient.deleteNotification(request);
+        iNotificationsClient.deleteNotification(request);
     }
 
     @Override
     public void notifyAlerters(String userSender, String tweetType, String tweetIdentifier) {
 
-        new Thread() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                List<String> receivers = iAccountsClient.getAlertedUsers();
-                try {
-                    receivers.forEach(userReceiver -> {
-                        iNotificationsClient.createNewNotification(NewNotificationRequest.builder()
-                                .tweetIdentifier(tweetIdentifier)
-                                .userSenderIdentifier(userSender)
-                                .userReceiverIdentifier(userReceiver)
-                                .typeDescription(tweetType)
-                                .build());
-                    });
-                } catch (Exception e) {
-                    log.error("Erro ao criar notificação: ", e);
-                }
-            }
-        }.start();
+//        String teste;
+//        new Thread() {
+//            @SneakyThrows
+//            @Override
+//            public void run() {
+//                List<String> receivers = iAccountsClient.getAlertedUsers();
+//                try {
+//                    receivers.forEach(userReceiver -> {
+//                        iNotificationsClient.createNewNotification(NewNotificationRequest.builder()
+//                                .tweetIdentifier(tweetIdentifier)
+//                                .userSenderIdentifier(userSender)
+//                                .userReceiverIdentifier(userReceiver)
+//                                .typeDescription(tweetType)
+//                                .build());
+//                    });
+//                } catch (Exception e) {
+//                    log.error("Erro ao criar notificação: ", e);
+//                }
+//            }
+//        }.start();
     }
 }

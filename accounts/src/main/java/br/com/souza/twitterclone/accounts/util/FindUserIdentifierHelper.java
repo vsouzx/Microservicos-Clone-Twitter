@@ -15,11 +15,14 @@ public class FindUserIdentifierHelper {
 
     public static String getIdentifier() throws Exception {
         RequestAttributes attribs = RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(attribs)).getRequest();
-        String userIdentifier = request.getHeader("LOGGED_USER_IDENTIFIER");
-        if (userIdentifier == null) {
-            throw new ApiAuthorizationException();
+        if(attribs != null){
+            HttpServletRequest request = ((ServletRequestAttributes) Objects.requireNonNull(attribs)).getRequest();
+            String userIdentifier = request.getHeader("LOGGED_USER_IDENTIFIER");
+            if (userIdentifier == null) {
+                throw new ApiAuthorizationException();
+            }
+            return userIdentifier;
         }
-        return userIdentifier;
+        throw new ApiAuthorizationException();
     }
 }

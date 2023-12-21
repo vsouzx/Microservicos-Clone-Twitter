@@ -40,42 +40,44 @@ public class PostsMessageTranslatorServiceImpl implements IPostsMessageTranslato
     @Override
     public void translateMessage(Tweets tweet) throws Exception {
 
-        new Thread() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                UserDetailsResponse sessionUser = iAccountsClient.getUserDetails();
-                if (sessionUser == null) {
-                    throw new Exception("User not found");
-                }
-
-                GPTResponse response;
-                try{
-                    CoreConfig key = iCoreConfigRepository.findByKeyName(KEY)
-                            .orElseThrow(() -> new Exception("GPT Key not found"));
-
-                    log.debug("Searching translation on ChatGPT..");
-                    response = iChatGPTClient.generate("Bearer " + key.getKeyValue() ,
-                            GPTRequest.builder()
-                                    .prompt(String.format(PROMPT,
-                                            sessionUser.getLanguagePreference().equals("pt") ? "português" : "inglês",
-                                            sessionUser.getLanguagePreference().equals("pt") ? "inglês" : "português",
-                                            tweet.getMessage())
-                                    )
-                                    .max_tokens(1000)
-                                    .n(1)
-                                    .temperature(new BigDecimal("0.8"))
-                                    .stop(null)
-                                    .build());
-
-                    tweet.setMessageTranslations(TextHelper.removeQuotationMarksAndDots(response.getChoices().get(0).getText()));
-                    iTweetsRepository.save(tweet);
-
-                    log.debug("Translation successfull saved..");
-                }catch (Exception e){
-                    log.error("Error while calling Chat GPT API...", e);
-                }
-            }
-        }.start();
+//        String teste;
+//
+//        new Thread() {
+//            @SneakyThrows
+//            @Override
+//            public void run() {
+//                UserDetailsResponse sessionUser = iAccountsClient.getUserDetails();
+//                if (sessionUser == null) {
+//                    throw new Exception("User not found");
+//                }
+//
+//                GPTResponse response;
+//                try{
+//                    CoreConfig key = iCoreConfigRepository.findByKeyName(KEY)
+//                            .orElseThrow(() -> new Exception("GPT Key not found"));
+//
+//                    log.debug("Searching translation on ChatGPT..");
+//                    response = iChatGPTClient.generate("Bearer " + key.getKeyValue() ,
+//                            GPTRequest.builder()
+//                                    .prompt(String.format(PROMPT,
+//                                            sessionUser.getLanguagePreference().equals("pt") ? "português" : "inglês",
+//                                            sessionUser.getLanguagePreference().equals("pt") ? "inglês" : "português",
+//                                            tweet.getMessage())
+//                                    )
+//                                    .max_tokens(1000)
+//                                    .n(1)
+//                                    .temperature(new BigDecimal("0.8"))
+//                                    .stop(null)
+//                                    .build());
+//
+//                    tweet.setMessageTranslations(TextHelper.removeQuotationMarksAndDots(response.getChoices().get(0).getText()));
+//                    iTweetsRepository.save(tweet);
+//
+//                    log.debug("Translation successfull saved..");
+//                }catch (Exception e){
+//                    log.error("Error while calling Chat GPT API...", e);
+//                }
+//            }
+//        }.start();
     }
 }

@@ -127,7 +127,10 @@ public class PostsServiceImpl implements IPostsService {
                 ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.toString()).getTypeIdentifier()
                 : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.toString()).getTypeIdentifier();
 
-        Optional<Tweets> tweetsOptional = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
+        Optional<Tweets> tweetsOptional = Optional.empty();
+        if(type.equals(TweetTypeEnum.NO_VALUE_RETWEET.toString())){
+            tweetsOptional = iInteractionsService.verifyIsRetweeted(originalTweetIdentifier, sessionUserIdentifier);
+        }
 
         if (tweetsOptional.isPresent()) {
             iNotificationsClientService.deleteNotification(
