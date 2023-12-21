@@ -123,12 +123,15 @@ public class PostsServiceImpl implements IPostsService {
             throw new InvalidAttachmentException();
         }
 
+        String noValuesRetweetTypeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier();
+        String retweetTypeIdentifier = iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier();
+
         String type = message == null && (attachments == null)
-                ? iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.NO_VALUE_RETWEET.name()).getTypeIdentifier()
-                : iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.RETWEET.name()).getTypeIdentifier();
+                ? noValuesRetweetTypeIdentifier
+                : retweetTypeIdentifier;
 
         Optional<Tweets> tweetsOptional = Optional.empty();
-        if(type.equals(TweetTypeEnum.NO_VALUE_RETWEET.name())){
+        if(type.equals(noValuesRetweetTypeIdentifier)){
             tweetsOptional = iInteractionsService.verifyIsNoValueRetweeted(originalTweetIdentifier, sessionUserIdentifier);
         }
 
