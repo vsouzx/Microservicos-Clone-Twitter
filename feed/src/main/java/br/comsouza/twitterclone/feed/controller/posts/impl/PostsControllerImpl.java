@@ -30,7 +30,7 @@ public class PostsControllerImpl implements IPostsController {
 
     @PostMapping(value = "/newtweet")
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
-                                             @RequestPart(value = "canBeReplied", required = true) String flag,
+                                             @RequestPart(value = "canBeReplied", required = true) Integer flag,
                                              @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments) throws Exception {
         String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
         redisService.isValidUser(sessionUserIdentifier);
@@ -41,10 +41,11 @@ public class PostsControllerImpl implements IPostsController {
     @PostMapping(value = "/retweettoggle/{originalTweet}")
     public ResponseEntity<Void> retweetToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
+                                              @RequestPart(value = "canBeReplied", required = true) Integer flag,
                                               @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments) throws Exception {
         String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
         redisService.isValidUser(sessionUserIdentifier);
-        iPostsService.retweetToggle(request, sessionUserIdentifier, attachments, originalTweet);
+        iPostsService.retweetToggle(request, sessionUserIdentifier, attachments, originalTweet, flag);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

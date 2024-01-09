@@ -30,5 +30,6 @@ public class UserDetailsByIdentifierResponse {
     private Boolean isFollowingMe;
     private Boolean isSilencedByMe;
     private ProfilePhotoResponse profilePhoto;
+    private Boolean isVerified;
 
 }

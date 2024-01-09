@@ -75,7 +75,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String flag) throws Exception {
+    public void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachments, Integer flag) throws Exception {
         if ((message == null || message.isBlank()) && (attachments == null)) {
             throw new InvalidTweetException();
         }
@@ -94,7 +94,7 @@ public class PostsServiceImpl implements IPostsService {
                 .messageTranslations(null)
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.TWEET.toString()).getTypeIdentifier())
                 .publicationTime(UsefulDate.now())
-                .canBeRepliedByNotFollowedUser(flag.equals("1"))
+                .canBeRepliedByNotFollowedUser(flag)
                 .hasAttachment(attachments != null)
                 .build());
 
@@ -106,7 +106,7 @@ public class PostsServiceImpl implements IPostsService {
     }
 
     @Override
-    public void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier) throws Exception {
+    public void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachments, String originalTweetIdentifier, Integer flag) throws Exception {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
@@ -156,7 +156,7 @@ public class PostsServiceImpl implements IPostsService {
                     .messageTranslations(null)
                     .type(type)
                     .publicationTime(UsefulDate.now())
-                    .canBeRepliedByNotFollowedUser(true)
+                    .canBeRepliedByNotFollowedUser(message == null && (attachments == null) ? 1 : flag)
                     .hasAttachment(attachments != null)
                     .build());
 
@@ -189,6 +189,8 @@ public class PostsServiceImpl implements IPostsService {
         Tweets originalTweet = tweetsRepository.findById(originalTweetIdentifier)
                 .orElseThrow(TweetNotFoundException::new);
 
+        UserDetailsByIdentifierResponse sessionUser = iAccountsClient.getUserInfosByIdentifier(sessionUserIdentifier);
+
         if(!originalTweet.getUserIdentifier().equals(sessionUserIdentifier)){
             UserDetailsByIdentifierResponse tweetUserInfos = iAccountsClient.getUserInfosByIdentifier(originalTweet.getUserIdentifier());
             if (tweetUserInfos == null) {
@@ -200,7 +202,10 @@ public class PostsServiceImpl implements IPostsService {
             if (tweetUserInfos.getPrivateAccount() && !tweetUserInfos.getIsFollowedByMe()) {
                 throw new UnableToCommentException();
             }
-            if (!originalTweet.getCanBeRepliedByNotFollowedUser() && !tweetUserInfos.getIsFollowingMe()) {
+            if (originalTweet.getCanBeRepliedByNotFollowedUser().equals(0) && !tweetUserInfos.getIsFollowingMe()) {
+                throw new UnableToCommentException();
+            }
+            if (originalTweet.getCanBeRepliedByNotFollowedUser().equals(-1) && !sessionUser.getIsVerified()) {
                 throw new UnableToCommentException();
             }
         }
@@ -213,7 +218,7 @@ public class PostsServiceImpl implements IPostsService {
                 .messageTranslations(null)
                 .type(iTweetTypeService.findTweetTypeByDescription(TweetTypeEnum.COMMENT.toString()).getTypeIdentifier())
                 .publicationTime(UsefulDate.now())
-                .canBeRepliedByNotFollowedUser(true)
+                .canBeRepliedByNotFollowedUser(1)
                 .hasAttachment(attachments != null)
                 .build());
 

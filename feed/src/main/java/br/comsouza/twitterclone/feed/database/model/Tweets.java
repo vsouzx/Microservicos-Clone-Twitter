@@ -3,7 +3,6 @@ package br.comsouza.twitterclone.feed.database.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -40,7 +39,7 @@ public class Tweets {
     private LocalDateTime publicationTime;
 
     @Column(name = "can_be_replied_by_not_followed_user")
-    private Boolean canBeRepliedByNotFollowedUser;
+    private Integer canBeRepliedByNotFollowedUser;
 
     @Column(name = "has_attachment")
     private Boolean hasAttachment;

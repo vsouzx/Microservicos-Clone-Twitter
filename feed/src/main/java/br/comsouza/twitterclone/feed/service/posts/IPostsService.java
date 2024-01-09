@@ -6,8 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IPostsService {
 
-    void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachment, String flag) throws Exception;
-    void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachment, String originalTweetIdentifier) throws Exception;
+    void postNewTweet(String message, String sessionUserIdentifier, List<MultipartFile> attachment, Integer flag) throws Exception;
+    void retweetToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachment, String originalTweetIdentifier, Integer flag) throws Exception;
     void commentToggle(String message, String sessionUserIdentifier, List<MultipartFile> attachment, String originalTweetIdentifier) throws Exception;
     void likeToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception;
     void favToggle(String tweetIdentifier, String sessionUserIdentifier) throws Exception;
