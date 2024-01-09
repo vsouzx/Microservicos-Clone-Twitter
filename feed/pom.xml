@@ -120,6 +120,11 @@
 			<artifactId>aws-java-sdk-s3</artifactId>
 			<version>1.12.588</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>2.13.0</version> <!-- Use a versão apropriada para a sua versão do Jackson -->
+		</dependency>
 	</dependencies>
 
 	<build>

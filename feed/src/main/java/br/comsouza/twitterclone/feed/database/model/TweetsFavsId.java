@@ -3,6 +3,7 @@ package br.comsouza.twitterclone.feed.database.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Embeddable
-public class TweetsFavsId {
+public class TweetsFavsId  implements Serializable {
 
     @Column(name = "tweet_identifier", length = 36)
     private String tweetIdentifier;

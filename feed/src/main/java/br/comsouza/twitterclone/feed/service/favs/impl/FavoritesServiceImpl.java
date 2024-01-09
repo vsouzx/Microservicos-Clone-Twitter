@@ -5,6 +5,7 @@ import br.comsouza.twitterclone.feed.dto.posts.TimelineTweetResponse;
 import br.comsouza.twitterclone.feed.service.favs.IFavoritesService;
 import br.comsouza.twitterclone.feed.service.posts.IPostsService;
 import java.util.List;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +21,7 @@ public class FavoritesServiceImpl implements IFavoritesService {
     }
 
     @Override
+    @Cacheable(value = "favs-tweets")
     public List<TimelineTweetResponse> getFavsTweets(String userIdentifier, Integer page, Integer size) throws Exception {
         List<TimelineTweetResponse> favs = favoriteTweetsRepository.find(userIdentifier, page, size);
 

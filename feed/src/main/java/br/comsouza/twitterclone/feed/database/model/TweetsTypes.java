@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
         indexes = {
                 @Index(name = "UC_tweets_types", columnList = "description", unique = true)
         })
-public class TweetsTypes {
+public class TweetsTypes  implements Serializable {
 
     @Id
     @Column(name = "type_identifier", length = 36)
