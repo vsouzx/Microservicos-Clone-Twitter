@@ -41,7 +41,7 @@ public class TimelineTweetResponse {
     private LocalDateTime nowTime;
     private boolean canBeRepliedByMe;
     private boolean isTweetMine;
-    private boolean isTweetUserFollowedByMe;
+    private Boolean isTweetUserFollowedByMe;
 
     public TimelineTweetResponse(Object[] result, IAmazonService iAmazonService) throws Exception {
         this.tweetIdentifier = (String) result[0];
@@ -66,6 +66,6 @@ public class TimelineTweetResponse {
         this.nowTime = UsefulDate.now();
         this.canBeRepliedByMe = (boolean) result[19];
         this.isTweetMine = (boolean) result[20];
-        this.isTweetUserFollowedByMe = (boolean) result[21];
+        this.isTweetUserFollowedByMe = (Boolean) result[21];
     }
 }
