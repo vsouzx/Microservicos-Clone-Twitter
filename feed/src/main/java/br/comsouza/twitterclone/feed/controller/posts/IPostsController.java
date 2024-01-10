@@ -19,7 +19,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> postNewTweet(String request, Integer flag, List<MultipartFile> attachments) throws Exception;
+    ResponseEntity<Void> postNewTweet(String request, String flag, List<MultipartFile> attachments) throws Exception;
 
     @Operation(summary = "Creates a new tweet's retweet.")
     @ApiResponses(value = {
@@ -28,7 +28,7 @@ public interface IPostsController {
             @ApiResponse(responseCode = "401", description = "Não autorizado", content = @Content),
             @ApiResponse(responseCode = "500", description = "Erro interno sem causa mapeada", content = @Content)
     })
-    ResponseEntity<Void> retweetToggle(String originalTweet, String request, Integer flag, List<MultipartFile> attachment) throws Exception;
+    ResponseEntity<Void> retweetToggle(String originalTweet, String request, String flag, List<MultipartFile> attachment) throws Exception;
 
     @Operation(summary = "Creates a new tweet's comment.")
     @ApiResponses(value = {

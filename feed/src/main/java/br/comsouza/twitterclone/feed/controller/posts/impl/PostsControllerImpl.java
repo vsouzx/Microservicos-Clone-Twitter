@@ -30,22 +30,22 @@ public class PostsControllerImpl implements IPostsController {
 
     @PostMapping(value = "/newtweet")
     public ResponseEntity<Void> postNewTweet(@RequestPart(value = "message", required = false) String request,
-                                             @RequestPart(value = "canBeReplied", required = true) Integer flag,
+                                             @RequestPart(value = "canBeReplied", required = true) String flag,
                                              @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments) throws Exception {
         String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
         redisService.isValidUser(sessionUserIdentifier);
-        iPostsService.postNewTweet(request, sessionUserIdentifier, attachments, flag);
+        iPostsService.postNewTweet(request, sessionUserIdentifier, attachments, Integer.valueOf(flag));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/retweettoggle/{originalTweet}")
     public ResponseEntity<Void> retweetToggle(@PathVariable(value = "originalTweet") String originalTweet,
                                               @RequestPart(value = "message", required = false) String request,
-                                              @RequestPart(value = "canBeReplied", required = true) Integer flag,
+                                              @RequestPart(value = "canBeReplied", required = true) String flag,
                                               @RequestPart(value = "attachment", required = false) List<MultipartFile> attachments) throws Exception {
         String sessionUserIdentifier = FindUserIdentifierHelper.getIdentifier();
         redisService.isValidUser(sessionUserIdentifier);
-        iPostsService.retweetToggle(request, sessionUserIdentifier, attachments, originalTweet, flag);
+        iPostsService.retweetToggle(request, sessionUserIdentifier, attachments, originalTweet, Integer.valueOf(flag));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
