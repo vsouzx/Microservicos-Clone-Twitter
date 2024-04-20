@@ -31,7 +31,7 @@ public class FavoriteTweetsRepository {
         sb.append("	   ,@PageNumber				INT = ? ");
         sb.append("       ,@RowsOfPage				INT = ? ");
         sb.append(" ");
-        sb.append(TweetResponseUtil.customResponse());
+        sb.append(TweetResponseUtil.COMMON_QUERY);
         sb.append("	     ,f.time ");
         sb.append("FROM tweets t ");
         sb.append("INNER JOIN tweets_favs f ");

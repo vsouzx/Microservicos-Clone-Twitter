@@ -34,7 +34,7 @@ public class ExploreByMainRepository implements IExploreStrategy {
         sb.append("       ,@RowsOfPage				INT            = ? ");
         sb.append("	      ,@sessionUserIdentifier   VARCHAR(MAX)   = ? ");
         sb.append("  ");
-        sb.append(TweetResponseUtil.customResponse());
+        sb.append(TweetResponseUtil.COMMON_QUERY);
         sb.append("FROM tweets t   ");
         sb.append("INNER JOIN users u   ");
         sb.append("	ON u.identifier = t.user_identifier  ");

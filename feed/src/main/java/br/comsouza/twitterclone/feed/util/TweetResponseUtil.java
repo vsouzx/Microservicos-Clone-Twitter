@@ -1,13 +1,11 @@
 package br.comsouza.twitterclone.feed.util;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 public class TweetResponseUtil {
 
-    public static String customResponse() {
-        return """
+    public static final String COMMON_QUERY = """
                   SELECT t.tweet_identifier   
                   ,t.original_tweet_identifier   
                   ,p.description   
@@ -76,7 +74,5 @@ public class TweetResponseUtil {
                      			WHERE followed_identifier = u.identifier
                      				  AND follower_identifier = @sessionUserIdentifier)
                       END isTweetUserFollowedByMe
-                               """;
-    }
-
+            """;
 }

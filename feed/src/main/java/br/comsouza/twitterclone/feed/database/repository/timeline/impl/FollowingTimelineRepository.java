@@ -38,7 +38,7 @@ public class FollowingTimelineRepository implements ITimelineStrategy {
         sb.append("	      ,@PageNumber				INT = ?  ");
         sb.append("       ,@RowsOfPage				INT = ?     ");
         sb.append(" ");
-        sb.append(TweetResponseUtil.customResponse());
+        sb.append(TweetResponseUtil.COMMON_QUERY);
         sb.append("FROM tweets t ");
         sb.append("INNER JOIN users_follows f ");
         sb.append("	ON f.follower_identifier = @sessionUserIdentifier ");

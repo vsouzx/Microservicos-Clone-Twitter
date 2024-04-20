@@ -31,7 +31,7 @@ public class PostResumeRepository {
         sb.append("DECLARE @targetTweetIdentifier VARCHAR(MAX) = ?  ");
         sb.append("       ,@sessionUserIdentifier VARCHAR(MAX) = ?  ");
         sb.append("  ");
-        sb.append(TweetResponseUtil.customResponse());
+        sb.append(TweetResponseUtil.COMMON_QUERY);
         sb.append("FROM tweets t  ");
         sb.append("INNER JOIN users u  ");
         sb.append("	ON u.identifier = t.user_identifier  ");
